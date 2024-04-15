@@ -1,0 +1,54 @@
+[gd_scene load_steps=7 format=3 uid="uid://j2dmckl6eh61"]
+
+[ext_resource type="Script" path="res://addons/godot-xr-tools2/setup/loading_screen/xrt2_loading_screen.gd" id="1_ugti3"]
+[ext_resource type="PackedScene" uid="uid://c0osfqxwvi7ko" path="res://addons/godot-xr-tools2/ui/buttons/xrt2_hold_button.tscn" id="2_m02j3"]
+
+[sub_resource type="Curve" id="Curve_ve03c"]
+max_value = 3.14
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 3.14), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Shader" id="Shader_0digd"]
+code = "// NOTE: Shader automatically converted from Godot Engine 4.3.dev4's StandardMaterial3D.
+
+shader_type spatial;
+render_mode unshaded;
+
+uniform sampler2D texture_albedo : source_color,filter_linear_mipmap,repeat_enable;
+
+void fragment() {
+	vec4 albedo_tex = texture(texture_albedo,UV);
+	ALBEDO = albedo_tex.rgb;
+	ALPHA = albedo_tex.a;
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_juqya"]
+resource_local_to_scene = true
+render_priority = 0
+shader = SubResource("Shader_0digd")
+
+[sub_resource type="QuadMesh" id="QuadMesh_d472w"]
+size = Vector2(80, 60)
+
+[node name="LoadingScreen" type="Node3D"]
+script = ExtResource("1_ugti3")
+follow_speed = SubResource("Curve_ve03c")
+
+[node name="SplashScreen" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, -50)
+material_override = SubResource("ShaderMaterial_juqya")
+mesh = SubResource("QuadMesh_d472w")
+
+[node name="PressToContinue" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
+visible = false
+pixel_size = 0.05
+text = "Hold button to continue	"
+
+[node name="HoldButton" parent="PressToContinue" instance=ExtResource("2_m02j3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.92283, 0, 0)
+hold_time = 0.5
+color = Color(0, 0.717647, 1, 1)
+
+[connection signal="pressed" from="PressToContinue/HoldButton" to="." method="_on_hold_button_pressed"]

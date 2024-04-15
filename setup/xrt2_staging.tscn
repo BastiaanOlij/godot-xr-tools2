@@ -1,0 +1,38 @@
+[gd_scene load_steps=6 format=3 uid="uid://8sqqx5gxegw7"]
+
+[ext_resource type="Script" path="res://addons/godot-xr-tools2/setup/xrt2_staging.gd" id="1_ap58f"]
+[ext_resource type="Script" path="res://addons/godot-xr-tools2/setup/xrt2_start_xr.gd" id="2_d55t1"]
+[ext_resource type="PackedScene" uid="uid://dxvyqip0j4gdj" path="res://addons/godot-xr-tools2/effects/fade/xrt2_fade.tscn" id="2_mnsfb"]
+[ext_resource type="PackedScene" uid="uid://j2dmckl6eh61" path="res://addons/godot-xr-tools2/setup/loading_screen/xrt2_loading_screen.tscn" id="3_5dvaj"]
+[ext_resource type="Environment" uid="uid://d12ro1nqqnic1" path="res://addons/godot-xr-tools2/setup/xrt2_staging_environment.tres" id="3_7oin8"]
+
+[node name="Xrt2Staging" type="Node3D"]
+script = ExtResource("1_ap58f")
+
+[node name="Fade" parent="." instance=ExtResource("2_mnsfb")]
+
+[node name="Player" type="Node3D" parent="."]
+
+[node name="XROrigin3D" type="XROrigin3D" parent="Player"]
+
+[node name="XRCamera3D" type="XRCamera3D" parent="Player/XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+environment = ExtResource("3_7oin8")
+
+[node name="LeftHand" type="XRController3D" parent="Player/XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, -0.5)
+tracker = &"left_hand"
+pose = &"grip"
+
+[node name="RightHand" type="XRController3D" parent="Player/XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1, -0.5)
+tracker = &"right_hand"
+pose = &"grip"
+
+[node name="LoadingScreen" parent="." node_paths=PackedStringArray("follow_camera") instance=ExtResource("3_5dvaj")]
+follow_camera = NodePath("../Player/XROrigin3D/XRCamera3D")
+
+[node name="Scene" type="Node3D" parent="."]
+
+[node name="StartXR" type="Node3D" parent="."]
+script = ExtResource("2_d55t1")

@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3 uid="uid://dxvyqip0j4gdj"]
+
+[ext_resource type="Shader" path="res://addons/godot-xr-tools2/effects/fade/xrt2_fade.gdshader" id="1_kocuh"]
+[ext_resource type="Script" path="res://addons/godot-xr-tools2/effects/fade/xrt2_fade.gd" id="1_y1bfr"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_npntl"]
+resource_local_to_scene = true
+render_priority = 50
+shader = ExtResource("1_kocuh")
+shader_parameter/alpha = 0.1
+
+[sub_resource type="QuadMesh" id="QuadMesh_1n2v3"]
+size = Vector2(2, 2)
+
+[node name="Fade" type="Node3D"]
+script = ExtResource("1_y1bfr")
+
+[node name="ScreenQuad" type="MeshInstance3D" parent="."]
+visible = false
+material_override = SubResource("ShaderMaterial_npntl")
+mesh = SubResource("QuadMesh_1n2v3")
+
+[node name="Message" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
+visible = false
+no_depth_test = true
+render_priority = 52
+outline_render_priority = 51

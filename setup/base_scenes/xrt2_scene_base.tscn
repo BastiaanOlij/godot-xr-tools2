@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://cl352deej8d8f"]
+
+[ext_resource type="Script" path="res://addons/godot-xr-tools2/setup/base_scenes/xrt2_scene_base.gd" id="1_vdt8w"]
+[ext_resource type="Environment" uid="uid://b2l51i561qe83" path="res://addons/godot-xr-tools2/setup/base_scenes/xrt2_default_environment.tres" id="2_jqa2c"]
+
+[node name="Xrt2SceneBase" type="Node3D"]
+script = ExtResource("1_vdt8w")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("2_jqa2c")
+
+[node name="SunLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.936959, -0.223829, 0.268343, 0, 0.767926, 0.640539, -0.349439, -0.600159, 0.719515, 0, 0, 0)

@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3 uid="uid://bc6kket4vsy0r"]
+
+[ext_resource type="Script" path="res://addons/godot-xr-tools2/components/xr_2d_ui.gd" id="1_icl45"]
+
+[node name="XR2DUI" type="Node3D"]
+process_priority = 99
+transform = Transform3D(1, 0, -5.96046e-08, 0, 1, 0, 5.96046e-08, 0, 1, 0, 0, 0)
+script = ExtResource("1_icl45")
+
+[node name="SubViewport" type="SubViewport" parent="."]
+render_target_update_mode = 4
+
+[node name="FollowXROrigin3D" type="Node3D" parent="."]
+
+[node name="OpenXRCompositionLayerQuad" type="OpenXRCompositionLayerQuad" parent="FollowXROrigin3D" node_paths=PackedStringArray("layer_viewport")]
+layer_viewport = NodePath("../../SubViewport")
