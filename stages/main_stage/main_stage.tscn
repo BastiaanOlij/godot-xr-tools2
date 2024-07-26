@@ -1,0 +1,50 @@
+[gd_scene load_steps=11 format=3 uid="uid://7lt82mv6lmxo"]
+
+[ext_resource type="PackedScene" uid="uid://cl352deej8d8f" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.tscn" id="1_spd8v"]
+[ext_resource type="PackedScene" uid="uid://xk4bemx6njni" path="res://components/player/player.tscn" id="2_jwbvt"]
+[ext_resource type="Texture2D" uid="uid://ds8hppgpq3pod" path="res://assets/main/pattern.png" id="3_cuyif"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ie47k"]
+
+[sub_resource type="Sky" id="Sky_yknig"]
+sky_material = SubResource("ProceduralSkyMaterial_ie47k")
+
+[sub_resource type="Environment" id="Environment_8sh2w"]
+background_mode = 2
+sky = SubResource("Sky_yknig")
+tonemap_mode = 2
+
+[sub_resource type="BoxMesh" id="BoxMesh_4hy5r"]
+size = Vector3(0.5, 0.5, 0.5)
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_of381"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lhbbs"]
+albedo_color = Color(0.0796347, 0.660561, 0, 1)
+albedo_texture = ExtResource("3_cuyif")
+uv1_scale = Vector3(10, 10, 10)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_3t8ge"]
+size = Vector2(100, 100)
+
+[node name="MainStage" node_paths=PackedStringArray("player_origin") instance=ExtResource("1_spd8v")]
+player_origin = NodePath("Player/DynamicPlayerRig")
+
+[node name="WorldEnvironment" parent="." index="0"]
+environment = SubResource("Environment_8sh2w")
+
+[node name="Player" parent="." index="2" instance=ExtResource("2_jwbvt")]
+
+[node name="Test" type="MeshInstance3D" parent="Player" index="2"]
+mesh = SubResource("BoxMesh_4hy5r")
+
+[node name="Floor" type="StaticBody3D" parent="." index="3"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" index="0"]
+shape = SubResource("WorldBoundaryShape3D_of381")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" index="1"]
+material_override = SubResource("StandardMaterial3D_lhbbs")
+mesh = SubResource("PlaneMesh_3t8ge")
+
+[editable path="Player"]
