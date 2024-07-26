@@ -1,7 +1,7 @@
 // Simple unshaded texture with alpha output
 
 shader_type spatial;
-render_mode unshaded;
+render_mode unshaded, cull_disabled;
 
 uniform sampler2D texture_albedo : source_color,filter_linear_mipmap,repeat_enable;
 
