@@ -1,7 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://j2dmckl6eh61"]
+[gd_scene load_steps=11 format=3 uid="uid://j2dmckl6eh61"]
 
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/setup/loading_screen/xrt2_loading_screen.gd" id="1_ugti3"]
 [ext_resource type="PackedScene" uid="uid://c0osfqxwvi7ko" path="res://addons/godot-xr-tools2/ui/buttons/xrt2_hold_button.tscn" id="2_m02j3"]
+[ext_resource type="Shader" path="res://addons/godot-xr-tools2/shaders/unshaded_texture_with_alpha.gdshader" id="2_tulow"]
+[ext_resource type="Texture2D" uid="uid://d5sknr112aih" path="res://addons/godot-xr-tools2/icon.png" id="2_y53v2"]
 
 [sub_resource type="Curve" id="Curve_ve03c"]
 max_value = 3.14
@@ -9,9 +11,7 @@ _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 3.14), 0.0, 0.0, 0, 0]
 point_count = 2
 
 [sub_resource type="Shader" id="Shader_0digd"]
-code = "// NOTE: Shader automatically converted from Godot Engine 4.3.dev4's StandardMaterial3D.
-
-shader_type spatial;
+code = "shader_type spatial;
 render_mode unshaded;
 
 uniform sampler2D texture_albedo : source_color,filter_linear_mipmap,repeat_enable;
@@ -31,14 +31,28 @@ shader = SubResource("Shader_0digd")
 [sub_resource type="QuadMesh" id="QuadMesh_d472w"]
 size = Vector2(80, 60)
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ycls2"]
+render_priority = 0
+shader = ExtResource("2_tulow")
+shader_parameter/texture_albedo = ExtResource("2_y53v2")
+
+[sub_resource type="QuadMesh" id="QuadMesh_rkvh4"]
+size = Vector2(3, 3)
+
 [node name="LoadingScreen" type="Node3D"]
 script = ExtResource("1_ugti3")
 follow_speed = SubResource("Curve_ve03c")
+spinning_logo = ExtResource("2_y53v2")
 
 [node name="SplashScreen" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, -50)
 material_override = SubResource("ShaderMaterial_juqya")
 mesh = SubResource("QuadMesh_d472w")
+
+[node name="SpinningLogo" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.706602, 0, 0.707612, 0, 1, 0, -0.707612, 0, 0.706602, 9.6923, 0, -10)
+material_override = SubResource("ShaderMaterial_ycls2")
+mesh = SubResource("QuadMesh_rkvh4")
 
 [node name="PressToContinue" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
