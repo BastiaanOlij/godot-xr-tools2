@@ -20,12 +20,36 @@ signal request_load_scene(p_scene_path, user_data)
 ## The [param user_data] parameter is passed through staging to the new scenes.
 signal request_reset_scene(user_data)
 
+
+## Player origin used in this stage
+@export var player_origin : XROrigin3D
+
+var _camera : XRCamera3D
+
 # TODO update documentation for entry points, there are differences with how 
 # this worked in XR Tools 2 around centering the player
 
+# Verifies our staging has a valid configuration.
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+
+	# Report player origin not specified
+	if not player_origin:
+		warnings.append("No player origin has been selected")
+
+	# Return warnings
+	return warnings
+
+
 ## This is called after the scene is loaded and added to our scene tree
 func scene_loaded(user_data = null) -> void:
-	pass
+	# Make our camera current
+	if _camera:
+		_camera.current = true
+
+	# Make our origin current
+	if player_origin:
+		player_origin.current = true
 
 
 ## This is called once our scene has become fully visible
@@ -40,11 +64,6 @@ func scene_pre_exiting(user_data = null) -> void:
 
 ## This is called just before our scene is removed from the scene tree
 func scene_exiting(user_data = null) -> void:
-	pass
-
-
-## This is called when the user has requested to recenter the player
-func pose_recenter() -> void:
 	pass
 
 
@@ -64,4 +83,12 @@ func reset_scene(user_data = null) -> void:
 
 
 func _ready() -> void:
-	pass
+	# Do not run if in the editor
+	if Engine.is_editor_hint():
+		return
+
+	if player_origin:
+		for child in player_origin.get_children():
+			if child is XRCamera3D:
+				_camera = child
+				break

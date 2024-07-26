@@ -43,19 +43,20 @@ size = Vector2(3, 3)
 script = ExtResource("1_ugti3")
 follow_speed = SubResource("Curve_ve03c")
 spinning_logo = ExtResource("2_y53v2")
+activate_action = null
 
 [node name="SplashScreen" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, -50)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, -75)
 material_override = SubResource("ShaderMaterial_juqya")
 mesh = SubResource("QuadMesh_d472w")
 
 [node name="SpinningLogo" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.706602, 0, 0.707612, 0, 1, 0, -0.707612, 0, 0.706602, 9.6923, 0, -10)
+transform = Transform3D(-0.154862, 0, -0.987937, 0, 1, 0, 0.987937, 0, -0.154862, 9.692, 0, -15)
 material_override = SubResource("ShaderMaterial_ycls2")
 mesh = SubResource("QuadMesh_rkvh4")
 
 [node name="PressToContinue" type="Label3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -15)
 visible = false
 pixel_size = 0.05
 text = "Hold button to continue	"

@@ -1,0 +1,25 @@
+[gd_scene load_steps=3 format=3 uid="uid://cynxxfm8nksg4"]
+
+[ext_resource type="Script" path="res://addons/godot-xr-tools2/player_rigs/dynamic_player_rig.gd" id="1_2824a"]
+[ext_resource type="PackedScene" uid="uid://dxvyqip0j4gdj" path="res://addons/godot-xr-tools2/effects/fade/xrt2_fade.tscn" id="2_awihb"]
+
+[node name="DynamicPlayerRig" type="XROrigin3D"]
+script = ExtResource("1_2824a")
+
+[node name="XRCamera3D" type="XRCamera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+
+[node name="Neck" type="Node3D" parent="XRCamera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0.1)
+
+[node name="Fade" parent="XRCamera3D" instance=ExtResource("2_awihb")]
+
+[node name="LeftHand" type="XRController3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, -0.5)
+tracker = &"left_hand"
+show_when_tracked = true
+
+[node name="RightHand" type="XRController3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1, -0.5)
+tracker = &"right_hand"
+show_when_tracked = true

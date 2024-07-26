@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://y1mt4vculye7"]
+
+[ext_resource type="Script" path="res://addons/godot-xr-tools2/player_rigs/static_player_rig.gd" id="1_v7cup"]
+[ext_resource type="PackedScene" uid="uid://dxvyqip0j4gdj" path="res://addons/godot-xr-tools2/effects/fade/xrt2_fade.tscn" id="2_0btq6"]
+
+[node name="StaticPlayerRig" type="XROrigin3D"]
+script = ExtResource("1_v7cup")
+
+[node name="XRCamera3D" type="XRCamera3D" parent="."]
+
+[node name="Fade" parent="XRCamera3D" instance=ExtResource("2_0btq6")]
+message = "Please recenter your tracking space."
+
+[node name="LeftHand" type="XRController3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, -0.5, -0.5)
+tracker = &"left_hand"
+show_when_tracked = true
+
+[node name="RightHand" type="XRController3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, -0.5, -0.5)
+tracker = &"right_hand"
+show_when_tracked = true

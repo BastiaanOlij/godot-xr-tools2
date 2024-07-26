@@ -31,9 +31,6 @@ signal xr_failed_to_start
 ## This signal is emitted if user has requested a pose recenter.
 signal xr_pose_recenter
 
-## If true, the XR passthrough is enabled (OpenXR only)
-@export var enable_passthrough : bool = false: set = _set_enable_passthrough
-
 ## Physics rate multiplier compared to HMD frame rate
 @export var physics_rate_multiplier : int = 1
 
@@ -44,34 +41,77 @@ signal xr_pose_recenter
 @export var hmd_viewport : Viewport
 
 
-## Current XR interface
-var xr_interface : XRInterface
+# Our singleton (there shall be only one!)
+static var _singleton : XRT2StartXR
 
-## XR active flag
-var xr_active : bool = false
+# Current XR interface
+var _xr_interface : XRInterface
+
+# XR active flag (there shall be only one!)
+var _xr_active : bool = false
 
 # Current refresh rate
 var _current_refresh_rate : float = 0
 
 
+# Get access to this from anywhere
+static func get_singleton() -> XRT2StartXR:
+	return _singleton
+
+
+static func is_xr_active() -> bool:
+	if _singleton:
+		return _singleton._xr_active
+	else:
+		return false
+
 # Handle auto-initialization when ready
 func _ready() -> void:
 	if !Engine.is_editor_hint():
+		if _singleton:
+			push_error("There should be only one StartXR node")
+			return
+
+		_singleton = self
 		initialize()
 
+
+func _exit_tree():
+	if _singleton:
+		_singleton = null
+
+		if _xr_interface:
+			# TODO Shutdown XR
+			pass
 
 ## Initialize the XR interface
 func initialize() -> bool:
 	# Check for OpenXR interface
-	xr_interface = XRServer.find_interface('OpenXR')
-	if xr_interface:
+	_xr_interface = XRServer.find_interface('OpenXR')
+	if _xr_interface:
 		return _setup_for_openxr()
 
+	# TODO: re-introduce webxr
+
 	# No XR interface
-	xr_interface = null
+	_xr_interface = null
 	print("No XR interface detected")
 	xr_failed_to_start.emit()
 	return false
+
+
+## Return our reference space
+func get_play_area_mode() -> XRInterface.PlayAreaMode:
+	if not _xr_interface:
+		return XRInterface.XR_PLAY_AREA_STAGE
+
+	# Don't completely trust all XR interfaces, so vetting this...
+	if _xr_interface.xr_play_area_mode == XRInterface.XR_PLAY_AREA_SITTING:
+		return _xr_interface.xr_play_area_mode
+	elif _xr_interface.xr_play_area_mode == XRInterface.XR_PLAY_AREA_ROOMSCALE:
+		return _xr_interface.xr_play_area_mode
+	else:
+		return XRInterface.XR_PLAY_AREA_STAGE
 
 
 # Check for configuration issues
@@ -88,7 +128,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 func _setup_for_openxr() -> bool:
 	print("OpenXR: Configuring interface")
 
-	var openxr_interface : OpenXRInterface = xr_interface
+	var openxr_interface : OpenXRInterface = _xr_interface
 	if not openxr_interface:
 		print("OpenXR: Not an OpenXR interface")
 		return false
@@ -111,11 +151,9 @@ func _setup_for_openxr() -> bool:
 	openxr_interface.session_visible.connect(_on_openxr_visible_state)
 	openxr_interface.session_focussed.connect(_on_openxr_focused_state)
 	openxr_interface.pose_recentered.connect(_on_openxr_pose_recentered)
-	# TODO connect to other signals
+	# TODO: connect to other signals
 
-	# Check for passthrough
-	if enable_passthrough and xr_interface.is_passthrough_supported():
-		enable_passthrough = xr_interface.start_passthrough()
+	# TODO: Re-implement passthrough logic
 
 	# Disable vsync
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
@@ -137,8 +175,14 @@ func _setup_for_openxr() -> bool:
 func _on_openxr_session_begun() -> void:
 	print("OpenXR: Session begun")
 
+	var openxr_interface : OpenXRInterface = _xr_interface
+	if not openxr_interface:
+		# This should not be possible!
+		print("OpenXR: Not an OpenXR interface")
+		return
+
 	# Get the reported refresh rate
-	_current_refresh_rate = xr_interface.get_display_refresh_rate()
+	_current_refresh_rate = openxr_interface.get_display_refresh_rate()
 	if _current_refresh_rate > 0:
 		print("OpenXR: Refresh rate reported as ", str(_current_refresh_rate))
 	else:
@@ -146,7 +190,7 @@ func _on_openxr_session_begun() -> void:
 
 	# Pick a desired refresh rate
 	var desired_rate := target_refresh_rate if target_refresh_rate > 0 else _current_refresh_rate
-	var available_rates : Array = xr_interface.get_available_display_refresh_rates()
+	var available_rates : Array = openxr_interface.get_available_display_refresh_rates()
 	if available_rates.size() == 0:
 		print("OpenXR: Target does not support refresh rate extension")
 	elif available_rates.size() == 1:
@@ -156,7 +200,7 @@ func _on_openxr_session_begun() -> void:
 		var rate = _find_closest(available_rates, desired_rate)
 		if rate > 0:
 			print("OpenXR: Setting refresh rate to ", str(rate))
-			xr_interface.set_display_refresh_rate(rate)
+			openxr_interface.set_display_refresh_rate(rate)
 			_current_refresh_rate = rate
 
 	# Pick a physics rate
@@ -169,39 +213,24 @@ func _on_openxr_session_begun() -> void:
 # Handle OpenXR visible state
 func _on_openxr_visible_state() -> void:
 	# Report the XR ending
-	if xr_active:
+	if _xr_active:
 		print("OpenXR: XR ended (visible_state)")
-		xr_active = false
+		_xr_active = false
 		xr_ended.emit()
 
 
 # Handle OpenXR focused state
 func _on_openxr_focused_state() -> void:
 	# Report the XR starting
-	if not xr_active:
+	if not _xr_active:
 		print("OpenXR: XR started (focused_state)")
-		xr_active = true
+		_xr_active = true
 		xr_started.emit()
 
 
 # Handle pose recenter
 func _on_openxr_pose_recentered() -> void:
 	xr_pose_recenter.emit()
-
-
-# Handle changes to the enable_passthrough property
-func _set_enable_passthrough(p_new_value : bool) -> void:
-	# Save the new value
-	enable_passthrough = p_new_value
-
-	# Only actually start our passthrough if our interface has been instanced
-	# if not this will be delayed until initialise is successfully called.
-	if xr_interface:
-		if enable_passthrough:
-			# unset enable_passthrough if we can't start it.
-			enable_passthrough = xr_interface.start_passthrough()
-		else:
-			xr_interface.stop_passthrough()
 
 
 # Find the closest value in the array to the target
