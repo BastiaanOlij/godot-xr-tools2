@@ -9,7 +9,7 @@ extends Node3D
 @export var prompt_for_continue : bool = true
 
 ## The current scene
-var _current_scene : XRT2SceneBase
+var _current_scene : XRT2StageBase
 
 ## The current scene path
 var _current_scene_path : String
@@ -42,7 +42,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
 
 	# Report main scene not specified
-	if main_scene == "":
+	if main_scene.is_empty():
 		warnings.append("No main scene selected")
 
 	# Report main scene invalid
@@ -58,7 +58,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 ## The [param user_data] parameter contains optional data passed from the old
 ## scene to the new scene.
 ##
-## See [method XRT2SceneBase.scene_loaded] for details on how to implement
+## See [method XRT2StageBase.scene_loaded] for details on how to implement
 ## advanced scene-switching.
 func load_scene(p_scene_path : String, user_data = null) -> void:
 	# Do not load if in the editor
@@ -194,14 +194,14 @@ func _set_fade(p_value : float) -> void:
 
 
 # Add signals to our scene
-func _add_signals(p_scene : XRT2SceneBase):
+func _add_signals(p_scene : XRT2StageBase):
 	p_scene.request_exit_to_main_menu.connect(_on_exit_to_main_menu)
 	p_scene.request_load_scene.connect(_on_load_scene)
 	p_scene.request_reset_scene.connect(_on_reset_scene)
 
 
 # Remove signals from our scene
-func _remove_signals(p_scene : XRT2SceneBase):
+func _remove_signals(p_scene : XRT2StageBase):
 	p_scene.request_exit_to_main_menu.disconnect(_on_exit_to_main_menu)
 	p_scene.request_load_scene.disconnect(_on_load_scene)
 	p_scene.request_reset_scene.disconnect(_on_reset_scene)

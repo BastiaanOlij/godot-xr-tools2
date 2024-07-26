@@ -1,6 +1,6 @@
 [gd_scene load_steps=11 format=3 uid="uid://j2dmckl6eh61"]
 
-[ext_resource type="Script" path="res://addons/godot-xr-tools2/setup/loading_screen/xrt2_loading_screen.gd" id="1_ugti3"]
+[ext_resource type="Script" path="res://addons/godot-xr-tools2/staging/loading_screen/xrt2_loading_screen.gd" id="1_ugti3"]
 [ext_resource type="PackedScene" uid="uid://c0osfqxwvi7ko" path="res://addons/godot-xr-tools2/ui/buttons/xrt2_hold_button.tscn" id="2_m02j3"]
 [ext_resource type="Shader" path="res://addons/godot-xr-tools2/shaders/unshaded_texture_with_alpha.gdshader" id="2_tulow"]
 [ext_resource type="Texture2D" uid="uid://d5sknr112aih" path="res://addons/godot-xr-tools2/icon.png" id="2_y53v2"]

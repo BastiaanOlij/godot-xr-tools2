@@ -1,5 +1,5 @@
 @tool
-class_name XRT2SceneBase
+class_name XRT2StageBase
 extends Node3D
 
 ## This signal is used to request the staging transition to the main-menu
