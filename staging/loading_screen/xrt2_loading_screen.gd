@@ -57,6 +57,13 @@ var _spinning_logo_material : ShaderMaterial
 		if is_inside_tree():
 			_update_press_to_continue()
 
+
+@export var activate_action : String = "trigger_click":
+	set(value):
+		activate_action = value
+		if is_inside_tree():
+			_update_activate_action()
+
 const SPIN_SPEED = 2.0
 var spinning_logo_angle = 0.0
 
@@ -75,11 +82,15 @@ func _update_progress_bar() -> void:
 
 
 func _update_press_to_continue() -> void:
-	if is_inside_tree():
-		# _progress_bar.visible = !enable_press_to_continue
-		_spinning_logo.visible = !enable_press_to_continue
-		_press_to_continue.visible = enable_press_to_continue
-		_hold_button.enabled = enable_press_to_continue
+	# _progress_bar.visible = !enable_press_to_continue
+	_spinning_logo.visible = !enable_press_to_continue
+	_press_to_continue.visible = enable_press_to_continue
+	_hold_button.enabled = enable_press_to_continue
+
+
+func _update_activate_action() -> void:
+	if not Engine.is_editor_hint():
+		_hold_button.activate_action = activate_action
 
 
 # Called when the node enters the scene tree for the first time.
@@ -92,6 +103,7 @@ func _ready() -> void:
 	_update_spinning_logo()
 	_update_progress_bar()
 	_update_press_to_continue()
+	_update_activate_action()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

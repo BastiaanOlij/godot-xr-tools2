@@ -23,6 +23,7 @@ var _tween : Tween
 @onready var _xr_camera : XRCamera3D = $Player/XROrigin3D/XRCamera3D
 @onready var _loading_screen : Node3D = $LoadingScreen
 @onready var _scene : Node3D = $Scene
+@onready var _start_xr : XRT2StartXR = $StartXR
 
 # Misc
 var _is_loading : bool = false
@@ -109,7 +110,11 @@ func load_scene(p_scene_path : String, user_data = null) -> void:
 		_loading_screen.enable_press_to_continue = false
 		_loading_screen.follow_camera_enabled = true
 		_loading_screen.visible = true
-		_pose_recenter()
+
+		# Recenter our pose, will only work on Stage,
+		# we can't trigger a recenter in local or local floor modes
+		# and this will be ignored
+		_on_xr_pose_recenter()
 
 		# Fade to visible
 		if _tween:
@@ -159,7 +164,6 @@ func load_scene(p_scene_path : String, user_data = null) -> void:
 		# Hide our loading screen
 		_loading_screen.visible = false
 		_loading_screen.follow_camera_enabled = false
-		_xr_origin.set_process_internal(false)
 
 	# Get the loaded scene
 	var new_scene : PackedScene = ResourceLoader.load_threaded_get(p_scene_path)
@@ -222,18 +226,21 @@ func _on_reset_scene(user_data):
 	load_scene(_current_scene_path, user_data)
 
 
-# Recenter our pose for our loading screen
-func _pose_recenter() -> void:
-	# Center our player on the XROrigin3D node.
-	XRServer.center_on_hmd(XRServer.RESET_BUT_KEEP_TILT, true)
+# Handle user requesting a recenter
+func _on_xr_pose_recenter():
+	if not _is_loading:
+		return
+
+	var play_area_mode : XRInterface.PlayAreaMode = _start_xr.get_play_area_mode()
+	if play_area_mode == XRInterface.XR_PLAY_AREA_SITTING:
+		# This is already handled by the headset, no need to do more!
+		pass
+	elif play_area_mode == XRInterface.XR_PLAY_AREA_ROOMSCALE:
+		# This is already handled by the headset, we ignore the height
+		pass
+	else:
+		# Center our player on the XROrigin3D node.
+		XRServer.center_on_hmd(XRServer.RESET_BUT_KEEP_TILT, true)
 
 	# Reset origin
 	_xr_origin.transform = Transform3D()
-
-
-# Handle user requesting a recenter
-func _on_xr_pose_recenter():
-	if _is_loading:
-		_pose_recenter()
-	elif _current_scene:
-		_current_scene.pose_recenter()
