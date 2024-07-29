@@ -11,12 +11,26 @@ class_name XRT2StaticPlayerRig
 @onready var max_head_distance : float = 0.5
 @onready var fade_distance : float = 0.1
 
-
-var _start_xr : XRT2StartXR
+signal left_hand_tracking_changed(tracking : bool)
+signal right_hand_tracking_changed(tracking : bool)
 
 # Node helpers
 @onready var _xr_camera : XRCamera3D = $XRCamera3D
 @onready var _fade : XRT2EffectFade = $XRCamera3D/Fade
+@onready var _left_hand : XRController3D = $LeftHand
+@onready var _right_hand : XRController3D = $RightHand
+
+var _start_xr : XRT2StartXR
+
+
+## Returns true left left hand has tracking data
+func left_hand_has_tracking() -> bool:
+	return _left_hand.get_has_tracking_data()
+
+
+## Returns true if right hand has tracking data
+func right_hand_has_tracking() -> bool:
+	return _right_hand.get_has_tracking_data()
 
 
 # User triggered pose recenter.
@@ -53,3 +67,11 @@ func _process(delta):
 	var distance = _xr_camera.position.length()
 	if distance > max_head_distance:
 		_fade.fade = clamp((distance - max_head_distance) / fade_distance, 0.0, 1.0)
+
+
+func _on_left_hand_tracking_changed(tracking):
+	left_hand_tracking_changed.emit(tracking)
+
+
+func _on_right_hand_tracking_changed(tracking):
+	right_hand_tracking_changed.emit(tracking)
