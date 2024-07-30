@@ -22,12 +22,34 @@ signal request_reset_scene(user_data)
 
 
 ## Player origin used in this stage
-@export var player_origin : XROrigin3D
+@export var player_origin : XROrigin3D:
+	set(value):
+		player_origin = value
+		if is_inside_tree():
+			_get_xr_camera()
 
 var _camera : XRCamera3D
 
 # TODO update documentation for entry points, there are differences with how 
 # this worked in XR Tools 2 around centering the player
+
+func make_current():
+	# Make our camera current
+	if _camera:
+		_camera.current = true
+
+	# Make our origin current
+	if player_origin:
+		player_origin.current = true
+
+
+func _get_xr_camera():
+	if player_origin:
+		for child in player_origin.get_children():
+			if child is XRCamera3D:
+				_camera = child
+				return
+		push_error("Missing XRCamera3D in stage.")
 
 # Verifies our staging has a valid configuration.
 func _get_configuration_warnings() -> PackedStringArray:
@@ -43,13 +65,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 ## This is called after the scene is loaded and added to our scene tree
 func scene_loaded(user_data = null) -> void:
-	# Make our camera current
-	if _camera:
-		_camera.current = true
-
-	# Make our origin current
-	if player_origin:
-		player_origin.current = true
+	make_current()
 
 
 ## This is called once our scene has become fully visible
@@ -88,7 +104,4 @@ func _ready() -> void:
 		return
 
 	if player_origin:
-		for child in player_origin.get_children():
-			if child is XRCamera3D:
-				_camera = child
-				break
+		_get_xr_camera()
