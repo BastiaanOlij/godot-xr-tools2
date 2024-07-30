@@ -1,9 +1,10 @@
-[gd_scene load_steps=11 format=3 uid="uid://j2dmckl6eh61"]
+[gd_scene load_steps=14 format=3 uid="uid://j2dmckl6eh61"]
 
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/staging/loading_screen/xrt2_loading_screen.gd" id="1_ugti3"]
 [ext_resource type="PackedScene" uid="uid://c0osfqxwvi7ko" path="res://addons/godot-xr-tools2/ui/buttons/xrt2_hold_button.tscn" id="2_m02j3"]
 [ext_resource type="Shader" path="res://addons/godot-xr-tools2/shaders/unshaded_texture_with_alpha.gdshader" id="2_tulow"]
 [ext_resource type="Texture2D" uid="uid://d5sknr112aih" path="res://addons/godot-xr-tools2/icon.png" id="2_y53v2"]
+[ext_resource type="Shader" path="res://materials/textured_with_alpha_unshaded.gdshader" id="4_pjv7i"]
 
 [sub_resource type="Curve" id="Curve_ve03c"]
 max_value = 3.14
@@ -14,7 +15,7 @@ point_count = 2
 code = "shader_type spatial;
 render_mode unshaded;
 
-uniform sampler2D texture_albedo : source_color,filter_linear_mipmap,repeat_enable;
+uniform sampler2D texture_albedo : source_color,hint_default_black,filter_linear_mipmap,repeat_enable;
 
 void fragment() {
 	vec4 albedo_tex = texture(texture_albedo,UV);
@@ -32,6 +33,7 @@ shader = SubResource("Shader_0digd")
 size = Vector2(80, 60)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ycls2"]
+resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("2_tulow")
 shader_parameter/texture_albedo = ExtResource("2_y53v2")
@@ -39,11 +41,23 @@ shader_parameter/texture_albedo = ExtResource("2_y53v2")
 [sub_resource type="QuadMesh" id="QuadMesh_rkvh4"]
 size = Vector2(3, 3)
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jgetr"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("4_pjv7i")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/uv_offset = Vector2(0, 0)
+
+[sub_resource type="QuadMesh" id="QuadMesh_6lr7l"]
+resource_local_to_scene = true
+size = Vector2(1.5, 1.5)
+
 [node name="LoadingScreen" type="Node3D"]
 script = ExtResource("1_ugti3")
 follow_speed = SubResource("Curve_ve03c")
 spinning_logo = ExtResource("2_y53v2")
-activate_action = null
+enable_press_to_continue = true
 
 [node name="SplashScreen" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, -75)
@@ -51,18 +65,26 @@ material_override = SubResource("ShaderMaterial_juqya")
 mesh = SubResource("QuadMesh_d472w")
 
 [node name="SpinningLogo" type="MeshInstance3D" parent="."]
-transform = Transform3D(-0.154862, 0, -0.987937, 0, 1, 0, 0.987937, 0, -0.154862, 9.692, 0, -15)
+transform = Transform3D(-0.393952, 0, 0.919132, 0, 1, 0, -0.919132, 0, -0.393952, 9.692, 0, -15)
+visible = false
 material_override = SubResource("ShaderMaterial_ycls2")
 mesh = SubResource("QuadMesh_rkvh4")
 
 [node name="PressToContinue" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -15)
-visible = false
 pixel_size = 0.05
-text = "Hold button to continue	"
+text = "Hold trigger to continue"
+autowrap_mode = 2
+width = 400.0
+
+[node name="ButtonIcon" type="MeshInstance3D" parent="PressToContinue"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.4019, 0, 0)
+material_override = SubResource("ShaderMaterial_jgetr")
+mesh = SubResource("QuadMesh_6lr7l")
 
 [node name="HoldButton" parent="PressToContinue" instance=ExtResource("2_m02j3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.92283, 0, 0)
+enabled = true
 hold_time = 0.5
 color = Color(0, 0.717647, 1, 1)
 

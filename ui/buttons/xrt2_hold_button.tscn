@@ -4,15 +4,17 @@
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/ui/buttons/xrt2_hold_button.gd" id="1_ir5oa"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hl8u4"]
+resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("1_7ops6")
-shader_parameter/albedo = Color(0.943309, 0.929654, 0.939543, 1)
+shader_parameter/albedo = Color(1, 1, 1, 1)
 shader_parameter/value = 0.2
 shader_parameter/fade = 0.05
 shader_parameter/radius = 0.8
 shader_parameter/width = 0.2
 
 [sub_resource type="QuadMesh" id="QuadMesh_osg7c"]
+resource_local_to_scene = true
 
 [node name="HoldButton" type="Node3D"]
 script = ExtResource("1_ir5oa")

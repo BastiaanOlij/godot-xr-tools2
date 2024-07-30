@@ -10,11 +10,13 @@ signal continue_pressed
 @onready var _spinning_logo : MeshInstance3D = $SpinningLogo
 # @onready var _progress_bar : Node3D = $ProgressBar
 @onready var _press_to_continue : Label3D = $PressToContinue
+@onready var _button_icon : MeshInstance3D = $PressToContinue/ButtonIcon
 @onready var _hold_button : XRT2HoldButton = $PressToContinue/HoldButton
 
 # Materials
 var _splash_screen_material : ShaderMaterial
 var _spinning_logo_material : ShaderMaterial
+var _button_icon_material : ShaderMaterial
 
 ## Enabled the follow camera
 @export var follow_camera_enabled : bool = false:
@@ -57,6 +59,19 @@ var _spinning_logo_material : ShaderMaterial
 		if is_inside_tree():
 			_update_press_to_continue()
 
+## Text to display
+@export var press_to_continue_text : String = "Hold trigger to continue":
+	set(value):
+		press_to_continue_text = value
+		if is_inside_tree():
+			_update_press_to_continue_text()
+
+## Set an image to show as an icon before our press to continue text.
+@export var button_icon : Texture2D:
+	set(value):
+		button_icon = value
+		if is_inside_tree():
+			_update_button_icon()
 
 @export var activate_action : String = "trigger_click":
 	set(value):
@@ -87,6 +102,21 @@ func _update_press_to_continue() -> void:
 	_press_to_continue.visible = enable_press_to_continue
 	_hold_button.enabled = enable_press_to_continue
 
+func _update_press_to_continue_text() -> void:
+	_press_to_continue.text = press_to_continue_text
+	pass
+
+func _update_button_icon() -> void:
+	if button_icon:
+		var image_size = button_icon.get_size()
+		var mesh : QuadMesh = _button_icon.mesh
+		if mesh and image_size.x > 0.0:
+			mesh.size = Vector2(1.5, 1.5 * image_size.y / image_size.x)
+		if _button_icon_material:
+			_button_icon_material.set_shader_parameter("albedo_texture", button_icon)
+		_button_icon.visible = true
+	else:
+		_button_icon.visible = false
 
 func _update_activate_action() -> void:
 	if not Engine.is_editor_hint():
@@ -98,11 +128,14 @@ func _ready() -> void:
 	# Get materials
 	_splash_screen_material = _splash_screen.material_override
 	_spinning_logo_material = _spinning_logo.material_override
+	_button_icon_material = _button_icon.material_override
 
 	_update_splash_screen()
 	_update_spinning_logo()
 	_update_progress_bar()
 	_update_press_to_continue()
+	_update_press_to_continue_text()
+	_update_button_icon()
 	_update_activate_action()
 
 

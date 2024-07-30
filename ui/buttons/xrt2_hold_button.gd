@@ -4,26 +4,30 @@ extends Node3D
 
 signal pressed
 
-# Enable our button
+## Enable our button
 @export var enabled : bool = false:
 	set(value):
+		if enabled == value:
+			return
+
 		enabled = value
 		if is_inside_tree():
 			_update_enabled()
 
+## Action in action map and/or input map that triggers
 @export var activate_action : String = "trigger_click"
 
-# Countdown
+## Duration action must be pressed
 @export var hold_time : float = 2.0
 
-# Color our our visualisation
+## Color our our visualisation
 @export var color : Color = Color(1.0, 1.0, 1.0, 1.0):
 	set(value):
 		color = value
 		if is_inside_tree():
 			_update_color()
 
-# Size
+## Size
 @export var size : Vector2 = Vector2(1.0, 1.0):
 	set(value):
 		size = value
@@ -75,16 +79,22 @@ func _ready() -> void:
 
 func _process(delta) -> void:
 	if Engine.is_editor_hint():
+		set_process(false)
 		return
 
-	var button_pressed = false
+	if !enabled:
+		set_process(false)
+		return
 
-	# we check all trackers
-	var controllers = XRServer.get_trackers(XRServer.TRACKER_CONTROLLER)
-	for tracker_name in controllers:
-		var tracker : XRPositionalTracker = controllers[tracker_name]
-		if tracker.get_input(activate_action):
-			button_pressed = true
+	var button_pressed = Input.is_action_pressed(activate_action)
+
+	if !button_pressed:
+		# We check all trackers
+		var controllers = XRServer.get_trackers(XRServer.TRACKER_CONTROLLER)
+		for tracker_name in controllers:
+			var tracker : XRPositionalTracker = controllers[tracker_name]
+			if tracker.get_input(activate_action):
+				button_pressed = true
 
 	if button_pressed:
 		_set_time_held(time_held + delta)
