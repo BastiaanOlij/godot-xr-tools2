@@ -30,7 +30,7 @@ render_priority = 0
 shader = SubResource("Shader_0digd")
 
 [sub_resource type="QuadMesh" id="QuadMesh_d472w"]
-size = Vector2(80, 60)
+size = Vector2(120, 90)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ycls2"]
 resource_local_to_scene = true
@@ -57,34 +57,33 @@ size = Vector2(1.5, 1.5)
 script = ExtResource("1_ugti3")
 follow_speed = SubResource("Curve_ve03c")
 spinning_logo = ExtResource("2_y53v2")
-enable_press_to_continue = true
 
 [node name="SplashScreen" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, -75)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -100)
 material_override = SubResource("ShaderMaterial_juqya")
 mesh = SubResource("QuadMesh_d472w")
 
 [node name="SpinningLogo" type="MeshInstance3D" parent="."]
-transform = Transform3D(-0.393952, 0, 0.919132, 0, 1, 0, -0.919132, 0, -0.393952, 9.692, 0, -15)
-visible = false
+transform = Transform3D(-0.93767, 0, -0.347528, 0, 1, 0, 0.347528, 0, -0.93767, 6, -3, -10)
 material_override = SubResource("ShaderMaterial_ycls2")
 mesh = SubResource("QuadMesh_rkvh4")
 
 [node name="PressToContinue" type="Label3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -15)
-pixel_size = 0.05
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3, -10)
+visible = false
+pixel_size = 0.025
 text = "Hold trigger to continue"
 autowrap_mode = 2
 width = 400.0
 
 [node name="ButtonIcon" type="MeshInstance3D" parent="PressToContinue"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.4019, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, 0)
+visible = false
 material_override = SubResource("ShaderMaterial_jgetr")
 mesh = SubResource("QuadMesh_6lr7l")
 
 [node name="HoldButton" parent="PressToContinue" instance=ExtResource("2_m02j3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.92283, 0, 0)
-enabled = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 0)
 hold_time = 0.5
 color = Color(0, 0.717647, 1, 1)
 

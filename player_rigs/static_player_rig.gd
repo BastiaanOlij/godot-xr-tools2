@@ -8,8 +8,10 @@ class_name XRT2StaticPlayerRig
 
 
 ## Maximum distance the players head can be from the origin point before we fade to black.
-@onready var max_head_distance : float = 0.5
-@onready var fade_distance : float = 0.1
+@export var max_head_distance : float = 0.5
+
+## Distance over which we fade
+@export var fade_distance : float = 0.1
 
 signal left_hand_tracking_changed(tracking : bool)
 signal right_hand_tracking_changed(tracking : bool)
@@ -67,6 +69,8 @@ func _process(delta):
 	var distance = _xr_camera.position.length()
 	if distance > max_head_distance:
 		_fade.fade = clamp((distance - max_head_distance) / fade_distance, 0.0, 1.0)
+	else:
+		_fade.fade = 0
 
 
 func _on_left_hand_tracking_changed(tracking):

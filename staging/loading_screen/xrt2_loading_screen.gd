@@ -87,9 +87,11 @@ func _update_splash_screen() -> void:
 	if _splash_screen_material:
 		_splash_screen_material.set_shader_parameter("texture_albedo", splash_screen)
 
+
 func _update_spinning_logo() -> void:
 	if _spinning_logo_material:
 		_spinning_logo_material.set_shader_parameter("texture_albedo", spinning_logo)
+
 
 func _update_progress_bar() -> void:
 	# TODO IMPLEMENT!
@@ -102,9 +104,11 @@ func _update_press_to_continue() -> void:
 	_press_to_continue.visible = enable_press_to_continue
 	_hold_button.enabled = enable_press_to_continue
 
+
 func _update_press_to_continue_text() -> void:
 	_press_to_continue.text = press_to_continue_text
 	pass
+
 
 func _update_button_icon() -> void:
 	if button_icon:
@@ -117,6 +121,7 @@ func _update_button_icon() -> void:
 		_button_icon.visible = true
 	else:
 		_button_icon.visible = false
+
 
 func _update_activate_action() -> void:
 	if not Engine.is_editor_hint():
@@ -172,4 +177,8 @@ func _process(delta: float) -> void:
 
 
 func _on_hold_button_pressed() -> void:
+	# Press only once
+	_hold_button.enabled = false
+
+	# Let our parent know
 	continue_pressed.emit()

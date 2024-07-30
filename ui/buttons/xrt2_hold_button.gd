@@ -36,6 +36,7 @@ signal pressed
 
 
 var time_held = 0.0
+var pressed_trigger = true
 
 var material : ShaderMaterial
 
@@ -98,9 +99,10 @@ func _process(delta) -> void:
 
 	if button_pressed:
 		_set_time_held(time_held + delta)
-		if time_held > hold_time:
-			# done, disable this
-			enabled = false
+		if !pressed_trigger and time_held > hold_time:
+			# Prevent multiple emits
+			pressed_trigger = true
 			pressed.emit()
 	else:
+		pressed_trigger = false
 		_set_time_held(max(0.0, time_held - delta))
