@@ -6,7 +6,7 @@ extends Node3D
 @export_file('*.tscn') var main_scene : String
 
 ## If true, the player is prompted to continue
-@export var prompt_for_continue : bool = true
+@export var prompt_for_continue : bool = false
 
 ## The current scene
 var _current_scene : XRT2StageBase
@@ -27,6 +27,7 @@ var _tween : Tween
 
 # Misc
 var _is_loading : bool = false
+var _must_prompt_for_continue = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -99,7 +100,7 @@ func load_scene(p_scene_path : String, user_data = null) -> void:
 
 	# If a continue-prompt is desired or the new scene has not finished
 	# loading, then switch to the loading screen.
-	if prompt_for_continue or \
+	if prompt_for_continue or _must_prompt_for_continue or \
 		ResourceLoader.load_threaded_get_status(p_scene_path) != ResourceLoader.THREAD_LOAD_LOADED:
 
 		# Make our loading screen visible again and reset some stuff
@@ -150,9 +151,12 @@ func load_scene(p_scene_path : String, user_data = null) -> void:
 			get_tree().quit(1)
 
 		# Wait for user to be ready
-		if prompt_for_continue:
+		if prompt_for_continue or _must_prompt_for_continue:
 			_loading_screen.enable_press_to_continue = true
 			await _loading_screen.continue_pressed
+
+		# Now that we've prompted, we don't have to until user takes off headset
+		_must_prompt_for_continue = false
 
 		# Fade to black
 		if _tween:
@@ -244,3 +248,8 @@ func _on_xr_pose_recenter():
 
 	# Reset origin
 	_xr_origin.transform = Transform3D()
+
+
+func _on_xr_ended():
+	# Focus lost
+	_must_prompt_for_continue = true

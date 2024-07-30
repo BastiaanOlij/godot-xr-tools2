@@ -36,3 +36,6 @@ follow_camera = NodePath("../Player/XROrigin3D/XRCamera3D")
 
 [node name="StartXR" type="Node3D" parent="."]
 script = ExtResource("2_d55t1")
+
+[connection signal="xr_ended" from="StartXR" to="." method="_on_xr_ended"]
+[connection signal="xr_pose_recenter" from="StartXR" to="." method="_on_xr_pose_recenter"]
