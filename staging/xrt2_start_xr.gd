@@ -65,6 +65,14 @@ static func is_xr_active() -> bool:
 	else:
 		return false
 
+
+static func get_xr_interface() -> XRInterface:
+	if _singleton:
+		return _singleton._xr_interface
+	else:
+		return null
+
+
 # Handle auto-initialization when ready
 func _ready() -> void:
 	if !Engine.is_editor_hint():
