@@ -252,4 +252,5 @@ func _on_xr_pose_recenter():
 
 func _on_xr_ended():
 	# Focus lost
-	_must_prompt_for_continue = true
+	if _is_loading:
+		_must_prompt_for_continue = true
