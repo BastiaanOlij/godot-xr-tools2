@@ -3,10 +3,18 @@
 shader_type spatial;
 render_mode unshaded, cull_disabled;
 
-uniform sampler2D texture_albedo : source_color,filter_linear_mipmap,repeat_enable;
+uniform vec4 albedo : source_color = vec4(1.0);
+uniform sampler2D texture_albedo : source_color,filter_linear,repeat_disable;
+
+uniform vec2 uv_scale = vec2(1.0);
+uniform vec2 uv_offset = vec2(0.0);
+
+void vertex() {
+	UV = UV * uv_scale + uv_offset;
+}
 
 void fragment() {
 	vec4 albedo_tex = texture(texture_albedo,UV);
-	ALBEDO = albedo_tex.rgb;
-	ALPHA = albedo_tex.a;
+	ALBEDO = albedo.rgb * albedo_tex.rgb;
+	ALPHA = albedo.a * albedo_tex.a;
 }

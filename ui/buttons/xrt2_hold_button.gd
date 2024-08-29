@@ -87,7 +87,10 @@ func _process(delta) -> void:
 		set_process(false)
 		return
 
-	var button_pressed = Input.is_action_pressed(activate_action)
+	var button_pressed = false
+	
+	if InputMap.has_action(activate_action) and Input.is_action_pressed(activate_action):
+		button_pressed = true
 
 	if !button_pressed:
 		# We check all trackers

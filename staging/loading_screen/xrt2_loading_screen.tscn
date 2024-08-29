@@ -1,10 +1,9 @@
-[gd_scene load_steps=14 format=3 uid="uid://j2dmckl6eh61"]
+[gd_scene load_steps=13 format=3 uid="uid://j2dmckl6eh61"]
 
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/staging/loading_screen/xrt2_loading_screen.gd" id="1_ugti3"]
-[ext_resource type="PackedScene" uid="uid://c0osfqxwvi7ko" path="res://addons/godot-xr-tools2/ui/buttons/xrt2_hold_button.tscn" id="2_m02j3"]
-[ext_resource type="Shader" path="res://addons/godot-xr-tools2/shaders/unshaded_texture_with_alpha.gdshader" id="2_tulow"]
+[ext_resource type="PackedScene" uid="uid://c0osfqxwvi7ko" path="res://misc/UI/hold_button.tscn" id="2_m02j3"]
 [ext_resource type="Texture2D" uid="uid://d5sknr112aih" path="res://addons/godot-xr-tools2/icon.png" id="2_y53v2"]
-[ext_resource type="Shader" path="res://materials/textured_with_alpha_unshaded.gdshader" id="4_pjv7i"]
+[ext_resource type="Shader" path="res://addons/godot-xr-tools2/shaders/unshaded_texture_with_alpha.gdshader" id="4_pjv7i"]
 
 [sub_resource type="Curve" id="Curve_ve03c"]
 max_value = 3.14
@@ -35,7 +34,10 @@ size = Vector2(120, 90)
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ycls2"]
 resource_local_to_scene = true
 render_priority = 0
-shader = ExtResource("2_tulow")
+shader = ExtResource("4_pjv7i")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/uv_offset = Vector2(0, 0)
 shader_parameter/texture_albedo = ExtResource("2_y53v2")
 
 [sub_resource type="QuadMesh" id="QuadMesh_rkvh4"]
@@ -64,7 +66,7 @@ material_override = SubResource("ShaderMaterial_juqya")
 mesh = SubResource("QuadMesh_d472w")
 
 [node name="SpinningLogo" type="MeshInstance3D" parent="."]
-transform = Transform3D(-0.93767, 0, -0.347528, 0, 1, 0, 0.347528, 0, -0.93767, 6, -3, -10)
+transform = Transform3D(-0.38433, 0, -0.923196, 0, 1, 0, 0.923196, 0, -0.38433, 6, -3, -10)
 material_override = SubResource("ShaderMaterial_ycls2")
 mesh = SubResource("QuadMesh_rkvh4")
 
