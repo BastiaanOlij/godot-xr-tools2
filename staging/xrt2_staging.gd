@@ -232,22 +232,27 @@ func _on_reset_scene(user_data):
 
 # Handle user requesting a recenter
 func _on_xr_pose_recenter():
-	if not _is_loading:
-		return
+	if _is_loading:
 
-	var play_area_mode : XRInterface.PlayAreaMode = _start_xr.get_play_area_mode()
-	if play_area_mode == XRInterface.XR_PLAY_AREA_SITTING:
-		# This is already handled by the headset, no need to do more!
-		pass
-	elif play_area_mode == XRInterface.XR_PLAY_AREA_ROOMSCALE:
-		# This is already handled by the headset, we ignore the height
-		pass
-	else:
-		# Center our player on the XROrigin3D node.
-		XRServer.center_on_hmd(XRServer.RESET_BUT_KEEP_TILT, true)
+		var play_area_mode : XRInterface.PlayAreaMode = _start_xr.get_play_area_mode()
+		if play_area_mode == XRInterface.XR_PLAY_AREA_SITTING:
+			# This is already handled by the headset, no need to do more!
+			pass
+		elif play_area_mode == XRInterface.XR_PLAY_AREA_ROOMSCALE:
+			# This is already handled by the headset, we ignore the height
+			pass
+		else:
+			# Center our player on the XROrigin3D node.
+			XRServer.center_on_hmd(XRServer.RESET_BUT_KEEP_TILT, true)
 
-	# Reset origin
-	_xr_origin.transform = Transform3D()
+		# Reset origin
+		_xr_origin.transform = Transform3D()
+
+		# Reset camera position
+		_xr_camera.position.x = 0.0
+		_xr_camera.position.z = 0.0
+	elif _current_scene:
+		_current_scene.pose_recentered()
 
 
 func _on_xr_ended():

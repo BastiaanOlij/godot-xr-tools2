@@ -72,6 +72,11 @@ static func get_xr_interface() -> XRInterface:
 	else:
 		return null
 
+func get_xr_viewport() -> Viewport:
+	if hmd_viewport:
+		return hmd_viewport
+
+	return get_viewport()
 
 # Handle auto-initialization when ready
 func _ready() -> void:
@@ -142,9 +147,7 @@ func _setup_for_openxr() -> bool:
 		return false
 
 	# Get our viewport
-	var vp : Viewport = hmd_viewport
-	if !vp:
-		vp = get_viewport()
+	var vp : Viewport = get_xr_viewport()
 
 	# Initialize the OpenXR interface
 	if not openxr_interface.is_initialized():

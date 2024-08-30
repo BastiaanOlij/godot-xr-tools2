@@ -33,6 +33,8 @@ var _camera : XRCamera3D
 # TODO update documentation for entry points, there are differences with how 
 # this worked in XR Tools 2 around centering the player
 
+
+## Make our origin and camera the current entries
 func make_current():
 	# Make our camera current
 	if _camera:
@@ -50,6 +52,7 @@ func _get_xr_camera():
 				_camera = child
 				return
 		push_error("Missing XRCamera3D in stage.")
+
 
 # Verifies our staging has a valid configuration.
 func _get_configuration_warnings() -> PackedStringArray:
@@ -70,16 +73,25 @@ func scene_loaded(user_data = null) -> void:
 
 ## This is called once our scene has become fully visible
 func scene_visible(user_data = null) -> void:
+	# Implement on extended class
 	pass
 
 
 ## This is called prior to our scene becoming unloaded
 func scene_pre_exiting(user_data = null) -> void:
+	# Implement on extended class
 	pass
 
 
 ## This is called just before our scene is removed from the scene tree
 func scene_exiting(user_data = null) -> void:
+	# Implement on extended class
+	pass
+
+
+## Called when user has requested pose recenter
+func pose_recentered():
+	# Implement on extended class
 	pass
 
 

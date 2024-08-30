@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/staging/xrt2_staging.gd" id="1_ap58f"]
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/staging/xrt2_start_xr.gd" id="2_d55t1"]
-[ext_resource type="PackedScene" uid="uid://dxvyqip0j4gdj" path="res://misc/effects/fade.tscn" id="2_mnsfb"]
+[ext_resource type="PackedScene" uid="uid://dxvyqip0j4gdj" path="res://addons/godot-xr-tools2/effects/fade/xrt2_fade.tscn" id="2_mnsfb"]
 [ext_resource type="PackedScene" uid="uid://j2dmckl6eh61" path="res://addons/godot-xr-tools2/staging/loading_screen/xrt2_loading_screen.tscn" id="3_5dvaj"]
 [ext_resource type="Environment" uid="uid://d12ro1nqqnic1" path="res://addons/godot-xr-tools2/staging/xrt2_staging_environment.tres" id="3_7oin8"]
 
