@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://y1mt4vculye7"]
 
-[ext_resource type="Script" path="res://addons/godot-xr-tools2/player_rigs/static_player_rig.gd" id="1_v7cup"]
+[ext_resource type="Script" path="res://addons/godot-xr-tools2/player_rigs/xrt2_static_player_rig.gd" id="1_v7cup"]
 [ext_resource type="PackedScene" uid="uid://dxvyqip0j4gdj" path="res://addons/godot-xr-tools2/effects/fade/xrt2_fade.tscn" id="2_0btq6"]
 
 [node name="StaticPlayerRig" type="XROrigin3D"]

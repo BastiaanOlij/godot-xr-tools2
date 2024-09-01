@@ -4,6 +4,8 @@ class_name XRT2DynamicPlayerRig
 
 ## This player rig is meant for games where the player can move around
 
+## Adjust the height of the XROrigin3D node above the player rig.
+@export var height_adjust : float = 0.0
 
 var _start_xr : XRT2StartXR
 var _player_is_colliding :bool = false
@@ -114,12 +116,14 @@ func _physics_process(delta):
 	parent.velocity = (player_body_location - org_player_body) / delta
 	parent.move_and_slide()
 
+	# TODO handle any collision with rigidbodies and transfer momentum
+
 	# Now move our XROrigin back
 	var delta_movement = parent.global_transform.origin - org_player_body
 	global_transform.origin -= delta_movement
 
 	# Negate any height change in local space due to player hitting ramps etc.
-	transform.origin.y = 0.0
+	transform.origin.y = height_adjust
 
 	# Return our value
 	parent.velocity = current_velocity
