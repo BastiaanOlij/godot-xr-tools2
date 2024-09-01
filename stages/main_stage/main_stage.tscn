@@ -1,7 +1,8 @@
-[gd_scene load_steps=11 format=3 uid="uid://7lt82mv6lmxo"]
+[gd_scene load_steps=12 format=3 uid="uid://7lt82mv6lmxo"]
 
 [ext_resource type="PackedScene" uid="uid://cl352deej8d8f" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.tscn" id="1_spd8v"]
-[ext_resource type="PackedScene" uid="uid://xk4bemx6njni" path="res://components/player/player.tscn" id="2_jwbvt"]
+[ext_resource type="PackedScene" uid="uid://bq5rgapu8u4xk" path="res://addons/godot-xr-tools2/player_rigs/xrt2_player_character.tscn" id="2_kgg0w"]
+[ext_resource type="Script" path="res://addons/godot-xr-tools2/player_rigs/movement_functions/xrt2_direct_movement.gd" id="3_7f0s7"]
 [ext_resource type="Texture2D" uid="uid://ds8hppgpq3pod" path="res://assets/main/pattern.png" id="3_cuyif"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ie47k"]
@@ -28,15 +29,20 @@ uv1_scale = Vector3(10, 10, 10)
 size = Vector2(100, 100)
 
 [node name="MainStage" node_paths=PackedStringArray("player_origin") instance=ExtResource("1_spd8v")]
-player_origin = NodePath("Player/DynamicPlayerRig")
+player_origin = NodePath("Xrt2PlayerCharacter/DynamicPlayerRig")
 
 [node name="WorldEnvironment" parent="." index="0"]
 environment = SubResource("Environment_8sh2w")
 
-[node name="Player" parent="." index="2" instance=ExtResource("2_jwbvt")]
+[node name="Xrt2PlayerCharacter" parent="." index="2" instance=ExtResource("2_kgg0w")]
 
-[node name="Test" type="MeshInstance3D" parent="Player" index="2"]
+[node name="Test" type="MeshInstance3D" parent="Xrt2PlayerCharacter" index="2"]
 mesh = SubResource("BoxMesh_4hy5r")
+skeleton = NodePath("")
+
+[node name="XRT2DirectMovement" type="Node3D" parent="Xrt2PlayerCharacter" index="3"]
+script = ExtResource("3_7f0s7")
+movement_action = "move"
 
 [node name="Floor" type="StaticBody3D" parent="." index="3"]
 
@@ -47,4 +53,4 @@ shape = SubResource("WorldBoundaryShape3D_of381")
 material_override = SubResource("StandardMaterial3D_lhbbs")
 mesh = SubResource("PlaneMesh_3t8ge")
 
-[editable path="Player"]
+[editable path="Xrt2PlayerCharacter"]
