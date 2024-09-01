@@ -58,6 +58,24 @@ func recenter():
 	_camera_node.position.z = 0.0
 
 
+## Return a XR player character ancestor
+static func get_xr_player_character(p_node : Node3D) -> XRT2PlayerCharacter:
+	var parent = p_node.get_parent()
+	while parent:
+		if parent is XRT2PlayerCharacter:
+			return parent
+
+		parent = parent.get_parent()
+
+	# Not found
+	return null
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	process_physics_priority = -91
+
+
 # _physics_process handles our virtual player movement.
 # Note that physical movement is handled in our Dynamic Player Rig
 func _physics_process(delta):

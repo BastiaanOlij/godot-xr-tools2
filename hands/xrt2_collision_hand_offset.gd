@@ -1,4 +1,4 @@
-# xrt2_movement_provider.gd
+# xrt2_collision_offset.gd
 #
 # MIT License
 #
@@ -22,40 +22,37 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-@tool
 extends Node3D
-class_name XRT2MovementProvider
+class_name XRT2CollisionHandOffset
 
-## If ticked, this movement function is enabled
-@export var enabled : bool = true
+## XRTools2 Collision Hand Offset Script
+##
+## This script applies the movement offset of a [XR2CollisionHand] object
+## to another node tree. This is currently important due to the split in
+## hand action poses and hand tracking, or between hand action poses.
+## We may fix this in Godot itself some day so we can share a root node.
 
-@onready var _xr_player_character : XRT2PlayerCharacter = XRT2PlayerCharacter.get_xr_player_character(self)
-
-
-# Verifies if we have a valid configuration.
-func _get_configuration_warnings() -> PackedStringArray:
-	var warnings := PackedStringArray()
-
-	var player_character = XRT2PlayerCharacter.get_xr_player_character(self)
-	if not player_character:
-		warnings.push_back("This node requires an XRT2PlayerCharacter as an anchestor.")
-
-	# Return warnings
-	return warnings
-
+@export var follow_node : XRT2CollisionHand
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	if Engine.is_editor_hint():
-		return
+	# Run early, but after XRT2CollisionHand
+	process_physics_priority = -89
 
-	if _xr_player_character:
-		_xr_player_character.register_movement_provider(self)
+# Handle physics processing
+func _physics_process(_delta):
+	if follow_node:
+		var follow_parent = follow_node.get_parent()
+		if follow_parent:
+			# XRT2CollisionHand has top level enabled,
+			# so this transform is in global space...
+			var t : Transform3D = follow_node.transform
+			
+			# We want our local transform
+			t = follow_parent.global_transform.inverse() * t
 
+			# And now adjust our position to our new orientation
+			t.origin = get_parent().global_basis.inverse() * follow_parent.global_basis * t.origin
 
-## Called by player characters physics process.
-func handle_movement(player_character : XRT2PlayerCharacter, delta : float):
-	# Implement on extended class.
-	# Note: player character will perform move_and_slide and handle gravity,
-	# you should implement 
-	pass
+			# And use this.. 
+			transform = t
