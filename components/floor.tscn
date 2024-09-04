@@ -1,0 +1,56 @@
+[gd_scene load_steps=6 format=3 uid="uid://dvvlw0k32b8wq"]
+
+[ext_resource type="Texture2D" uid="uid://ds8hppgpq3pod" path="res://assets/main/pattern.png" id="1_ml584"]
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_of381"]
+
+[sub_resource type="Shader" id="Shader_pv3lj"]
+code = "shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley, specular_schlick_ggx;
+
+uniform vec4 albedo : source_color = vec4(1.0);
+uniform sampler2D texture_albedo : source_color, filter_linear_mipmap, repeat_enable;
+
+uniform float roughness : hint_range(0.0, 1.0) = 1.0;
+uniform float specular : hint_range(0.0, 1.0, 0.01) = 0.5;
+uniform float metallic : hint_range(0.0, 1.0, 0.01) = 0.0;
+
+uniform vec3 uv1_scale;
+uniform vec3 uv1_offset;
+
+void vertex() {
+	UV = UV * uv1_scale.xy + uv1_offset.xy;
+}
+
+void fragment() {
+	vec4 albedo_tex = texture(texture_albedo, UV);
+	ALBEDO = albedo.rgb * albedo_tex.rgb;
+
+	METALLIC = metallic;
+	SPECULAR = specular;
+	ROUGHNESS = roughness;
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_beopk"]
+render_priority = 0
+shader = SubResource("Shader_pv3lj")
+shader_parameter/albedo = Color(0.0796347, 0.660561, 0, 1)
+shader_parameter/roughness = 1.0
+shader_parameter/specular = 0.5
+shader_parameter/metallic = 0.0
+shader_parameter/uv1_scale = Vector3(10, 10, 10)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+shader_parameter/texture_albedo = ExtResource("1_ml584")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_3t8ge"]
+size = Vector2(100, 100)
+
+[node name="Floor" type="StaticBody3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("WorldBoundaryShape3D_of381")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+material_override = SubResource("ShaderMaterial_beopk")
+mesh = SubResource("PlaneMesh_3t8ge")

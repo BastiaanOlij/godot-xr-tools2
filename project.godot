@@ -54,5 +54,5 @@ openxr/enabled=true
 openxr/reference_space=1
 openxr/foveation_level=3
 openxr/foveation_dynamic=true
-openxr/extensions/hand_tracking=false
+openxr/extensions/hand_interaction_profile=true
 shaders/enabled=true
