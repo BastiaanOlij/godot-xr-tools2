@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://cynxxfm8nksg4" path="res://addons/godot-xr-tools2/player_rigs/xrt2_dynamic_player_rig.tscn" id="2_22tak"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_v62os"]
+radius = 0.3
 
 [node name="Xrt2PlayerCharacter" type="CharacterBody3D"]
 script = ExtResource("1_htswx")

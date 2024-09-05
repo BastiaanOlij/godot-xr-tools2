@@ -1,4 +1,4 @@
-# xrt2_movement_provider.gd
+# xrt2_grab_point.gd
 #
 # MIT License
 #
@@ -24,38 +24,26 @@
 
 @tool
 extends Node3D
-class_name XRT2MovementProvider
+class_name XRT2GrabPoint
 
-## If ticked, this movement function is enabled
-@export var enabled : bool = true
+## XRTools2 Grab Point
+##
+## This node identifies a predefined place a user can grab an object.
 
-@onready var _xr_player_character : XRT2PlayerCharacter = XRT2PlayerCharacter.get_xr_player_character(self)
+# TODO for now this is just a bare bone placeholder:
+# - add visualiser for hand to properly orient hand
+# - be able to specify a pose for the hand that we'll use, be nice if we can auto generate this.
 
+@export var left_hand : bool = true
+@export var right_hand : bool = true
 
 # Verifies if we have a valid configuration.
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
 
-	var player_character = XRT2PlayerCharacter.get_xr_player_character(self)
-	if not player_character:
-		warnings.push_back("This node requires an XRT2PlayerCharacter as an anchestor.")
+	var parent = get_parent()
+	if not parent is PhysicsBody3D:
+		warnings.push_back("This node should be a child of a PhysicsBody3D node.")
 
 	# Return warnings
 	return warnings
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	if Engine.is_editor_hint():
-		return
-
-	if _xr_player_character:
-		_xr_player_character.register_movement_provider(self)
-
-
-## Called by player characters physics process.
-func handle_movement(player_character : XRT2PlayerCharacter, delta : float):
-	# Implement on extended class.
-	# Note: player character will perform move_and_slide and handle gravity,
-	# you should implement 
-	pass

@@ -38,10 +38,10 @@ static func get_xr_controller(p_node : Node3D) -> XRController3D:
 	return null
 
 
-static func get_xr_origin(p_node : Node3D) -> XROrigin3D:
+static func get_xr_node(p_node : Node3D) -> XRNode3D:
 	var parent = p_node.get_parent()
 	while parent:
-		if parent is XROrigin3D:
+		if parent is XRNode3D:
 			return parent
 
 		parent = parent.get_parent()
@@ -50,10 +50,10 @@ static func get_xr_origin(p_node : Node3D) -> XROrigin3D:
 	return null
 
 
-static func get_xr_player_character(p_node : Node3D) -> XRT2PlayerCharacter:
+static func get_xr_origin(p_node : Node3D) -> XROrigin3D:
 	var parent = p_node.get_parent()
 	while parent:
-		if parent is XRT2PlayerCharacter:
+		if parent is XROrigin3D:
 			return parent
 
 		parent = parent.get_parent()

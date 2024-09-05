@@ -93,6 +93,8 @@ func _ready():
 	if Engine.is_editor_hint():
 		return
 
+	process_physics_priority = -92
+
 	_start_xr = XRT2StartXR.get_singleton()
 	if _start_xr:
 		_start_xr.xr_pose_recenter.connect(_on_xr_pose_recenter)
