@@ -22,6 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+@tool
 extends AnimatableBody3D
 class_name XRT2ForceBody
 
@@ -58,6 +59,9 @@ class ForceBodyCollision extends RefCounted:
 
 
 func _ready():
+	if Engine.is_editor_hint():
+		return
+
 	# Make sure this is off or weird shit happens...
 	sync_to_physics = false
 

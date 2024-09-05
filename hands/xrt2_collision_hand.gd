@@ -22,6 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+@tool
 extends XRT2ForceBody
 class_name XRT2CollisionHand
 
@@ -56,6 +57,24 @@ const TELEPORT_DISTANCE := 1.0
 ## Controls the hand collision mode
 @export var mode : CollisionHandMode = CollisionHandMode.COLLIDE
 
+## Links to skeleton that adds finger digits
+@export var hand_skeleton : Skeleton3D:
+	set(value):
+		if hand_skeleton == value:
+			return
+
+		if hand_skeleton:
+			_hand_tracking_parent = null
+			hand_skeleton.skeleton_updated.disconnect(_on_skeleton_updated)
+			for digit in _digit_collision_shapes:
+				var shape : CollisionShape3D = _digit_collision_shapes[digit]
+				remove_child(shape)
+				shape.queue_free()
+			_digit_collision_shapes.clear()
+
+		hand_skeleton = value
+		if hand_skeleton and is_inside_tree():
+			_update_hand_skeleton()
 
 ## Target-override class
 class TargetOverride:
@@ -74,7 +93,6 @@ class TargetOverride:
 		priority = p
 		offset = o
 
-
 # Controller to target (if no target overrides)
 var _controller : XRController3D
 
@@ -86,6 +104,11 @@ var _target : Node3D
 
 # Current target offset
 var _target_offset : Transform3D
+
+# Skeleton collisions
+var _hand_tracking_parent : XRNode3D
+var _palm_collision_shape : CollisionShape3D
+var _digit_collision_shapes : Dictionary
 
 ## Return a XR collision hand ancestor
 static func get_xr_collision_hand(p_node : Node3D) -> XRT2CollisionHand:
@@ -102,6 +125,18 @@ static func get_xr_collision_hand(p_node : Node3D) -> XRT2CollisionHand:
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	_palm_collision_shape = CollisionShape3D.new()
+	_palm_collision_shape.name = "Palm"
+	_palm_collision_shape.shape = preload("res://addons/godot-xr-tools2/hands/xrt2_hand_palm.shape")
+	# This probably needs to be set based on left or right hand
+	_palm_collision_shape.rotation_degrees = Vector3(0.0, 90, 90)
+	add_child(_palm_collision_shape, false, Node.INTERNAL_MODE_BACK)
+
+	_update_hand_skeleton()
+
+	if Engine.is_editor_hint():
+		return
+
 	super()
 
 	# Disconnect from parent transform as we move to it in the physics step,
@@ -118,6 +153,9 @@ func _ready():
 
 # Handle physics processing
 func _physics_process(_delta):
+	if Engine.is_editor_hint():
+		return
+
 	# Ignore when controller is not tracking
 	if not _controller.get_has_tracking_data():
 		return
@@ -231,3 +269,45 @@ func _move_to_target():
 	global_transform.basis = target.basis
 	move_and_slide(target.origin - global_position)
 	force_update_transform()
+
+func _update_hand_skeleton():
+	if hand_skeleton:
+		_hand_tracking_parent = XRT2Helper.get_xr_node(hand_skeleton)
+		hand_skeleton.skeleton_updated.connect(_on_skeleton_updated)
+
+		# Run atleast once to init
+		_on_skeleton_updated()
+
+func _on_skeleton_updated():
+	var bone_count = hand_skeleton.get_bone_count()
+	for i in bone_count:
+		var collision_node : CollisionShape3D
+		var offset : Transform3D
+		offset.origin = Vector3(0.0, 0.015, 0.0) # move to side of object
+
+		var bone_name = hand_skeleton.get_bone_name(i)
+		if bone_name == "RightHand" or bone_name == "LeftHand":
+			offset.origin = Vector3(0.0, 0.025, 0.0) # move to side of object
+			collision_node = _palm_collision_shape
+		elif bone_name.contains("Proximal") or bone_name.contains("Intermediate") or bone_name.contains("Distal"):
+			if _digit_collision_shapes.has(bone_name):
+				collision_node = _digit_collision_shapes[bone_name]
+			else:
+				print("Creating ",bone_name)
+				collision_node = CollisionShape3D.new()
+				collision_node.name = bone_name
+				collision_node.shape = preload("res://addons/godot-xr-tools2/hands/xrt2_hand_digit.shape")
+				add_child(collision_node, false, Node.INTERNAL_MODE_BACK)
+				_digit_collision_shapes[bone_name] = collision_node
+
+		if collision_node:
+			# TODO it would require a far more complex approach,
+			# but being able to check if our collision shapes can move to their new locations
+			# would be interesting.
+
+			# We need to ignore our applied offsets in XRT2CollisionHandOffset or nodes,
+			# We assume for a moment that there are no scales applied on our hand models
+			var t : Transform3D = _hand_tracking_parent.global_transform * hand_skeleton.get_bone_global_pose(i)
+
+			# We can ignore our XRT2CollisionHand* offset simply by taking its parents global transform :P
+			collision_node.transform = get_parent().global_transform.inverse() * t * offset
