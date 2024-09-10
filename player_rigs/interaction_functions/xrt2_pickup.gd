@@ -462,7 +462,7 @@ func drop_held_object( \
 	apply_linear_velocity : Vector3 = Vector3(), apply_angular_velocity : Vector3 = Vector3() \
 	) -> void:
 	# Make sure we clear some initial state
-	_remote_transform.remote_path = NodePath()
+	_remote_transform.remote_path = ""
 	_remove_collision()
 
 	# TODO remove weight from collision hand
