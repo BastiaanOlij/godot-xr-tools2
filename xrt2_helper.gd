@@ -1,5 +1,6 @@
+#-------------------------------------------------------------------------------
 # xrt2_helper.gd
-#
+#-------------------------------------------------------------------------------
 # MIT License
 #
 # Copyright (c) 2024-present Bastiaan Olij, Malcolm A Nixon and contributors
@@ -21,10 +22,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#-------------------------------------------------------------------------------
+
 
 @tool
-extends Node
 class_name XRT2Helper
+extends Node
 
 static func get_xr_controller(p_node : Node3D) -> XRController3D:
 	var parent = p_node.get_parent()

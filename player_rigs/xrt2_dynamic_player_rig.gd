@@ -1,5 +1,6 @@
+#-------------------------------------------------------------------------------
 # xrt2_dynamic_player_rig.gd
-#
+#-------------------------------------------------------------------------------
 # MIT License
 #
 # Copyright (c) 2024-present Bastiaan Olij, Malcolm A Nixon and contributors
@@ -21,10 +22,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#-------------------------------------------------------------------------------
+
 
 @tool
-extends XROrigin3D
 class_name XRT2DynamicPlayerRig
+extends XROrigin3D
 
 ## This player rig is meant for games where the player can move around
 
@@ -66,7 +69,7 @@ func _on_xr_pose_recenter() -> void:
 		XRServer.center_on_hmd(XRServer.RESET_BUT_KEEP_TILT, true)
 
 	# Reset our XROrigin transform
-	# TODO: adjust this ever so slightly based on neck position 
+	# TODO: adjust this ever so slightly based on neck position
 	transform = Transform3D()
 
 	# TODO: we may want to trigger re-orienting our parent in a fixed direction.
@@ -135,7 +138,8 @@ func _physics_process(delta):
 
 	# Now apply movement, first move our player body to the right location
 	var org_player_body: Vector3 = parent.global_transform.origin
-	var player_body_location: Vector3 = transform * _xr_camera.transform * _neck_position.transform.origin
+	var player_body_location: Vector3 = transform * _xr_camera.transform * \
+		_neck_position.transform.origin
 	player_body_location.y = 0.0
 	player_body_location = parent.global_transform * player_body_location
 
@@ -163,4 +167,4 @@ func _physics_process(delta):
 		_player_is_colliding = true
 	else:
 		_fade.fade = 0.0
-		_player_is_colliding = false	
+		_player_is_colliding = false

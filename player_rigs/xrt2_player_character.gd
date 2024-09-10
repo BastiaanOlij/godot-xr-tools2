@@ -1,5 +1,6 @@
+#-------------------------------------------------------------------------------
 # xrt2_player_character.gd
-#
+#-------------------------------------------------------------------------------
 # MIT License
 #
 # Copyright (c) 2024-present Bastiaan Olij, Malcolm A Nixon and contributors
@@ -21,20 +22,22 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#-------------------------------------------------------------------------------
 
-extends CharacterBody3D
+
 class_name XRT2PlayerCharacter
+extends CharacterBody3D
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
+
+var _movement_providers : Array[XRT2MovementProvider]
 
 # Helper variables to keep our code readable
 @onready var _player_rig_node : XRT2DynamicPlayerRig = $DynamicPlayerRig
 @onready var _camera_node : XRCamera3D = $DynamicPlayerRig/XRCamera3D
 
 @onready var _reset_basis : Basis = $DynamicPlayerRig.global_basis
-
-var _movement_providers : Array[XRT2MovementProvider]
 
 
 ## Register a movement provider that will provide movement for this player character

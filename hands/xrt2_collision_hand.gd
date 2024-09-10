@@ -1,5 +1,6 @@
+#-------------------------------------------------------------------------------
 # xrt2_collision_hand.gd
-#
+#-------------------------------------------------------------------------------
 # MIT License
 #
 # Copyright (c) 2024-present Bastiaan Olij, Malcolm A Nixon and contributors
@@ -21,10 +22,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#-------------------------------------------------------------------------------
+
 
 @tool
-extends XRT2ForceBody
 class_name XRT2CollisionHand
+extends XRT2ForceBody
 
 ## XRTools2 Collision Hand Container Script
 ##
@@ -167,7 +170,8 @@ func _physics_process(_delta):
 ## This function adds a target override. The collision hand will attempt to
 ## move to the highest priority target, or the [XRController3D] if no override
 ## is specified.
-func add_target_override(target : Node3D, priority : int, offset : Transform3D = Transform3D()) -> void:
+func add_target_override(target : Node3D, priority : int, offset : Transform3D = Transform3D()) \
+	-> void:
 	# Remove any existing target override from this source
 	var modified := _remove_target_override(target)
 
@@ -192,7 +196,9 @@ func remove_target_override(target : Node3D) -> void:
 
 # This function inserts a target override into the overrides list by priority
 # order.
-func _insert_target_override(target : Node3D, priority : int, offset : Transform3D = Transform3D()) -> void:
+func _insert_target_override( \
+	target : Node3D, priority : int, offset : Transform3D = Transform3D() \
+	) -> void:
 	# Construct the target override
 	var override := TargetOverride.new(target, priority, offset)
 
@@ -289,14 +295,16 @@ func _on_skeleton_updated():
 		if bone_name == "RightHand" or bone_name == "LeftHand":
 			offset.origin = Vector3(0.0, 0.025, 0.0) # move to side of object
 			collision_node = _palm_collision_shape
-		elif bone_name.contains("Proximal") or bone_name.contains("Intermediate") or bone_name.contains("Distal"):
+		elif bone_name.contains("Proximal") or bone_name.contains("Intermediate") or \
+			bone_name.contains("Distal"):
 			if _digit_collision_shapes.has(bone_name):
 				collision_node = _digit_collision_shapes[bone_name]
 			else:
 				print("Creating ",bone_name)
 				collision_node = CollisionShape3D.new()
 				collision_node.name = bone_name
-				collision_node.shape = preload("res://addons/godot-xr-tools2/hands/xrt2_hand_digit.shape")
+				collision_node.shape = \
+					preload("res://addons/godot-xr-tools2/hands/xrt2_hand_digit.shape")
 				add_child(collision_node, false, Node.INTERNAL_MODE_BACK)
 				_digit_collision_shapes[bone_name] = collision_node
 
@@ -307,7 +315,8 @@ func _on_skeleton_updated():
 
 			# We need to ignore our applied offsets in XRT2CollisionHandOffset or nodes,
 			# We assume for a moment that there are no scales applied on our hand models
-			var t : Transform3D = _hand_tracking_parent.global_transform * hand_skeleton.get_bone_global_pose(i)
+			var t : Transform3D = _hand_tracking_parent.global_transform * \
+				hand_skeleton.get_bone_global_pose(i)
 
-			# We can ignore our XRT2CollisionHand* offset simply by taking its parents global transform :P
+			# We can ignore our XRT2CollisionHand* offset simply by using its parents.
 			collision_node.transform = get_parent().global_transform.inverse() * t * offset

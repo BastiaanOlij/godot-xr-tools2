@@ -1,5 +1,6 @@
+#-------------------------------------------------------------------------------
 # xrt2_pickup.gd
-#
+#-------------------------------------------------------------------------------
 # MIT License
 #
 # Copyright (c) 2024-present Bastiaan Olij, Malcolm A Nixon and contributors
@@ -21,10 +22,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#-------------------------------------------------------------------------------
+
 
 @tool
-extends Node3D
 class_name XRT2Pickup
+extends Node3D
 
 
 ## XRTools2 Pickup Script
@@ -34,10 +37,10 @@ class_name XRT2Pickup
 
 # TODO:
 # - Right now we just pick up RigidBodies which then move with our hand.
-#   The idea is to also be able to grab marked StaticBodies but we then keep 
+#   The idea is to also be able to grab marked StaticBodies but we then keep
 #   our hand attached to the static body and work with a movement provider
 #   to allow allow body movement.
-# - We need to communicate the weight of the [RigidBody3D] we pick up to 
+# - We need to communicate the weight of the [RigidBody3D] we pick up to
 #   our collision hands so we can react to holding weighted objects
 # - We need to deal with two handed pickup
 # - We no longer have logic on our [RigidBody3D] so we need a static
@@ -47,6 +50,16 @@ class_name XRT2Pickup
 #   when we are holding an object. Ideally we should have an option to
 #   automatically pose the hand correctly if no grab point is specified.
 # - Need to re-introduce grab points with optional finger poses
+
+# Class for storing our highlight overrule data
+class HighlightOverrule extends RefCounted:
+	var mesh_instance : MeshInstance3D
+	var original_material : Material
+
+# Class for storing copied collision data
+class CopiedCollision extends RefCounted:
+	var collision_shape : CollisionShape3D
+	var org_transform : Transform3D
 
 ## If ticked we monitor for things we can pick up
 @export var enabled : bool = true:
@@ -91,7 +104,7 @@ var _editor_mesh_instance : MeshInstance3D
 # Tween for animations
 var _tween : Tween
 
-# Tracks if our input is currently in grab mode (even if we're not holding anything) 
+# Tracks if our input is currently in grab mode (even if we're not holding anything)
 var _is_grab : bool = false
 
 # Remember if our XR action was pressed last frame
@@ -111,30 +124,21 @@ var _original_collision_mask : int
 # If true, we are the primary hand holding this object (for 2 handed)
 var _is_primary : bool = false
 
-# Array of all current pickup handlers
-static var _pickup_handlers : Array[XRT2Pickup]
-
-# Class for storing our highlight overrule data
-class HighlightOverrule extends RefCounted:
-	var mesh_instance : MeshInstance3D
-	var original_material : Material
-
-# Our highlight material
-var _highlight_material : ShaderMaterial = preload("res://addons/godot-xr-tools2/shaders/highlight_by_vertex.material")
-
 # Active highlights
 var _active_highlights : Array[HighlightOverrule]
 
-# We only want one hand to highlight
-static var _highlighted_bodies : Array[Node3D]
-
-# Class for storing copied collision data
-class CopiedCollision extends RefCounted:
-	var collision_shape : CollisionShape3D
-	var org_transform : Transform3D
+# Our highlight material
+var _highlight_material : ShaderMaterial = \
+	preload("res://addons/godot-xr-tools2/shaders/highlight_by_vertex.material")
 
 # Active copied collisions
 var _active_copied_collisions : Array[CopiedCollision]
+
+# Array of all current pickup handlers
+static var _pickup_handlers : Array[XRT2Pickup]
+
+# We only want one hand to highlight
+static var _highlighted_bodies : Array[Node3D]
 
 
 ## Find which pickup handler has picked up this object
@@ -151,7 +155,7 @@ static func picked_up_by(what : PhysicsBody3D) -> XRT2Pickup:
 	# If we found one, it will be our secondary hand
 	return by
 
-## Returns true if we've picked up something (/are holding onto something) 
+## Returns true if we've picked up something (/are holding onto something)
 func has_picked_up() -> bool:
 	if is_instance_valid(_picked_up):
 		return true
@@ -222,7 +226,7 @@ func _ready():
 		_editor_sphere.radial_segments = 32
 		_editor_sphere.rings = 16
 		_editor_sphere.material = material
-		
+
 		_editor_mesh_instance = MeshInstance3D.new()
 		_editor_mesh_instance.mesh = _editor_sphere
 		add_child(_editor_mesh_instance, false, Node.INTERNAL_MODE_BACK)
@@ -276,9 +280,11 @@ func _get_closest_transform(body : PhysicsBody3D, to_point : Vector3) -> Transfo
 	for child in body.get_children():
 		if child is XRT2GrabPoint:
 			var grab_point : XRT2GrabPoint = child
-			if not grab_point.left_hand and _xr_controller.get_tracker_hand() == XRPositionalTracker.TRACKER_HAND_LEFT:
+			if not grab_point.left_hand and _xr_controller.get_tracker_hand() == \
+				XRPositionalTracker.TRACKER_HAND_LEFT:
 				continue
-			elif not grab_point.right_hand and _xr_controller.get_tracker_hand() == XRPositionalTracker.TRACKER_HAND_RIGHT:
+			elif not grab_point.right_hand and _xr_controller.get_tracker_hand() == \
+				XRPositionalTracker.TRACKER_HAND_RIGHT:
 				continue
 
 			var dist = (grab_point.global_position - to_point).length_squared()
@@ -344,7 +350,7 @@ func _add_highlight(node : Node3D):
 			_active_highlights.push_back(highlight)
 
 			child.material_overlay = _highlight_material
-		
+
 		# Find mesh instances any level deep
 		_add_highlight(child)
 
@@ -371,7 +377,8 @@ func _copy_collisions(from : RigidBody3D):
 			copied_collision.org_transform = child.transform
 
 			_collision_hand.add_child(copied_collision.collision_shape, false, Node.INTERNAL_MODE_BACK)
-			copied_collision.collision_shape.transform = _remote_transform.transform * copied_collision.org_transform
+			copied_collision.collision_shape.transform = _remote_transform.transform * \
+				copied_collision.org_transform
 
 			_active_copied_collisions.push_back(copied_collision)
 
@@ -380,7 +387,8 @@ func _update_collision():
 	if is_instance_valid(_collision_hand) and is_instance_valid(_remote_transform):
 		for copied_collision : CopiedCollision in _active_copied_collisions:
 			if is_instance_valid(copied_collision.collision_shape):
-				copied_collision.collision_shape.transform = _remote_transform.transform * copied_collision.org_transform
+				copied_collision.collision_shape.transform = _remote_transform.transform * \
+					copied_collision.org_transform
 
 
 func _remove_collision():
@@ -427,7 +435,7 @@ func pickup_object(which : PhysicsBody3D):
 
 			# Determine the location we should be holding our object
 			var dest_transform : Transform3D = _get_closest_transform(_picked_up, global_position)
-			dest_transform = dest_transform.inverse() * _picked_up.global_transform 
+			dest_transform = dest_transform.inverse() * _picked_up.global_transform
 
 			# TODO should adjust our dest_transform to account for any offset in our hand mesh
 
@@ -450,7 +458,9 @@ func pickup_object(which : PhysicsBody3D):
 		pass
 
 
-func drop_held_object(apply_linear_velocity : Vector3 = Vector3(), apply_angular_velocity : Vector3 = Vector3()):
+func drop_held_object( \
+	apply_linear_velocity : Vector3 = Vector3(), apply_angular_velocity : Vector3 = Vector3() \
+	) -> void:
 	# Make sure we clear some initial state
 	_remote_transform.remote_path = NodePath()
 	_remove_collision()
@@ -480,7 +490,7 @@ func drop_held_object(apply_linear_velocity : Vector3 = Vector3(), apply_angular
 	_is_primary = false
 
 
-func _process(delta):
+func _process(_delta):
 	# Don't run in editor
 	if Engine.is_editor_hint():
 		return

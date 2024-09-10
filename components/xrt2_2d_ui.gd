@@ -1,5 +1,6 @@
+#-------------------------------------------------------------------------------
 # xrt2_2d_ui.gd
-#
+#-------------------------------------------------------------------------------
 # MIT License
 #
 # Copyright (c) 2024-present Bastiaan Olij, Malcolm A Nixon and contributors
@@ -21,6 +22,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#-------------------------------------------------------------------------------
+
 
 @tool
 extends Node3D
@@ -33,7 +36,8 @@ extends Node3D
 
 # Node helpers
 @onready var _origin : Node3D = $FollowXROrigin3D
-@onready var _composition_layer : OpenXRCompositionLayerQuad = $FollowXROrigin3D/OpenXRCompositionLayerQuad
+@onready var _composition_layer : OpenXRCompositionLayerQuad = \
+	$FollowXROrigin3D/OpenXRCompositionLayerQuad
 
 
 # Called when our screen size was changed
@@ -47,7 +51,7 @@ func _ready():
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	# Don't run in editor
 	if Engine.is_editor_hint():
 		return
