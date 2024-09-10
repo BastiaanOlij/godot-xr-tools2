@@ -300,7 +300,6 @@ func _on_skeleton_updated():
 			if _digit_collision_shapes.has(bone_name):
 				collision_node = _digit_collision_shapes[bone_name]
 			else:
-				print("Creating ",bone_name)
 				collision_node = CollisionShape3D.new()
 				collision_node.name = bone_name
 				collision_node.shape = \
