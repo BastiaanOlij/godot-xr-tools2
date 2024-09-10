@@ -5,3 +5,6 @@
 *.tres eol=lf
 *.import eol=lf
 *.gdshader eol=lf
+*.yaml eol=lf
+*.yml eol=lf
+*.py eol=lf

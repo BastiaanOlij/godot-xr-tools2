@@ -1,5 +1,6 @@
+#-------------------------------------------------------------------------------
 # xrt2_force_body.gd
-#
+#-------------------------------------------------------------------------------
 # MIT License
 #
 # Copyright (c) 2024-present Bastiaan Olij, Malcolm A Nixon and contributors
@@ -21,10 +22,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#-------------------------------------------------------------------------------
+
 
 @tool
-extends AnimatableBody3D
 class_name XRT2ForceBody
+extends AnimatableBody3D
 
 ## XRTools2 Force Body script
 ##
@@ -112,7 +115,8 @@ func move_and_slide(move : Vector3) -> ForceBodyCollision:
 			if body and body == last_body:
 				# Don't repeatedly hit the same body
 				return ret
-			elif body:
+
+			if body:
 				# Calculate the momentum lost by the collision
 				var lost_momentum := step_move - next_move
 

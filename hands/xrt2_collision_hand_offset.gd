@@ -1,5 +1,6 @@
-# xrt2_collision_offset.gd
-#
+#-------------------------------------------------------------------------------
+# xrt2_collision_hand_offset.gd
+#-------------------------------------------------------------------------------
 # MIT License
 #
 # Copyright (c) 2024-present Bastiaan Olij, Malcolm A Nixon and contributors
@@ -21,9 +22,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#-------------------------------------------------------------------------------
 
-extends Node3D
+
 class_name XRT2CollisionHandOffset
+extends Node3D
 
 ## XRTools2 Collision Hand Offset Script
 ##
@@ -45,14 +48,14 @@ func _physics_process(_delta):
 		var follow_parent = follow_node.get_parent()
 		if follow_parent:
 			# XRT2CollisionHand has top level enabled,
-			# so this transform is in global space...
+			# so this transform is in global space.
 			var t : Transform3D = follow_node.transform
-			
-			# We want our local transform
+
+			# We want our local transform.
 			t = follow_parent.global_transform.inverse() * t
 
-			# And now adjust our position to our new orientation
+			# And now adjust our position to our new orientation.
 			t.origin = get_parent().global_basis.inverse() * follow_parent.global_basis * t.origin
 
-			# And use this.. 
+			# And use this.
 			transform = t

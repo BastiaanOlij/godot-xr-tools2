@@ -1,0 +1,61 @@
+# Workflow to perform static checks
+name: Static checks
+
+on:
+  [push, pull_request]
+
+jobs:
+  static-checks:
+    name: Code style, file formatting, etc.
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the repository
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      # Ensure python is installed
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # Install gdtoolkit
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'gdtoolkit==4.*'
+
+      # Find files that were changed in this PR
+      - name: Get changed files
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            files=$(git diff-tree --no-commit-id --name-only -r HEAD^1..HEAD 2> /dev/null || true)
+          elif [ "${{ github.event_name }}" == "push" -a "${{ github.event.forced }}" == "false" -a "${{ github.event.created }}" == "false" ]; then
+            files=$(git diff-tree --no-commit-id --name-only -r ${{ github.event.before }}..${{ github.event.after }} 2> /dev/null || true)
+          fi
+          echo "$files" >> changed.txt
+          cat changed.txt
+          files=$(echo "$files" | grep -v misc | xargs -I {} sh -c 'echo "\"./{}\""' | tr '\n' ' ')
+          echo "CHANGED_FILES=$files" >> $GITHUB_ENV
+
+      # Run our pre-commit hooks but only for the files we have changed
+      - name: Style checks via pre-commit
+        uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: --verbose --files ${{ env.CHANGED_FILES }}
+
+      # Lint the godot-xr-tools2 addon
+      - name: Lint Godot XR Tools 2
+        run: |
+          for file in $( cat changed.txt | grep .gd )
+          do
+            # Make sure it ends with .gd
+            if [[ $file =~ .gd$ ]]; then
+              gdlint $file
+            fi
+          done
