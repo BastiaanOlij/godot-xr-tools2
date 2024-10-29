@@ -1,7 +1,7 @@
 [gd_scene load_steps=18 format=3 uid="uid://7lt82mv6lmxo"]
 
-[ext_resource type="PackedScene" uid="uid://cl352deej8d8f" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.tscn" id="1_spd8v"]
-[ext_resource type="PackedScene" uid="uid://bq5rgapu8u4xk" path="res://addons/godot-xr-tools2/player_rigs/xrt2_player_character.tscn" id="2_kgg0w"]
+[ext_resource type="PackedScene" uid="uid://xrt200000007" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.tscn" id="1_spd8v"]
+[ext_resource type="PackedScene" uid="uid://xrt200000012" path="res://addons/godot-xr-tools2/player_rigs/xrt2_player_character.tscn" id="2_kgg0w"]
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/player_rigs/movement_functions/xrt2_direct_movement.gd" id="3_7f0s7"]
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/player_rigs/interaction_functions/xrt2_pickup.gd" id="4_l0n08"]
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/hands/xrt2_collision_hand.gd" id="5_don5u"]
