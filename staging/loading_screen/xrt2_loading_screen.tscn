@@ -1,8 +1,8 @@
-[gd_scene load_steps=13 format=3 uid="uid://j2dmckl6eh61"]
+[gd_scene load_steps=13 format=3 uid="uid://xrt200000004"]
 
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/staging/loading_screen/xrt2_loading_screen.gd" id="1_ugti3"]
-[ext_resource type="PackedScene" uid="uid://c0osfqxwvi7ko" path="res://addons/godot-xr-tools2/ui/buttons/xrt2_hold_button.tscn" id="2_m02j3"]
-[ext_resource type="Texture2D" uid="uid://d5sknr112aih" path="res://addons/godot-xr-tools2/icon.png" id="2_y53v2"]
+[ext_resource type="PackedScene" uid="uid://xrt200000011" path="res://addons/godot-xr-tools2/ui/buttons/xrt2_hold_button.tscn" id="2_m02j3"]
+[ext_resource type="Texture2D" uid="uid://xrt200000001" path="res://addons/godot-xr-tools2/icon.png" id="2_y53v2"]
 [ext_resource type="Shader" path="res://addons/godot-xr-tools2/shaders/unshaded_texture_with_alpha.gdshader" id="4_pjv7i"]
 
 [sub_resource type="Curve" id="Curve_ve03c"]
@@ -66,7 +66,7 @@ material_override = SubResource("ShaderMaterial_juqya")
 mesh = SubResource("QuadMesh_d472w")
 
 [node name="SpinningLogo" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.839271, 0, -0.543714, 0, 1, 0, 0.543714, 0, 0.839271, 6, -3, -10)
+transform = Transform3D(-0.111994, 0, -0.993709, 0, 1, 0, 0.993709, 0, -0.111994, 6, -3, -10)
 material_override = SubResource("ShaderMaterial_ycls2")
 mesh = SubResource("QuadMesh_rkvh4")
 

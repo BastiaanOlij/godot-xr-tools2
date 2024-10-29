@@ -1,6 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://c0osfqxwvi7ko"]
+[gd_scene load_steps=5 format=3 uid="uid://xrt200000011"]
 
-[ext_resource type="Shader" uid="uid://ntq5rgbft3mu" path="res://addons/godot-xr-tools2/ui/buttons/xrt2_hold_button_visualshader.tres" id="1_7ops6"]
+[ext_resource type="Shader" uid="uid://xrt200000010" path="res://addons/godot-xr-tools2/ui/buttons/xrt2_hold_button_visualshader.tres" id="1_7ops6"]
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/ui/buttons/xrt2_hold_button.gd" id="1_ir5oa"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hl8u4"]
