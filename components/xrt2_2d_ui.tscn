@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://bc6kket4vsy0r"]
+[gd_scene load_steps=2 format=3 uid="uid://xrt200000013"]
 
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/components/xrt2_2d_ui.gd" id="1_icl45"]
 

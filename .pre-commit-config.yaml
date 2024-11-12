@@ -9,3 +9,8 @@ repos:
         language: python
         entry: python misc/workflow_scripts/copyright_headers.py
         files: \.(gd)$
+      - id: uid-checks
+        name: uid-checks
+        language: python
+        entry: python misc/workflow_scripts/uid_checks.py
+        files: \.(tscn|import|tres)$
