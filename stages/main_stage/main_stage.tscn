@@ -1,7 +1,7 @@
-[gd_scene load_steps=18 format=3 uid="uid://7lt82mv6lmxo"]
+[gd_scene load_steps=19 format=3 uid="uid://7lt82mv6lmxo"]
 
 [ext_resource type="PackedScene" uid="uid://xrt200000007" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.tscn" id="1_spd8v"]
-[ext_resource type="PackedScene" uid="uid://xrt200000012" path="res://addons/godot-xr-tools2/player_rigs/xrt2_player_character.tscn" id="2_kgg0w"]
+[ext_resource type="PackedScene" uid="uid://xrt200000009" path="res://addons/godot-xr-tools2/player_rigs/xrt2_dynamic_player_rig.tscn" id="2_f7mcw"]
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/player_rigs/movement_functions/xrt2_direct_movement.gd" id="3_7f0s7"]
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/player_rigs/interaction_functions/xrt2_pickup.gd" id="4_l0n08"]
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/hands/xrt2_collision_hand.gd" id="5_don5u"]
@@ -25,8 +25,11 @@ background_mode = 2
 sky = SubResource("Sky_yknig")
 tonemap_mode = 2
 
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0jk8f"]
+radius = 0.3
+
 [node name="MainStage" node_paths=PackedStringArray("player_origin") instance=ExtResource("1_spd8v")]
-player_origin = NodePath("Xrt2PlayerCharacter/DynamicPlayerRig")
+player_origin = NodePath("CharacterBody3D/XRT2DynamicPlayerRig")
 
 [node name="WorldEnvironment" parent="." index="0"]
 environment = SubResource("Environment_8sh2w")
@@ -34,75 +37,75 @@ environment = SubResource("Environment_8sh2w")
 [node name="SunLight3D" parent="." index="1"]
 shadow_enabled = true
 
-[node name="Xrt2PlayerCharacter" parent="." index="2" instance=ExtResource("2_kgg0w")]
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." index="2"]
 
-[node name="LeftHand" parent="Xrt2PlayerCharacter/DynamicPlayerRig" index="1"]
-show_when_tracked = false
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_0jk8f")
 
-[node name="XRT2CollisionHand" type="AnimatableBody3D" parent="Xrt2PlayerCharacter/DynamicPlayerRig/LeftHand" index="0" node_paths=PackedStringArray("hand_skeleton")]
+[node name="XRT2DynamicPlayerRig" parent="CharacterBody3D" index="1" instance=ExtResource("2_f7mcw")]
+
+[node name="XRT2CollisionHand" type="AnimatableBody3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHand" index="0" node_paths=PackedStringArray("hand_skeleton")]
 script = ExtResource("5_don5u")
 hand_skeleton = NodePath("../../LeftHandTracker/XRT2CollisionHandOffset/LeftHandHumanoid2/LeftHandHumanoid/Skeleton3D")
 
-[node name="XRT2Pickup" type="Node3D" parent="Xrt2PlayerCharacter/DynamicPlayerRig/LeftHand/XRT2CollisionHand" index="0"]
+[node name="XRT2Pickup" type="Node3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHand/XRT2CollisionHand" index="0"]
 script = ExtResource("4_l0n08")
 
-[node name="RightHand" parent="Xrt2PlayerCharacter/DynamicPlayerRig" index="2"]
-show_when_tracked = false
-
-[node name="XRT2CollisionHand" type="AnimatableBody3D" parent="Xrt2PlayerCharacter/DynamicPlayerRig/RightHand" index="0" node_paths=PackedStringArray("hand_skeleton")]
+[node name="XRT2CollisionHand" type="AnimatableBody3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/RightHand" index="0" node_paths=PackedStringArray("hand_skeleton")]
 script = ExtResource("5_don5u")
 hand_skeleton = NodePath("../../RightHandTracker/XRT2CollisionHandOffset/RightHandHumanoid2/RightHandHumanoid/Skeleton3D")
 
-[node name="XRT2Pickup" type="Node3D" parent="Xrt2PlayerCharacter/DynamicPlayerRig/RightHand/XRT2CollisionHand" index="0"]
+[node name="XRT2Pickup" type="Node3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/RightHand/XRT2CollisionHand" index="0"]
 script = ExtResource("4_l0n08")
 
-[node name="LeftHandTracker" type="XRNode3D" parent="Xrt2PlayerCharacter/DynamicPlayerRig" index="3"]
+[node name="LeftHandTracker" type="XRNode3D" parent="CharacterBody3D/XRT2DynamicPlayerRig" index="3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, -0.5)
 tracker = &"/user/hand_tracker/left"
 show_when_tracked = true
 
-[node name="XRT2CollisionHandOffset" type="Node3D" parent="Xrt2PlayerCharacter/DynamicPlayerRig/LeftHandTracker" index="0" node_paths=PackedStringArray("follow_node")]
+[node name="XRT2CollisionHandOffset" type="Node3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHandTracker" index="0" node_paths=PackedStringArray("follow_node")]
 script = ExtResource("6_kqggo")
 follow_node = NodePath("../../LeftHand/XRT2CollisionHand")
 
-[node name="LeftHandHumanoid2" parent="Xrt2PlayerCharacter/DynamicPlayerRig/LeftHandTracker/XRT2CollisionHandOffset" index="0" instance=ExtResource("7_l3oid")]
+[node name="LeftHandHumanoid2" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHandTracker/XRT2CollisionHandOffset" index="0" instance=ExtResource("7_l3oid")]
 
-[node name="XRHandModifier3D" type="XRHandModifier3D" parent="Xrt2PlayerCharacter/DynamicPlayerRig/LeftHandTracker/XRT2CollisionHandOffset/LeftHandHumanoid2/LeftHandHumanoid/Skeleton3D" index="1"]
+[node name="XRHandModifier3D" type="XRHandModifier3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHandTracker/XRT2CollisionHandOffset/LeftHandHumanoid2/LeftHandHumanoid/Skeleton3D" index="1"]
 
-[node name="GhostLeftHand" parent="Xrt2PlayerCharacter/DynamicPlayerRig/LeftHandTracker" index="1" node_paths=PackedStringArray("offset_node") instance=ExtResource("7_l3oid")]
+[node name="GhostLeftHand" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHandTracker" index="1" node_paths=PackedStringArray("offset_node") instance=ExtResource("7_l3oid")]
 script = ExtResource("7_5eq2v")
 offset_node = NodePath("../XRT2CollisionHandOffset")
 
-[node name="LeftHandHumanoidMesh" parent="Xrt2PlayerCharacter/DynamicPlayerRig/LeftHandTracker/GhostLeftHand/LeftHandHumanoid/Skeleton3D" index="0"]
+[node name="LeftHandHumanoidMesh" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHandTracker/GhostLeftHand/LeftHandHumanoid/Skeleton3D" index="0"]
 material_override = ExtResource("8_64kkr")
 
-[node name="XRHandModifier3D" type="XRHandModifier3D" parent="Xrt2PlayerCharacter/DynamicPlayerRig/LeftHandTracker/GhostLeftHand/LeftHandHumanoid/Skeleton3D" index="1"]
+[node name="XRHandModifier3D" type="XRHandModifier3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHandTracker/GhostLeftHand/LeftHandHumanoid/Skeleton3D" index="1"]
 
-[node name="RightHandTracker" type="XRNode3D" parent="Xrt2PlayerCharacter/DynamicPlayerRig" index="4"]
+[node name="RightHandTracker" type="XRNode3D" parent="CharacterBody3D/XRT2DynamicPlayerRig" index="4"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1, -0.5)
 tracker = &"/user/hand_tracker/right"
 show_when_tracked = true
 
-[node name="XRT2CollisionHandOffset" type="Node3D" parent="Xrt2PlayerCharacter/DynamicPlayerRig/RightHandTracker" index="0" node_paths=PackedStringArray("follow_node")]
+[node name="XRT2CollisionHandOffset" type="Node3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/RightHandTracker" index="0" node_paths=PackedStringArray("follow_node")]
 script = ExtResource("6_kqggo")
 follow_node = NodePath("../../RightHand/XRT2CollisionHand")
 
-[node name="RightHandHumanoid2" parent="Xrt2PlayerCharacter/DynamicPlayerRig/RightHandTracker/XRT2CollisionHandOffset" index="0" instance=ExtResource("8_8e4u0")]
+[node name="RightHandHumanoid2" parent="CharacterBody3D/XRT2DynamicPlayerRig/RightHandTracker/XRT2CollisionHandOffset" index="0" instance=ExtResource("8_8e4u0")]
 
-[node name="XRHandModifier3D" type="XRHandModifier3D" parent="Xrt2PlayerCharacter/DynamicPlayerRig/RightHandTracker/XRT2CollisionHandOffset/RightHandHumanoid2/RightHandHumanoid/Skeleton3D" index="1"]
+[node name="XRHandModifier3D" type="XRHandModifier3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/RightHandTracker/XRT2CollisionHandOffset/RightHandHumanoid2/RightHandHumanoid/Skeleton3D" index="1"]
 hand_tracker = &"/user/hand_tracker/right"
 
-[node name="GhostRightHand" parent="Xrt2PlayerCharacter/DynamicPlayerRig/RightHandTracker" index="1" node_paths=PackedStringArray("offset_node") instance=ExtResource("8_8e4u0")]
+[node name="GhostRightHand" parent="CharacterBody3D/XRT2DynamicPlayerRig/RightHandTracker" index="1" node_paths=PackedStringArray("offset_node") instance=ExtResource("8_8e4u0")]
 script = ExtResource("7_5eq2v")
 offset_node = NodePath("../XRT2CollisionHandOffset")
 
-[node name="RightHandHumanoidMesh" parent="Xrt2PlayerCharacter/DynamicPlayerRig/RightHandTracker/GhostRightHand/RightHandHumanoid/Skeleton3D" index="0"]
+[node name="RightHandHumanoidMesh" parent="CharacterBody3D/XRT2DynamicPlayerRig/RightHandTracker/GhostRightHand/RightHandHumanoid/Skeleton3D" index="0"]
 material_override = ExtResource("8_64kkr")
 
-[node name="XRHandModifier3D" type="XRHandModifier3D" parent="Xrt2PlayerCharacter/DynamicPlayerRig/RightHandTracker/GhostRightHand/RightHandHumanoid/Skeleton3D" index="1"]
+[node name="XRHandModifier3D" type="XRHandModifier3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/RightHandTracker/GhostRightHand/RightHandHumanoid/Skeleton3D" index="1"]
 hand_tracker = &"/user/hand_tracker/right"
 
-[node name="XRT2DirectMovement" type="Node3D" parent="Xrt2PlayerCharacter" index="2"]
+[node name="XRT2DirectMovement" type="Node3D" parent="CharacterBody3D/XRT2DynamicPlayerRig" index="5"]
 script = ExtResource("3_7f0s7")
 movement_action = "move"
 
@@ -131,9 +134,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.144, 1.15, 0.376393)
 [node name="Box03" parent="Table" index="8" instance=ExtResource("13_ousus")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.181614, 1.15, 0.376)
 
-[editable path="Xrt2PlayerCharacter"]
-[editable path="Xrt2PlayerCharacter/DynamicPlayerRig"]
-[editable path="Xrt2PlayerCharacter/DynamicPlayerRig/LeftHandTracker/XRT2CollisionHandOffset/LeftHandHumanoid2"]
-[editable path="Xrt2PlayerCharacter/DynamicPlayerRig/LeftHandTracker/GhostLeftHand"]
-[editable path="Xrt2PlayerCharacter/DynamicPlayerRig/RightHandTracker/XRT2CollisionHandOffset/RightHandHumanoid2"]
-[editable path="Xrt2PlayerCharacter/DynamicPlayerRig/RightHandTracker/GhostRightHand"]
+[editable path="CharacterBody3D/XRT2DynamicPlayerRig"]
+[editable path="CharacterBody3D/XRT2DynamicPlayerRig/LeftHandTracker/XRT2CollisionHandOffset/LeftHandHumanoid2"]
+[editable path="CharacterBody3D/XRT2DynamicPlayerRig/LeftHandTracker/GhostLeftHand"]
+[editable path="CharacterBody3D/XRT2DynamicPlayerRig/RightHandTracker/XRT2CollisionHandOffset/RightHandHumanoid2"]
+[editable path="CharacterBody3D/XRT2DynamicPlayerRig/RightHandTracker/GhostRightHand"]

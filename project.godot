@@ -15,6 +15,10 @@ run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.3", "Mobile")
 config/icon="res://icon.svg"
 
+[debug]
+
+settings/stdout/verbose_stdout=true
+
 [input]
 
 move+x={
@@ -51,7 +55,7 @@ textures/vram_compression/import_etc2_astc=true
 [xr]
 
 openxr/enabled=true
-openxr/reference_space=1
+openxr/reference_space=2
 openxr/foveation_level=3
 openxr/foveation_dynamic=true
 openxr/extensions/hand_interaction_profile=true
