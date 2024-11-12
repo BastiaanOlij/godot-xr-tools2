@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/player_rigs/xrt2_dynamic_player_rig.gd" id="1_2824a"]
 [ext_resource type="PackedScene" uid="uid://xrt200000005" path="res://addons/godot-xr-tools2/effects/fade/xrt2_fade.tscn" id="2_awihb"]
 
-[node name="DynamicPlayerRig" type="XROrigin3D"]
+[node name="Xrt2DynamicPlayerRig" type="XROrigin3D"]
 script = ExtResource("1_2824a")
 
 [node name="XRCamera3D" type="XRCamera3D" parent="."]
@@ -12,7 +12,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
 [node name="Neck" type="Node3D" parent="XRCamera3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0.1)
 
-[node name="Fade" parent="XRCamera3D" instance=ExtResource("2_awihb")]
+[node name="Xrt2Fade" parent="XRCamera3D" instance=ExtResource("2_awihb")]
 
 [node name="LeftHand" type="XRController3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, -0.5)

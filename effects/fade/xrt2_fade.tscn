@@ -12,7 +12,7 @@ shader_parameter/alpha = 0.1
 [sub_resource type="QuadMesh" id="QuadMesh_1n2v3"]
 size = Vector2(2, 2)
 
-[node name="Fade" type="Node3D"]
+[node name="Xrt2Fade" type="Node3D"]
 script = ExtResource("1_y1bfr")
 
 [node name="ScreenQuad" type="MeshInstance3D" parent="."]
