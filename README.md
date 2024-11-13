@@ -1,7 +1,8 @@
 # Godot XR Tools v2 (XRT2)
 
 > **WARNING:** This repo is still a Work in Progress, this toolkit is still missing many features from Godot XR Tools v1 and is short on documentation.
-> Check the demo branch for a demo showcases current features.
+> Check the demo branch for a demo showcasing current features.
+>
 > While under early development this repository is hosted on my personal GitHub space.
 
 This repository contains a number of support files and support scenes that can be used together with the various AR and VR interfaces for the Godot game engine.
@@ -67,9 +68,6 @@ Manually create the `addons/godot-xr-tools2` folder in your project and unzip th
 Godot XR Tools 2 is **not** a drop in replacement for Godot XR Tools and if you have a project that far along we recommend not upgrading as you will need to do major refactoring.
 
 If you do wish to go down this route, install Godot XR Tools 2 alongside Godot XR Tools 1 and migrate your scenes over one by one.
-
-> Currently there is an issue with Godots UUID system where it will confuse parts of Godot XR Tools 2 with Godot XR Tools 1.
-> We are working on resolving this inside of the plugin.
 
 While Godot XR Tools 2 builds ontop of the implementations in Godot XR Tools 1 there is a fundamental difference in approach.
 Godot XR Tools 1 relies heavily on inheritence and require you to extend scenes.
