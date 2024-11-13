@@ -1,5 +1,6 @@
+#-------------------------------------------------------------------------------
 # xrt2_stage_base.gd
-#
+#-------------------------------------------------------------------------------
 # MIT License
 #
 # Copyright (c) 2024-present Bastiaan Olij, Malcolm A Nixon and contributors
@@ -21,6 +22,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#-------------------------------------------------------------------------------
 
 @tool
 class_name XRT2StageBase
@@ -134,10 +136,26 @@ func reset_scene(user_data = null) -> void:
 	request_reset_scene.emit(user_data)
 
 
+func _find_xr_origin(node : Node3D) -> XROrigin3D:
+	for child in node.get_children():
+		if child is XROrigin3D:
+			# Found it!
+			return child
+		elif child is Node3D:
+			return _find_xr_origin(child)
+
+	# Could not find it
+	return null
+
+
 func _ready() -> void:
 	# Do not run if in the editor
 	if Engine.is_editor_hint():
 		return
+
+	if not player_origin:
+		# Lets find it...
+		player_origin = _find_xr_origin(self)
 
 	if player_origin:
 		_get_xr_camera()

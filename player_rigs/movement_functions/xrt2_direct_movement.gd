@@ -1,8 +1,35 @@
-@tool
-extends XRT2MovementProvider
-class_name XRT2DirectMovement
+#-------------------------------------------------------------------------------
+# xrt2_direct_movement.gd
+#-------------------------------------------------------------------------------
+# MIT License
+#
+# Copyright (c) 2024-present Bastiaan Olij, Malcolm A Nixon and contributors
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#-------------------------------------------------------------------------------
 
-## The action in the OpenXR action map or Godot input map that controls movement (for input map add entries with -x/+x/-y/+y suffixes)
+@tool
+class_name XRT2DirectMovement
+extends XRT2MovementProvider
+
+## The action in the OpenXR action map or Godot input map that controls movement
+## (for input map add entries with -x/+x/-y/+y suffixes)
 @export var movement_action : String = "primary"
 
 ## Rotation speed based on X input (zero if no rotation wanted)
@@ -34,7 +61,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 
 ## Called by player characters physics process.
-func handle_movement(player_character : XRT2PlayerCharacter, delta : float):
+func handle_movement(character_body : CharacterBody3D, delta : float):
 	# If not enabled, ignore it (shouldn't be called)
 	if !enabled:
 		return
@@ -45,7 +72,7 @@ func handle_movement(player_character : XRT2PlayerCharacter, delta : float):
 		movement_input = xr_controller.get_vector2(movement_action)
 	else:
 		# If we're not, check all controllers
-		# TODO this should change to using proper OpenXR API for this!
+		# TODO this should change to using proper (Open)XR API for this!
 		var controllers = XRServer.get_trackers(XRServer.TRACKER_CONTROLLER)
 		for controller_path in controllers:
 			var controller : XRControllerTracker = controllers[controller_path]
@@ -62,24 +89,28 @@ func handle_movement(player_character : XRT2PlayerCharacter, delta : float):
 
 	if movement_input.x != 0.0 and rotation_speed > 0.0:
 		# Handle rotation
-		var player_basis : Basis = player_character.global_basis
-		player_character.global_basis = player_basis.rotated(player_basis.y, -movement_input.x * delta * rotation_speed)
+		var player_basis : Basis = character_body.global_basis
+		character_body.global_basis = player_basis.rotated( \
+			player_basis.y, \
+			-movement_input.x * delta * rotation_speed)
 
-	if player_character.is_on_floor() and (strafe_movement_speed > 0.0 or forward_movement_speed > 0.0):
+	if character_body.is_on_floor() and (strafe_movement_speed > 0.0 or forward_movement_speed > 0.0):
 		# This updates the velocity of our player according to our input
 		# the actual movement is applied in xr_player_character
 
-		var velocity : Vector3 = player_character.velocity
+		var velocity : Vector3 = character_body.velocity
 
 		# Now handle forward/backwards/left/right movement.
-		var direction = player_character.global_transform.basis * Vector3(movement_input.x * strafe_movement_speed, 0.0, -movement_input.y * forward_movement_speed)
+		var direction = character_body.global_transform.basis * Vector3(movement_input.x \
+			* strafe_movement_speed, 0.0, -movement_input.y * forward_movement_speed)
+
+		# TODO the code below needs to change in case the player is not standing upright
 
 		# Add our current downwards movement to our movement direction
-		# TODO if gravity is not straight down, we may need to alter this
 		direction.y += velocity.y
 
 		velocity.x = move_toward(velocity.x, direction.x, delta * movement_acceleration)
 		velocity.y = move_toward(velocity.y, direction.y, delta * movement_acceleration)
 		velocity.z = move_toward(velocity.z, direction.z, delta * movement_acceleration)
 
-		player_character.velocity = velocity
+		character_body.velocity = velocity

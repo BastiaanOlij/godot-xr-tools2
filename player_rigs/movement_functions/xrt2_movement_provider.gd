@@ -1,5 +1,6 @@
+#-------------------------------------------------------------------------------
 # xrt2_movement_provider.gd
-#
+#-------------------------------------------------------------------------------
 # MIT License
 #
 # Copyright (c) 2024-present Bastiaan Olij, Malcolm A Nixon and contributors
@@ -21,24 +22,26 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#-------------------------------------------------------------------------------
 
 @tool
-extends Node3D
 class_name XRT2MovementProvider
+extends Node3D
 
 ## If ticked, this movement function is enabled
 @export var enabled : bool = true
 
-@onready var _xr_player_character : XRT2PlayerCharacter = XRT2PlayerCharacter.get_xr_player_character(self)
+@onready var _xr_dynamic_rig : XRT2DynamicPlayerRig = \
+	XRT2DynamicPlayerRig.get_xr_dynamic_player_rig(self)
 
 
 # Verifies if we have a valid configuration.
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
 
-	var player_character = XRT2PlayerCharacter.get_xr_player_character(self)
-	if not player_character:
-		warnings.push_back("This node requires an XRT2PlayerCharacter as an anchestor.")
+	var dynamic_rig = XRT2DynamicPlayerRig.get_xr_dynamic_player_rig(self)
+	if not dynamic_rig:
+		warnings.push_back("This node requires an XRT2DynamicPlayerRig as an anchestor.")
 
 	# Return warnings
 	return warnings
@@ -49,13 +52,13 @@ func _ready():
 	if Engine.is_editor_hint():
 		return
 
-	if _xr_player_character:
-		_xr_player_character.register_movement_provider(self)
+	if _xr_dynamic_rig:
+		_xr_dynamic_rig.register_movement_provider(self)
 
 
 ## Called by player characters physics process.
-func handle_movement(player_character : XRT2PlayerCharacter, delta : float):
+func handle_movement(_character_body : CharacterBody3D, _delta : float):
 	# Implement on extended class.
 	# Note: player character will perform move_and_slide and handle gravity,
-	# you should implement 
+	# you should implement code that further adjust velocity for this movement.
 	pass

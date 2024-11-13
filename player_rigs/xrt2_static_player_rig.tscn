@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://addons/godot-xr-tools2/player_rigs/xrt2_static_player_rig.gd" id="1_v7cup"]
 [ext_resource type="PackedScene" uid="uid://xrt200000005" path="res://addons/godot-xr-tools2/effects/fade/xrt2_fade.tscn" id="2_0btq6"]
 
-[node name="StaticPlayerRig" type="XROrigin3D"]
+[node name="Xrt2StaticPlayerRig" type="XROrigin3D"]
 script = ExtResource("1_v7cup")
 
 [node name="XRCamera3D" type="XRCamera3D" parent="."]
