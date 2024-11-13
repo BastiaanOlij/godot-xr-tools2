@@ -1,5 +1,9 @@
 # Godot XR Tools v2 (XRT2)
 
+> **WARNING:** This repo is still a Work in Progress, this toolkit is still missing many features from Godot XR Tools v1 and is short on documentation.
+> Check the demo branch for a demo showcases current features.
+> While under early development this repository is hosted on my personal GitHub space.
+
 This repository contains a number of support files and support scenes that can be used together with the various AR and VR interfaces for the Godot game engine.
 
 ![GitHub forks](https://img.shields.io/github/forks/BastiaanOlij/godot-xr-tools2?style=plastic)
@@ -90,7 +94,7 @@ Images are licensed under CC0 unless otherwise specified.
 
 See `LICENSE` for the full license.
 
-## Complying with the license
+### Complying with the license
 
 If you use Godot XR Tools 2 in your project, this license must be accessible to your end users either by reproducing it in a credits/about screen or included as a distributed file. 
 
