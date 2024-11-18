@@ -61,6 +61,12 @@ class CopiedCollision extends RefCounted:
 	var collision_shape : CollisionShape3D
 	var org_transform : Transform3D
 
+# Array of all current pickup handlers
+static var _pickup_handlers : Array[XRT2Pickup]
+
+# We only want one hand to highlight
+static var _highlighted_bodies : Array[Node3D]
+
 ## If ticked we monitor for things we can pick up
 @export var enabled : bool = true:
 	set(value):
@@ -133,13 +139,6 @@ var _highlight_material : ShaderMaterial = \
 
 # Active copied collisions
 var _active_copied_collisions : Array[CopiedCollision]
-
-# Array of all current pickup handlers
-static var _pickup_handlers : Array[XRT2Pickup]
-
-# We only want one hand to highlight
-static var _highlighted_bodies : Array[Node3D]
-
 
 ## Find which pickup handler has picked up this object
 static func picked_up_by(what : PhysicsBody3D) -> XRT2Pickup:
@@ -365,11 +364,13 @@ func _remove_highlight():
 	_active_highlights.clear()
 
 
-func _copy_collisions(from : RigidBody3D):
-	if not is_instance_valid(_collision_hand) or not is_instance_valid(_remote_transform):
+func _copy_collisions():
+	if not is_instance_valid(_collision_hand) \
+		or not is_instance_valid(_picked_up) \
+		or not is_instance_valid(_remote_transform):
 		return
 
-	for child in from.get_children():
+	for child in _picked_up.get_children():
 		if child is CollisionShape3D:
 			var copied_collision : CopiedCollision = CopiedCollision.new()
 			copied_collision.collision_shape = CollisionShape3D.new()
@@ -383,7 +384,7 @@ func _copy_collisions(from : RigidBody3D):
 			_active_copied_collisions.push_back(copied_collision)
 
 
-func _update_collision():
+func _update_collisions():
 	if is_instance_valid(_collision_hand) and is_instance_valid(_remote_transform):
 		for copied_collision : CopiedCollision in _active_copied_collisions:
 			if is_instance_valid(copied_collision.collision_shape):
@@ -391,7 +392,7 @@ func _update_collision():
 					copied_collision.org_transform
 
 
-func _remove_collision():
+func _remove_collisions():
 	if is_instance_valid(_collision_hand):
 		for copied_collision : CopiedCollision in _active_copied_collisions:
 			if is_instance_valid(copied_collision.collision_shape):
@@ -401,6 +402,28 @@ func _remove_collision():
 	_active_copied_collisions.clear()
 
 
+func _add_exclusions():
+	if is_instance_valid(_collision_hand) and is_instance_valid(_picked_up):
+		_collision_hand.add_collision_exception_with(_picked_up)
+		_picked_up.add_collision_exception_with(_collision_hand)
+
+
+func _remove_exclusions():
+	if is_instance_valid(_collision_hand) and is_instance_valid(_picked_up):
+		# Delay this to give the object time to drop away from our hand.
+		get_tree().create_timer(0.5).timeout.connect( \
+			_remove_exclusion \
+			.bind(_collision_hand) \
+			.bind(_picked_up))
+
+
+static func _remove_exclusion(a : PhysicsBody3D, b : PhysicsBody3D):
+	if is_instance_valid(a) and is_instance_valid(b):
+		b.remove_collision_exception_with(a)
+		a.remove_collision_exception_with(b)
+
+
+## Pick up this object
 func pickup_object(which : PhysicsBody3D):
 	if not which is RigidBody3D:
 		push_warning("Picking up objects other than Rigidbody is currently disabled.")
@@ -448,7 +471,8 @@ func pickup_object(which : PhysicsBody3D):
 			_tween.tween_property(_remote_transform, "transform", dest_transform, 0.1)
 
 			if _collision_hand:
-				_copy_collisions(_picked_up)
+				_copy_collisions()
+				_add_exclusions()
 
 				# TODO Should add weight to collision hand
 
@@ -458,12 +482,14 @@ func pickup_object(which : PhysicsBody3D):
 		pass
 
 
+## Drop object we're currently holding
 func drop_held_object( \
 	apply_linear_velocity : Vector3 = Vector3(), apply_angular_velocity : Vector3 = Vector3() \
 	) -> void:
 	# Make sure we clear some initial state
 	_remote_transform.remote_path = ""
-	_remove_collision()
+	_remove_collisions()
+	_remove_exclusions()
 
 	# TODO remove weight from collision hand
 
@@ -481,9 +507,6 @@ func drop_held_object( \
 			_picked_up.freeze = false
 			_picked_up.linear_velocity = apply_linear_velocity
 			_picked_up.angular_velocity = apply_angular_velocity
-
-		# TODO add temporary exception for collisions with our hand
-
 
 	# And we're no longer holding something
 	_picked_up = null
@@ -504,14 +527,21 @@ func _process(_delta):
 		# We do not drop what we hold (right away)
 		return
 
+	# Get some info from our pose
+	var linear_velocity : Vector3 = Vector3()
+	var angular_velocity : Vector3 = Vector3()
+	var pose : XRPose = _xr_controller.get_pose()
+	if pose:
+		linear_velocity = pose.linear_velocity
+		angular_velocity = pose.angular_velocity
+
 	# Object we picked up no longer exists? Drop it
 	if _picked_up and not is_instance_valid(_picked_up):
-		drop_held_object()
+		drop_held_object(linear_velocity, angular_velocity)
 
 	# Our pickup handler is no longer enabled? Drop what we're holding
 	if not enabled and _picked_up:
-		var pose : XRPose = _xr_controller.get_pose()
-		drop_held_object(pose.linear_velocity, pose.angular_velocity)
+		drop_held_object(linear_velocity, angular_velocity)
 
 	# Check our grab status
 	var was_grab = _is_grab
@@ -530,10 +560,10 @@ func _process(_delta):
 
 	if _picked_up:
 		if _is_grab:
-			_update_collision()
+			_update_collisions()
 			return
 
-		drop_held_object()
+		drop_held_object(linear_velocity, angular_velocity)
 	elif not was_grab and _is_grab and _closest_object and is_instance_valid(_closest_object):
 		pickup_object(_closest_object)
 		return
