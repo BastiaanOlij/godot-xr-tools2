@@ -25,8 +25,8 @@ The following branches are in active development:
 
 |  Branch   |  Description                  |  Godot version  |
 |-----------|-------------------------------|-----------------|
-|  master   | Current development branch    |  Godot 4.3+     |
-|  demo     | Demo project for XRT2         |  Godot 4.3+     |
+|  master   | Current development branch    |  Godot 4.4+     |
+|  demo     | Demo project for XRT2         |  Godot 4.4+     |
 
 > Note, this repo is temporarily hosted on https://github.com/BastiaanOlij but will be moved to https://github.com/GodotVR in due course.
 
@@ -34,6 +34,10 @@ The following branches are in active development:
 
 Documentation for this plugin will become available at a later date when the plugin is more complete.
 For now check out [the demo branch](https://github.com/BastiaanOlij/godot-xr-tools2/tree/demo) in this repository.
+
+## Requirements
+
+Due to the introduction of UIDs and format changes to some of the resources used for OpenXR, the minimum version of Godot that needs to be used for this plugin is Godot 4.4.
 
 ## Installation
 
@@ -63,7 +67,7 @@ You can download a stable release from the releases page or use the download opt
 
 Manually create the `addons/godot-xr-tools2` folder in your project and unzip the contents of Godot XR Tools 2 into that folder. 
 
-## Upgrading from Godot XR Tools
+## Upgrading from Godot XR Tools v1
 
 Godot XR Tools 2 is **not** a drop in replacement for Godot XR Tools and if you have a project that far along we recommend not upgrading as you will need to do major refactoring.
 
@@ -74,6 +78,19 @@ Godot XR Tools 1 relies heavily on inheritence and require you to extend scenes.
 Godot XR Tools 2 uses composition where you add XR nodes to your scenes to enable functionality.
 
 This enabled Godot XR Tools 2 to be used even if you develop in another language than GDScript.
+
+## Upgrading to a new version of this plugin
+
+When upgrading this plugin to a newer v2 version, simply replace the contents of the `addons/godot-xr-tools2` folder with the new version.
+If you've submoduled the plugin, simply pull a new version by executing:
+```
+cd addons/godot-xr-tools2
+git pull origin main
+```
+
+> It's best to do this when Godot is NOT running!
+> We recommend deleting the `.godot/uid_cache.bin` file before starting Godot again.
+> We've had problems in the past of Godot retaining incorrect UIDs of the plugin. 
 
 ## Demo
 
