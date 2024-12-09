@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://xrt200000007"]
+[gd_scene load_steps=3 format=3 uid="uid://xrt20000007"]
 
-[ext_resource type="Script" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.gd" id="1_vdt8w"]
-[ext_resource type="Environment" uid="uid://xrt200000002" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_default_environment.tres" id="2_jqa2c"]
+[ext_resource type="Script" uid="uid://xrt2fjescsu" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.gd" id="1_vdt8w"]
+[ext_resource type="Environment" uid="uid://xrt20000002" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_default_environment.tres" id="2_jqa2c"]
 
 [node name="Xrt2SceneBase" type="Node3D"]
 script = ExtResource("1_vdt8w")

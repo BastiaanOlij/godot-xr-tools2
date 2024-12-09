@@ -1,4 +1,4 @@
-[gd_resource type="VisualShader" load_steps=28 format=3 uid="uid://xrt200000010"]
+[gd_resource type="VisualShader" load_steps=28 format=3 uid="uid://xrt20000010"]
 
 [sub_resource type="VisualShaderNodeFloatOp" id="1"]
 output_port_for_preview = 0

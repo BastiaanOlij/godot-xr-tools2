@@ -20,8 +20,15 @@ for f in sys.argv[1:]:
 
         while line != "":  # Dump everything until EOF
             for (uid) in re.findall(pattern, line):
-             fix = "uid://xrt2" + uid[10:18]
-             line = line.replace(uid, fix)
+                # Make sure it starts with xrt2 and cap to 7 extra digits to prevent overflows
+                fix = "uid://xrt2" + uid[10:17]
+
+                # Mark 9 and z as ? so they stand out, they shouldn't be used (see Godot GH-83843)
+                fix = fix.replace("9", "?")
+                fix = fix.replace("z", "?")
+
+                # And update
+                line = line.replace(uid, fix)
 
             text += line
             line = fileread.readline()
