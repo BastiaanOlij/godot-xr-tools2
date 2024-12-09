@@ -1,7 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://xrt200000005"]
+[gd_scene load_steps=5 format=3 uid="uid://xrt20000005"]
 
-[ext_resource type="Shader" path="res://addons/godot-xr-tools2/effects/fade/xrt2_fade.gdshader" id="1_kocuh"]
-[ext_resource type="Script" path="res://addons/godot-xr-tools2/effects/fade/xrt2_fade.gd" id="1_y1bfr"]
+[ext_resource type="Shader" uid="uid://xrt2yb6e2u5" path="res://addons/godot-xr-tools2/effects/fade/xrt2_fade.gdshader" id="1_kocuh"]
+[ext_resource type="Script" uid="uid://xrt2nm5hk3x" path="res://addons/godot-xr-tools2/effects/fade/xrt2_fade.gd" id="1_y1bfr"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_npntl"]
 resource_local_to_scene = true

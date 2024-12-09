@@ -1,12 +1,12 @@
-[gd_scene load_steps=13 format=3 uid="uid://xrt200000004"]
+[gd_scene load_steps=13 format=3 uid="uid://xrt20000004"]
 
-[ext_resource type="Script" path="res://addons/godot-xr-tools2/staging/loading_screen/xrt2_loading_screen.gd" id="1_ugti3"]
-[ext_resource type="PackedScene" uid="uid://xrt200000011" path="res://addons/godot-xr-tools2/ui/buttons/xrt2_hold_button.tscn" id="2_m02j3"]
-[ext_resource type="Texture2D" uid="uid://xrt200000001" path="res://addons/godot-xr-tools2/icon.png" id="2_y53v2"]
-[ext_resource type="Shader" path="res://addons/godot-xr-tools2/shaders/unshaded_texture_with_alpha.gdshader" id="4_pjv7i"]
+[ext_resource type="Script" uid="uid://xrt2pj0dr4j" path="res://addons/godot-xr-tools2/staging/loading_screen/xrt2_loading_screen.gd" id="1_ugti3"]
+[ext_resource type="PackedScene" uid="uid://xrt20000011" path="res://addons/godot-xr-tools2/ui/buttons/xrt2_hold_button.tscn" id="2_m02j3"]
+[ext_resource type="Texture2D" uid="uid://xrt20000001" path="res://addons/godot-xr-tools2/icon.png" id="2_y53v2"]
+[ext_resource type="Shader" uid="uid://xrt2as6gnsr" path="res://addons/godot-xr-tools2/shaders/unshaded_texture_with_alpha.gdshader" id="4_pjv7i"]
 
 [sub_resource type="Curve" id="Curve_ve03c"]
-max_value = 3.14
+_limits = [0.0, 3.14, 0.0, 1.0]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 3.14), 0.0, 0.0, 0, 0]
 point_count = 2
 
@@ -36,9 +36,9 @@ resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("4_pjv7i")
 shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/texture_albedo = ExtResource("2_y53v2")
 shader_parameter/uv_scale = Vector2(1, 1)
 shader_parameter/uv_offset = Vector2(0, 0)
-shader_parameter/texture_albedo = ExtResource("2_y53v2")
 
 [sub_resource type="QuadMesh" id="QuadMesh_rkvh4"]
 size = Vector2(3, 3)
@@ -66,7 +66,7 @@ material_override = SubResource("ShaderMaterial_juqya")
 mesh = SubResource("QuadMesh_d472w")
 
 [node name="SpinningLogo" type="MeshInstance3D" parent="."]
-transform = Transform3D(-0.111994, 0, -0.993709, 0, 1, 0, 0.993709, 0, -0.111994, 6, -3, -10)
+transform = Transform3D(0.240849, 0, 0.970563, 0, 1, 0, -0.970563, 0, 0.240849, 6, -3, -10)
 material_override = SubResource("ShaderMaterial_ycls2")
 mesh = SubResource("QuadMesh_rkvh4")
 

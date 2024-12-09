@@ -13,4 +13,4 @@ repos:
         name: uid-checks
         language: python
         entry: python misc/workflow_scripts/uid_checks.py
-        files: \.(tscn|import|tres)$
+        files: \.(tscn|import|tres|uid)$

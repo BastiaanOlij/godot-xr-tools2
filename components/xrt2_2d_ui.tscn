@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://xrt200000013"]
+[gd_scene load_steps=2 format=3 uid="uid://xrt20000013"]
 
-[ext_resource type="Script" path="res://addons/godot-xr-tools2/components/xrt2_2d_ui.gd" id="1_icl45"]
+[ext_resource type="Script" uid="uid://xrt2pss26pe" path="res://addons/godot-xr-tools2/components/xrt2_2d_ui.gd" id="1_icl45"]
 
 [node name="XR2DUI" type="Node3D"]
 process_priority = 99
