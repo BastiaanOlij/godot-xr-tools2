@@ -1,10 +1,12 @@
-[gd_scene load_steps=7 format=3 uid="uid://djjdpt6vpdljg"]
+[gd_scene load_steps=8 format=3 uid="uid://djjdpt6vpdljg"]
 
-[ext_resource type="Shader" path="res://materials_and_shaders/textured.gdshader" id="1_k2m5r"]
+[ext_resource type="Shader" uid="uid://hy6wp5qwpmjk" path="res://materials_and_shaders/textured.gdshader" id="1_k2m5r"]
+[ext_resource type="Script" uid="uid://ba6wewfa3a1cg" path="res://components/box.gd" id="1_ve6ct"]
 [ext_resource type="Texture2D" uid="uid://ds8hppgpq3pod" path="res://assets/main/pattern.png" id="2_cqel8"]
-[ext_resource type="Script" path="res://addons/godot-xr-tools2/components/xrt2_grab_point.gd" id="3_h7r30"]
+[ext_resource type="Script" uid="uid://xrt2jog5h0j" path="res://addons/godot-xr-tools2/components/xrt2_grab_point.gd" id="3_h7r30"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hxxno"]
+resource_local_to_scene = true
 margin = 0.01
 size = Vector3(0.1, 0.1, 0.1)
 
@@ -12,31 +14,39 @@ size = Vector3(0.1, 0.1, 0.1)
 render_priority = 0
 shader = ExtResource("1_k2m5r")
 shader_parameter/albedo = Color(0.911659, 0.00077837, 0.92895, 1)
+shader_parameter/texture_albedo = ExtResource("2_cqel8")
 shader_parameter/roughness = 1.0
 shader_parameter/specular = 0.5
 shader_parameter/metallic = 0.0
 shader_parameter/uv1_scale = Vector3(1, 1, 1)
 shader_parameter/uv1_offset = Vector3(0, 0, 0)
-shader_parameter/texture_albedo = ExtResource("2_cqel8")
 
 [sub_resource type="BoxMesh" id="BoxMesh_yjhaw"]
+resource_local_to_scene = true
 size = Vector3(0.1, 0.1, 0.1)
 
 [node name="Box" type="RigidBody3D"]
+script = ExtResource("1_ve6ct")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_hxxno")
+debug_color = Color(0, 0.6, 0.7, 0.42)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 material_override = SubResource("ShaderMaterial_xcktd")
 mesh = SubResource("BoxMesh_yjhaw")
 
 [node name="RightGrabPoint" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0749203, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.075, 0, 0.0301103)
 script = ExtResource("3_h7r30")
 left_hand = false
 
 [node name="LeftGrabPoint" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0850343, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.075, 0, 0.03)
 script = ExtResource("3_h7r30")
 right_hand = false
+
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.052)
+pixel_size = 0.001
+text = "1.0 Kg"

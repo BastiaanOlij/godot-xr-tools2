@@ -25,7 +25,7 @@ stretch_mode = 5
 
 [node name="Xrt2SpectatorCamera" parent="DesktopContainer/DesktopSubViewport" index="1" instance=ExtResource("2_hkn0h")]
 unique_name_in_owner = true
-transform = Transform3D(-0.581924, 0.251407, -0.773407, 0.00228936, 0.951519, 0.307582, 0.81324, 0.177219, -0.554287, -1.993, 2.0438, -2.63003)
+transform = Transform3D(-0.772577, 0.196973, -0.603594, 0.00228937, 0.951519, 0.307582, 0.634916, 0.236249, -0.735573, -0.993, 2.0438, -2.63003)
 
 [node name="Main" parent="VRSubViewport" index="0" instance=ExtResource("2_p0jir")]
 
