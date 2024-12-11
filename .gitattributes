@@ -9,3 +9,4 @@
 *.yml eol=lf
 *.py eol=lf
 *.uid eol=lf
+*.gltf eol=lf

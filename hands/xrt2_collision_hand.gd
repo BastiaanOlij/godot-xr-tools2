@@ -27,7 +27,7 @@
 
 @tool
 class_name XRT2CollisionHand
-extends XRT2ForceBody
+extends RigidBody3D
 
 ## XRTools2 Collision Hand Container Script
 ##
@@ -36,6 +36,12 @@ extends XRT2ForceBody
 ## and pickup functions.
 ##
 ## Note: This works best when used with the palm-pose pose.
+
+## Emitted when a new hand mesh was loaded
+signal hand_mesh_changed
+
+## Emitted when the skeleton is updated
+signal skeleton_updated
 
 ## Modes for collision hand
 enum CollisionHandMode {
@@ -56,28 +62,74 @@ const ORIENT_DISPLACEMENT := 0.05
 # Distance to teleport hands
 const TELEPORT_DISTANCE := 1.0
 
+## Properties related to tracking
+@export_group("Tracking")
+
+## Which hand are we tracking?
+@export_enum("Left","Right") var hand : int = 0:
+	set(value):
+		hand = value
+		if is_inside_tree():
+			_update_hand_meshes()
+
+			if not Engine.is_editor_hint():
+				_update_trackers()
+
+## Fallback settings used if hand tracking isn't available.
+@export_subgroup("Fallback", "fallback")
+
+## The fallback pose action to use.
+@export var fallback_pose_action : String = "palm_pose"
+
+## The fallback offset position to apply.
+@export var fallback_offset_position : Vector3
+
+## The fallback offset rotation to apply.
+@export_custom(PROPERTY_HINT_RANGE, "-360,360,0.1,or_less,or_greater,radians_as_degrees") \
+	var fallback_offset_rotation : Vector3
+
+## Properties related to physics
+@export_group("Physics")
 
 ## Controls the hand collision mode
-@export var mode : CollisionHandMode = CollisionHandMode.COLLIDE
-
-## Links to skeleton that adds finger digits
-@export var hand_skeleton : Skeleton3D:
+@export var mode : CollisionHandMode = CollisionHandMode.COLLIDE:
 	set(value):
-		if hand_skeleton == value:
-			return
+		mode = value
 
-		if hand_skeleton:
-			_hand_tracking_parent = null
-			hand_skeleton.skeleton_updated.disconnect(_on_skeleton_updated)
-			for digit in _digit_collision_shapes:
-				var shape : CollisionShape3D = _digit_collision_shapes[digit]
-				remove_child(shape)
-				shape.queue_free()
-			_digit_collision_shapes.clear()
+## Weight of our hand
+@export_range(0.1, 1.0, 0.01, "suffix:kg") var hand_mass : float = 0.4:
+	set(value):
+		hand_mass = value
+		mass = value
 
-		hand_skeleton = value
-		if hand_skeleton and is_inside_tree():
-			_update_hand_skeleton()
+## Linear force coef
+@export_range(10.0, 10000.0, 10.0) var force_coef : float = 800.0
+
+## Angular torgue coef
+@export_range(0.1, 20.0, 0.1) var torque_coef : float = 10.0
+
+## Properties related to physical appearance
+@export_group("Appearance")
+
+## If [code]true[/code], we show our hand mesh.
+## This has no effect on collisions or tracking.
+@export var show_hand_mesh : bool = true:
+	set(value):
+		show_hand_mesh = value
+
+		if _hand_mesh:
+			_hand_mesh.visible = show_hand_mesh
+
+## If [code]true[/code], we show a ghost hand if hand placement doesn't match.
+@export var enable_ghost_hand : bool = true
+
+## Override the material of the hand
+@export var material_override : Material:
+	set(value):
+		material_override = value
+
+		if _hand_mesh:
+			_update_hand_material(_hand_mesh, material_override, true)
 
 ## Target-override class
 class TargetOverride:
@@ -96,17 +148,23 @@ class TargetOverride:
 		priority = p
 		offset = o
 
-# Controller to target (if no target overrides)
-var _controller : XRController3D
+# Trackers used
+var _hand_tracker : XRPositionalTracker
+var _hand_skeleton : Skeleton3D
+var _controller_tracker : XRControllerTracker
 
 # Sorted stack of TargetOverride
 var _target_overrides : Array[TargetOverride]
 
-# Current target (controller or override)
-var _target : Node3D
+# Current target override
+var _target_override : Node3D
 
 # Current target offset
 var _target_offset : Transform3D
+
+# Hand meshes
+var _hand_mesh : Node3D
+var _ghost_mesh : Node3D
 
 # Skeleton collisions
 var _hand_tracking_parent : XRNode3D
@@ -126,29 +184,155 @@ static func get_xr_collision_hand(p_node : Node3D) -> XRT2CollisionHand:
 	return null
 
 
+## Returns the pose object that handles our tracking
+func get_pose() -> XRPose:
+	if _hand_tracker:
+		var pose : XRPose = _hand_tracker.get_pose("default")
+		if pose:
+			return pose
+
+	if _controller_tracker:
+		var pose : XRPose = _controller_tracker.get_pose(fallback_pose_action)
+		if pose:
+			return pose
+
+	return null
+
+
+## Returns [code]true[/code] if we have tracking data for this hand
+func get_has_tracking_data() -> bool:
+	var pose = get_pose()
+	if pose:
+		return pose.has_tracking_data
+
+	return false
+
+
+## Returns value for an associated action
+func get_input(p_action) -> Variant:
+	if _controller_tracker:
+		return _controller_tracker.get_input(p_action)
+
+	return null
+
+
+## Return a string of bone names for our collision hand
+func get_concatenated_bone_names() -> String:
+	if not _hand_mesh:
+		return ""
+
+	var skeleton : Skeleton3D = _get_skeleton_node(_hand_mesh)
+	if not skeleton:
+		return ""
+
+	return skeleton.get_concatenated_bone_names()
+
+
+## Get the transform of the given bone local to our collision hand
+func get_bone_transform(bone_name : String) -> Transform3D:
+	if not _hand_mesh:
+		return Transform3D()
+
+	var skeleton : Skeleton3D = _get_skeleton_node(_hand_mesh)
+	if not skeleton:
+		return Transform3D()
+
+	var bone_idx = skeleton.find_bone(bone_name)
+	var bone_transform : Transform3D = _hand_skeleton.get_bone_global_pose(bone_idx)
+
+	var orient_to_godot : Basis = Basis.from_euler(Vector3(0.5 * PI, 0.5 * -PI, 0.0)) if hand==0 \
+		else Basis.from_euler(Vector3(0.5 * PI, PI, 0.5 * PI))
+	var bone_offset : Transform3D = Transform3D(orient_to_godot, Vector3())
+
+	return bone_transform * bone_offset
+
+
+# Validate our properties
+func _validate_property(property: Dictionary):
+	# Always hide these built in properties as we control them
+	if property.name in [ \
+		"gravity_scale", \
+		"mass", \
+		"continuous_cd", \
+		"custom_integrator", \
+		"freeze", \
+		"linear_damp", \
+		"angular_damp" \
+		]:
+		property.usage = PROPERTY_USAGE_NONE
+
+
+# Check if we need different trackers
+func _update_trackers():
+	var new_hand_tracker : XRPositionalTracker = \
+		XRServer.get_tracker("/user/hand_tracker/left" if hand == 0 else "/user/hand_tracker/right")
+	if _hand_tracker != new_hand_tracker:
+		# Just assign it
+		_hand_tracker = new_hand_tracker
+
+	var new_controller_tracker : XRPositionalTracker = \
+		XRServer.get_tracker("left_hand" if hand == 0 else "right_hand")
+	if _controller_tracker != new_controller_tracker:
+		if _controller_tracker:
+			# TODO unbind
+			pass
+
+		_controller_tracker = new_controller_tracker
+		if _controller_tracker:
+			# TODO bind
+			pass
+
+func get_collision_parent() -> CollisionObject3D:
+	var parent = get_parent()
+	while parent:
+		if parent is CollisionObject3D:
+			return parent
+		parent = parent.get_parent()
+
+	return null
+
+# Find any parent collision object and exclude it
+func _exclude_parent() -> void:
+	var parent : CollisionObject3D = get_collision_parent()
+	if parent:
+		add_collision_exception_with(parent)
+		parent.add_collision_exception_with(self)
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	_palm_collision_shape = CollisionShape3D.new()
-	_palm_collision_shape.name = "Palm"
+	_palm_collision_shape.name = "PalmCol"
 	_palm_collision_shape.shape = preload("res://addons/godot-xr-tools2/hands/xrt2_hand_palm.shape")
 	# This probably needs to be set based on left or right hand
 	_palm_collision_shape.rotation_degrees = Vector3(0.0, 90, 90)
 	add_child(_palm_collision_shape, false, Node.INTERNAL_MODE_BACK)
 
-	_update_hand_skeleton()
+	# Hardcode these values
+	gravity_scale = 0.0
+	continuous_cd = true
+	linear_damp = 50.0
+	angular_damp = 50.0
+
+	# Init our hand meshes
+	_update_hand_meshes()
 
 	if Engine.is_editor_hint():
 		return
-
-	super()
 
 	# Disconnect from parent transform as we move to it in the physics step,
 	# and boost the physics priority above any grab-drivers or hands.
 	top_level = true
 	process_physics_priority = -90
 
-	# Populate nodes
-	_controller = XRT2Helper.get_xr_controller(self)
+	# Hands shouldn't collide with a parent collision object
+	_exclude_parent()
+
+	# Make sure our trackers are and stay correct
+	_update_trackers()
+	XRServer.tracker_added.connect(_update_trackers)
+	XRServer.tracker_removed.connect(_update_trackers)
+	XRServer.tracker_updated.connect(_update_trackers)
 
 	# Update the target
 	_update_target()
@@ -159,13 +343,91 @@ func _physics_process(_delta):
 	if Engine.is_editor_hint():
 		return
 
-	# Ignore when controller is not tracking
-	if not _controller.get_has_tracking_data():
+	# Handle DISABLED or no target
+	if mode == CollisionHandMode.DISABLED:
+		freeze = true
 		return
 
-	# Move to the current target
-	_move_to_target()
+	var target : Transform3D
 
+	if _target_override:
+		target = _target_override.global_transform * _target_offset
+	else:
+		var found_tracking_data = false
+
+		# Give priority to our hand tracker
+		if _hand_tracker:
+			var pose : XRPose = _hand_tracker.get_pose("default")
+			if pose and pose.has_tracking_data:
+				target = pose.get_adjusted_transform()
+				found_tracking_data = true
+
+		# Check our controller tracker
+		if not found_tracking_data and _controller_tracker:
+			var pose : XRPose = _controller_tracker.get_pose(fallback_pose_action)
+			if pose and pose.has_tracking_data:
+				target.basis = Basis.from_euler(fallback_offset_rotation)
+				target.origin = fallback_offset_position
+				target = pose.get_adjusted_transform() * target
+				found_tracking_data = true
+
+		# Ignore when controller is not tracking
+		if not found_tracking_data:
+			freeze = true
+			return
+
+		# Seeing we're working in global space,
+		# we need to take our parent into account
+		target = get_parent().global_transform * target
+
+	# Always place our ghost mesh at our tracked location
+	if _ghost_mesh:
+		_ghost_mesh.global_transform = target
+
+	# Handle TELEPORT
+	if mode == CollisionHandMode.TELEPORT:
+		freeze = true
+		global_transform = target
+		return
+
+	# Handle too far from target
+	if global_position.distance_to(target.origin) > TELEPORT_DISTANCE:
+		# TODO: if we're holding something, drop it!
+		freeze = true
+		global_transform = target
+		return
+
+	# We got this far, make sure we're unfrozen and let Godot position our hand
+	if freeze:
+		freeze = false
+		linear_velocity = Vector3()
+		angular_velocity = Vector3()
+
+	# Implementation below inspired by Dedm0zaj's physics hand implementation
+
+	# Apply force to move hand to tracked location
+	var linear_movement : Vector3 = target.origin - global_position
+	apply_central_force(linear_movement * force_coef)
+
+	var angular_movement : Quaternion = (target.basis * global_basis.inverse()) \
+		.get_rotation_quaternion()
+	apply_torque(angular_movement.get_euler() * torque_coef)
+
+
+func _process(_delta):
+	if Engine.is_editor_hint():
+		return
+
+	# Our hand should now be positioned so we can do our ghost logic.
+	if _ghost_mesh:
+		_ghost_mesh.visible = false
+		if enable_ghost_hand:
+			if (_ghost_mesh.global_position - _hand_mesh.global_position).length() > 0.005:
+				_ghost_mesh.visible = true
+			else:
+				if (_ghost_mesh.global_basis * _hand_mesh.global_basis.inverse()) \
+					.get_rotation_quaternion().get_angle() > deg_to_rad(1.0):
+					_ghost_mesh.visible = true
 
 ## This function adds a target override. The collision hand will attempt to
 ## move to the highest priority target, or the [XRController3D] if no override
@@ -243,56 +505,136 @@ func _remove_target_override(target : Node) -> bool:
 
 # This function updates the target for hand movement.
 func _update_target() -> void:
-	# Start by assuming the controller
-	_target = _controller
+	# Assume no current override.
+	_target_override = null
 	_target_offset = Transform3D()
 
 	# Use first target override if specified
 	if _target_overrides.size():
-		_target = _target_overrides[0].target
+		_target_override = _target_overrides[0].target
 		_target_offset = _target_overrides[0].offset
 
 
-# This function moves the collision hand to the target node.
-func _move_to_target():
-	# Handle DISABLED or no target
-	if mode == CollisionHandMode.DISABLED or not _target:
+# Find the skeleton node child
+func _get_skeleton_node(p_node : Node) -> Skeleton3D:
+	for child in p_node.get_children():
+		if child is Skeleton3D:
+			return child
+
+		var ret : Skeleton3D = _get_skeleton_node(child)
+		if ret:
+			return ret
+
+	return null
+
+
+# Add modifier nodes to our hand meshes
+func _add_hand_modifiers(p_hand_mesh : Node3D) -> void:
+	var skeleton_node = _get_skeleton_node(p_hand_mesh)
+	if not skeleton_node:
+		push_error("Couldn't locate skeleton node for " + name)
 		return
 
-	var target : Transform3D = _target.global_transform * _target_offset
+	var hand_tracking_modifier : XRHandModifier3D = XRHandModifier3D.new()
+	hand_tracking_modifier.hand_tracker = "/user/hand_tracker/left" if hand == 0 \
+		else "/user/hand_tracker/right"
+	skeleton_node.add_child(hand_tracking_modifier)
 
-	# Handle TELEPORT
-	if mode == CollisionHandMode.TELEPORT:
-		global_transform = target
-		return
+	# TODO add fallback modifier
 
-	# Handle too far from target
-	if global_position.distance_to(target.origin) > TELEPORT_DISTANCE:
-		global_transform = target
-		return
 
-	# Orient the hand then move
-	global_transform.basis = target.basis
-	move_and_slide(target.origin - global_position)
-	force_update_transform()
+# Find the mesh_instance node child
+func _get_mesh_instance_node(p_node : Node) -> MeshInstance3D:
+	for child in p_node.get_children():
+		if child is MeshInstance3D:
+			return child
 
-func _update_hand_skeleton():
-	if hand_skeleton:
-		_hand_tracking_parent = XRT2Helper.get_xr_node(hand_skeleton)
-		hand_skeleton.skeleton_updated.connect(_on_skeleton_updated)
+		var ret : MeshInstance3D = _get_mesh_instance_node(child)
+		if ret:
+			return ret
 
-		# Run atleast once to init
-		_on_skeleton_updated()
+	return null
 
-func _on_skeleton_updated():
-	var bone_count = hand_skeleton.get_bone_count()
+
+# Set the material on the given hand mesh
+func _update_hand_material(p_node : Node, p_material : Material, p_cast_shadows : bool) -> void:
+	var mesh_instance = _get_mesh_instance_node(p_node)
+	if mesh_instance:
+		mesh_instance.material_override = p_material
+		mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if p_cast_shadows \
+			else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+
+func _update_hand_meshes():
+	# Clean up old hand meshes
+	_clear_digit_collisions()
+
+	if _hand_skeleton:
+		_hand_skeleton.skeleton_updated.disconnect(_on_skeleton_updated)
+		_hand_skeleton = null
+
+	if _hand_mesh:
+		remove_child(_hand_mesh)
+		_hand_mesh.queue_free()
+		_hand_mesh = null
+
+	if _ghost_mesh:
+		remove_child(_ghost_mesh)
+		_ghost_mesh.queue_free()
+		_ghost_mesh = null
+
+	# Load new ones
+	var hand_scene : PackedScene
+	if hand == 0:
+		hand_scene = preload("res://addons/godot-xr-tools2/hands/gltf/LeftHandHumanoid.gltf")
+	else:
+		hand_scene = preload("res://addons/godot-xr-tools2/hands/gltf/RightHandHumanoid.gltf")
+
+	if hand_scene:
+		_hand_mesh = hand_scene.instantiate()
+		if _hand_mesh:
+			_hand_mesh.visible = show_hand_mesh
+			add_child(_hand_mesh)
+			_add_hand_modifiers(_hand_mesh)
+			_update_hand_material(_hand_mesh, material_override, true)
+
+			_hand_skeleton = _get_skeleton_node(_hand_mesh)
+			if _hand_skeleton:
+				_hand_skeleton.skeleton_updated.connect(_on_skeleton_updated)
+				_on_skeleton_updated()
+
+		_ghost_mesh = hand_scene.instantiate()
+		if _ghost_mesh:
+			_ghost_mesh.visible = false
+			_ghost_mesh.top_level = true
+			add_child(_ghost_mesh)
+			_add_hand_modifiers(_ghost_mesh)
+			_update_hand_material(_ghost_mesh, \
+				preload("res://addons/godot-xr-tools2/hands/gltf/ghost.material"), false)
+
+	hand_mesh_changed.emit()
+
+
+# Remove all our digit collisions
+func _clear_digit_collisions() -> void:
+	for digit in _digit_collision_shapes:
+		var collision_node = _digit_collision_shapes[digit]
+		remove_child(collision_node)
+		collision_node.queue_free()
+	_digit_collision_shapes.clear()
+
+
+# Update our skeleton including creating missing digit collisions
+func _on_skeleton_updated() -> void:
+	var bone_count = _hand_skeleton.get_bone_count()
 	for i in bone_count:
+		var bone_transform : Transform3D = _hand_skeleton.get_bone_global_pose(i)
 		var collision_node : CollisionShape3D
 		var offset : Transform3D
 		offset.origin = Vector3(0.0, 0.015, 0.0) # move to side of object
 
-		var bone_name = hand_skeleton.get_bone_name(i)
-		if bone_name == "RightHand" or bone_name == "LeftHand":
+		var bone_name = _hand_skeleton.get_bone_name(i)
+		if bone_name == ("LeftHand" if hand == 0 else "RightHand"):
 			offset.origin = Vector3(0.0, 0.025, 0.0) # move to side of object
 			collision_node = _palm_collision_shape
 		elif bone_name.contains("Proximal") or bone_name.contains("Intermediate") or \
@@ -301,7 +643,7 @@ func _on_skeleton_updated():
 				collision_node = _digit_collision_shapes[bone_name]
 			else:
 				collision_node = CollisionShape3D.new()
-				collision_node.name = bone_name
+				collision_node.name = bone_name + "Col"
 				collision_node.shape = \
 					preload("res://addons/godot-xr-tools2/hands/xrt2_hand_digit.shape")
 				add_child(collision_node, false, Node.INTERNAL_MODE_BACK)
@@ -311,11 +653,8 @@ func _on_skeleton_updated():
 			# TODO it would require a far more complex approach,
 			# but being able to check if our collision shapes can move to their new locations
 			# would be interesting.
+			# This should probably be a separate modifier that works with this node
 
-			# We need to ignore our applied offsets in XRT2CollisionHandOffset or nodes,
-			# We assume for a moment that there are no scales applied on our hand models
-			var t : Transform3D = _hand_tracking_parent.global_transform * \
-				hand_skeleton.get_bone_global_pose(i)
+			collision_node.transform = bone_transform * offset
 
-			# We can ignore our XRT2CollisionHand* offset simply by using its parents.
-			collision_node.transform = get_parent().global_transform.inverse() * t * offset
+	skeleton_updated.emit()
