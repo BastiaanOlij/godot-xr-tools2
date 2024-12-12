@@ -11,9 +11,10 @@ config_version=5
 [application]
 
 config/name="Godot XR Tools 2 demo"
-run/main_scene="res://main.tscn"
+run/main_scene="uid://dyclknruy8aqf"
 config/features=PackedStringArray("4.4", "Mobile")
 config/icon="res://icon.svg"
+run/main_scene.android="uid://cj2av4gb40wn4"
 
 [debug]
 
@@ -47,10 +48,17 @@ trigger_click={
 ]
 }
 
+[layer_names]
+
+3d_render/layer_1="Default"
+3d_render/layer_2="HMD only"
+3d_render/layer_3="Spectator only"
+
 [rendering]
 
 renderer/rendering_method="mobile"
 textures/vram_compression/import_etc2_astc=true
+environment/defaults/default_clear_color=Color(0, 0, 0, 1)
 
 [xr]
 
@@ -58,5 +66,6 @@ openxr/enabled=true
 openxr/reference_space=2
 openxr/foveation_level=3
 openxr/foveation_dynamic=true
+openxr/extensions/hand_tracking=true
 openxr/extensions/hand_interaction_profile=true
 shaders/enabled=true
