@@ -7,6 +7,7 @@
 script = ExtResource("1_v7cup")
 
 [node name="XRCamera3D" type="XRCamera3D" parent="."]
+cull_mask = 1048571
 
 [node name="Fade" parent="XRCamera3D" instance=ExtResource("2_0btq6")]
 message = "Please recenter your tracking space."
