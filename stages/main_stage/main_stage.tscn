@@ -1,12 +1,12 @@
-[gd_scene load_steps=19 format=3 uid="uid://7lt82mv6lmxo"]
+[gd_scene load_steps=20 format=3 uid="uid://7lt82mv6lmxo"]
 
-[ext_resource type="PackedScene" uid="uid://xrt200000007" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.tscn" id="1_spd8v"]
-[ext_resource type="PackedScene" uid="uid://xrt200000009" path="res://addons/godot-xr-tools2/player_rigs/xrt2_dynamic_player_rig.tscn" id="2_f7mcw"]
-[ext_resource type="Script" path="res://addons/godot-xr-tools2/player_rigs/movement_functions/xrt2_direct_movement.gd" id="3_7f0s7"]
-[ext_resource type="Script" path="res://addons/godot-xr-tools2/player_rigs/interaction_functions/xrt2_pickup.gd" id="4_l0n08"]
-[ext_resource type="Script" path="res://addons/godot-xr-tools2/hands/xrt2_collision_hand.gd" id="5_don5u"]
-[ext_resource type="Script" path="res://addons/godot-xr-tools2/hands/xrt2_collision_hand_offset.gd" id="6_kqggo"]
-[ext_resource type="Script" path="res://stages/main_stage/ghost_hand.gd" id="7_5eq2v"]
+[ext_resource type="PackedScene" uid="uid://xrt20000007" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.tscn" id="1_spd8v"]
+[ext_resource type="PackedScene" uid="uid://xrt2000001a" path="res://addons/godot-xr-tools2/player_rigs/xrt2_dynamic_player_rig.tscn" id="2_f7mcw"]
+[ext_resource type="Script" uid="uid://xrt2ebknph2" path="res://addons/godot-xr-tools2/player_rigs/movement_functions/xrt2_direct_movement.gd" id="3_7f0s7"]
+[ext_resource type="Script" uid="uid://xrt23qrb4js" path="res://addons/godot-xr-tools2/player_rigs/interaction_functions/xrt2_pickup.gd" id="4_l0n08"]
+[ext_resource type="Script" uid="uid://xrt2ebmt58c" path="res://addons/godot-xr-tools2/hands/xrt2_collision_hand.gd" id="5_don5u"]
+[ext_resource type="Script" uid="uid://xrt2lvbjedg" path="res://addons/godot-xr-tools2/hands/xrt2_collision_hand_offset.gd" id="6_kqggo"]
+[ext_resource type="Script" uid="uid://da0wtelb4mvm3" path="res://stages/main_stage/ghost_hand.gd" id="7_5eq2v"]
 [ext_resource type="PackedScene" uid="uid://d22k0sp2hinew" path="res://assets/gltf/LeftHandHumanoid.gltf" id="7_l3oid"]
 [ext_resource type="PackedScene" uid="uid://dlswhmq6s52gu" path="res://assets/gltf/RightHandHumanoid.gltf" id="8_8e4u0"]
 [ext_resource type="Material" uid="uid://b6mjiver4vgu3" path="res://stages/main_stage/ghost_hand.material" id="8_64kkr"]
@@ -28,6 +28,12 @@ tonemap_mode = 2
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0jk8f"]
 radius = 0.3
 
+[sub_resource type="SphereMesh" id="SphereMesh_i74ts"]
+radius = 0.1
+height = 0.2
+radial_segments = 32
+rings = 16
+
 [node name="MainStage" node_paths=PackedStringArray("player_origin") instance=ExtResource("1_spd8v")]
 player_origin = NodePath("CharacterBody3D/XRT2DynamicPlayerRig")
 
@@ -42,8 +48,14 @@ shadow_enabled = true
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CapsuleShape3D_0jk8f")
+debug_color = Color(0, 0.6, 0.7, 0.42)
 
 [node name="XRT2DynamicPlayerRig" parent="CharacterBody3D" index="1" instance=ExtResource("2_f7mcw")]
+
+[node name="Head" type="MeshInstance3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/XRCamera3D/Neck" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+layers = 4
+mesh = SubResource("SphereMesh_i74ts")
 
 [node name="XRT2CollisionHand" type="AnimatableBody3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHand" index="0" node_paths=PackedStringArray("hand_skeleton")]
 script = ExtResource("5_don5u")
