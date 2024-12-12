@@ -1,0 +1,72 @@
+[gd_scene load_steps=10 format=3 uid="uid://xrt23kyre42"]
+
+[ext_resource type="Script" uid="uid://xrt2dafnu3w" path="res://addons/godot-xr-tools2/construct/xrt2_spectator_camera.gd" id="1_dbds7"]
+[ext_resource type="Shader" uid="uid://xrt2oqik7ik" path="res://addons/godot-xr-tools2/shaders/shaded_no_alpha.gdshader" id="1_luqx8"]
+[ext_resource type="Shader" uid="uid://xrt2lfbdmdk" path="res://addons/godot-xr-tools2/shaders/unshaded_texture_no_alpha.gdshader" id="3_gcvm6"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4ym2f"]
+render_priority = 0
+shader = ExtResource("1_luqx8")
+shader_parameter/albedo = Color(0.147672, 0.147672, 0.147672, 1)
+shader_parameter/metallic = 0.3
+shader_parameter/roughness = 0.8
+shader_parameter/specular = 0.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_dbds7"]
+top_radius = 0.1
+bottom_radius = 0.1
+height = 0.1
+
+[sub_resource type="BoxMesh" id="BoxMesh_brmuf"]
+size = Vector3(0.21, 0.25, 0.6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_yqcti"]
+size = Vector3(0.4, 0.2, 0.05)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0gxnl"]
+render_priority = 0
+shader = ExtResource("3_gcvm6")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/uv_offset = Vector2(0, 0)
+
+[sub_resource type="QuadMesh" id="QuadMesh_impty"]
+
+[node name="Xrt2SpectatorCamera" type="Node3D"]
+script = ExtResource("1_dbds7")
+
+[node name="SpectatorCamera3D" type="Camera3D" parent="."]
+cull_mask = 1048573
+
+[node name="Camera" type="Node3D" parent="SpectatorCamera3D"]
+
+[node name="CameraLens" type="MeshInstance3D" parent="SpectatorCamera3D/Camera"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0.05)
+layers = 2
+material_override = SubResource("ShaderMaterial_4ym2f")
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_dbds7")
+skeleton = NodePath("../..")
+
+[node name="CameraBody" type="MeshInstance3D" parent="SpectatorCamera3D/Camera"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
+layers = 2
+material_override = SubResource("ShaderMaterial_4ym2f")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_brmuf")
+skeleton = NodePath("../..")
+
+[node name="CameraDisplay" type="MeshInstance3D" parent="SpectatorCamera3D/Camera"]
+transform = Transform3D(0.980319, 0, 0.197418, 0, 1, 0, -0.197418, 0, 0.980319, 0.31924, 0, 0.157601)
+layers = 2
+material_override = SubResource("ShaderMaterial_4ym2f")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_yqcti")
+skeleton = NodePath("../..")
+
+[node name="Display" type="MeshInstance3D" parent="SpectatorCamera3D/Camera/CameraDisplay"]
+transform = Transform3D(-0.38, 0, -1.50996e-07, 0, 0.18, 0, 5.73784e-08, 0, -1, 0.00580734, 0, -0.0288376)
+layers = 2
+material_override = SubResource("ShaderMaterial_0gxnl")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_impty")

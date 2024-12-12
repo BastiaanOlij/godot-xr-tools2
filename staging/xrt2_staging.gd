@@ -1,5 +1,6 @@
+#-------------------------------------------------------------------------------
 # xrt2_staging.gd
-#
+#-------------------------------------------------------------------------------
 # MIT License
 #
 # Copyright (c) 2024-present Bastiaan Olij, Malcolm A Nixon and contributors
@@ -21,10 +22,19 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#-------------------------------------------------------------------------------
 
 @tool
 class_name XRT2Staging
 extends Node3D
+
+## Signal emitted when loading screen is being showed,
+## this is emitted right before we fade in the loading screen.
+signal showing_loading_screen
+
+## Signal emitted when loaded scene is being showed,
+## this is emitted right before we fade in the loaded scene.
+signal showing_loaded_scene
 
 ## Main scene file
 @export_file('*.tscn') var main_scene : String
@@ -41,6 +51,10 @@ var _current_scene_path : String
 # Tween for fading
 var _tween : Tween
 
+# Misc
+var _is_loading : bool = false
+var _must_prompt_for_continue = true
+
 # Node helpers
 @onready var _fade : Node3D = $Fade
 @onready var _xr_origin : XROrigin3D = $Player/XROrigin3D
@@ -48,10 +62,6 @@ var _tween : Tween
 @onready var _loading_screen : Node3D = $LoadingScreen
 @onready var _scene : Node3D = $Scene
 @onready var _start_xr : XRT2StartXR = $StartXR
-
-# Misc
-var _is_loading : bool = false
-var _must_prompt_for_continue = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -141,6 +151,9 @@ func load_scene(p_scene_path : String, user_data = null) -> void:
 		# and this will be ignored
 		_on_xr_pose_recenter()
 
+		# Let the world know
+		showing_loading_screen.emit()
+
 		# Fade to visible
 		if _tween:
 			_tween.kill()
@@ -205,6 +218,9 @@ func load_scene(p_scene_path : String, user_data = null) -> void:
 	# We create a small delay here to give tracking some time to update our nodes...
 	await get_tree().create_timer(0.1).timeout
 	_current_scene.scene_loaded(user_data)
+
+	# Let world know
+	showing_loaded_scene.emit()
 
 	# Fade to visible
 	if _tween:
