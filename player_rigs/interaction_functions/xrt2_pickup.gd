@@ -527,12 +527,14 @@ func _highlight_meshes(node : Node3D) -> Dictionary[MeshInstance3D, Material]:
 	for child in node.get_children():
 		if child is MeshInstance3D:
 			var mesh_instance : MeshInstance3D = child
-			ret[mesh_instance] = mesh_instance.material_overlay
-			mesh_instance.material_overlay = _highlight_material
+			if mesh_instance.visible:
+				ret[mesh_instance] = mesh_instance.material_overlay
+				mesh_instance.material_overlay = _highlight_material
 
-		# Find mesh instances any level deep
-		var dic : Dictionary[MeshInstance3D, Material] = _highlight_meshes(child)
-		ret.merge(dic)
+		if child is Node3D:
+			# Find mesh instances any level deep
+			var dic : Dictionary[MeshInstance3D, Material] = _highlight_meshes(child)
+			ret.merge(dic)
 
 	return ret
 
@@ -560,7 +562,8 @@ func _remove_highlight(node : Node3D):
 
 		if _highlighted_bodies[node].pickups.is_empty():
 			for mesh_instance in _highlighted_bodies[node].original_materials:
-				mesh_instance.material_overlay = _highlighted_bodies[node].original_materials[mesh_instance]
+				if is_instance_valid(mesh_instance) and is_instance_valid(_highlighted_bodies[node]):
+					mesh_instance.material_overlay = _highlighted_bodies[node].original_materials[mesh_instance]
 
 			_highlighted_bodies.erase(node)
 
@@ -588,12 +591,14 @@ func _get_pose() -> XRPose:
 # Returns our grab input
 func _get_grab_value() -> float:
 	if _xr_collision_hand:
-		var value : float = _xr_collision_hand.get_input(grab_action)
-		return value
+		var input : Variant = _xr_collision_hand.get_input(grab_action)
+		if input:
+			var value : float = input
+			return value
 	elif _xr_controller:
 		return _xr_controller.get_float(grab_action)
-	else:
-		return 0.0
+
+	return 0.0
 
 
 func _process(_delta):

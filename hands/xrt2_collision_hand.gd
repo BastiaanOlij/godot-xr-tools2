@@ -130,10 +130,10 @@ const TELEPORT_DISTANCE := 1.0
 		mass = value
 
 ## Linear force coef
-@export_range(10.0, 10000.0, 10.0) var force_coef : float = 800.0
+@export_range(10.0, 10000.0, 10.0) var force_coef : float = 2000.0
 
 ## Angular torgue coef
-@export_range(0.1, 20.0, 0.1) var torque_coef : float = 10.0
+@export_range(0.1, 100.0, 0.1) var torque_coef : float = 30.0
 
 ## Properties related to physical appearance
 @export_group("Appearance")
@@ -414,8 +414,8 @@ func _ready():
 	# Hardcode these values
 	gravity_scale = 0.0
 	continuous_cd = true
-	linear_damp = 50.0
-	angular_damp = 50.0
+	linear_damp = 100.0
+	angular_damp = 100.0
 
 	# Init our hand meshes
 	_update_hand_meshes()
