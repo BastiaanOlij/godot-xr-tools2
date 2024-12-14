@@ -62,6 +62,7 @@ const ORIENT_DISPLACEMENT := 0.05
 # Distance to teleport hands
 const TELEPORT_DISTANCE := 1.0
 
+#region Export variables
 ## Properties related to tracking
 @export_group("Tracking")
 
@@ -74,6 +75,18 @@ const TELEPORT_DISTANCE := 1.0
 
 			if not Engine.is_editor_hint():
 				_update_trackers()
+				_update_hand_motion_range()
+
+## Set the tracked hand motion range (if supported).
+## Note, this is a global setting per hand.
+## Having multiple collision hand nodes for the same hand
+## will result in the latest hand being configured defining
+## this behavior.
+@export_enum("Full", "Controller") var hand_motion_range = 0:
+	set(value):
+		hand_motion_range = value
+		if is_inside_tree() and not Engine.is_editor_hint():
+			_update_hand_motion_range()
 
 ## Fallback settings used if hand tracking isn't available.
 @export_subgroup("Fallback", "fallback")
@@ -111,6 +124,17 @@ const TELEPORT_DISTANCE := 1.0
 ## Properties related to physical appearance
 @export_group("Appearance")
 
+## Specify an alternative hand scene to use instead of our built-in hand.
+## Must be a proper Godot humanoid hand with Skeleton3D but without physics.
+@export var alternative_hand_scene : PackedScene:
+	set(value):
+		alternative_hand_scene = value
+		if is_inside_tree():
+			_update_hand_meshes()
+
+			if not Engine.is_editor_hint():
+				_update_trackers()
+
 ## If [code]true[/code], we show our hand mesh.
 ## This has no effect on collisions or tracking.
 @export var show_hand_mesh : bool = true:
@@ -130,6 +154,7 @@ const TELEPORT_DISTANCE := 1.0
 
 		if _hand_mesh:
 			_update_hand_material(_hand_mesh, material_override, true)
+#endregion
 
 ## Target-override class
 class TargetOverride:
@@ -148,6 +173,7 @@ class TargetOverride:
 		priority = p
 		offset = o
 
+#region Private Variables
 # Trackers used
 var _hand_tracker : XRPositionalTracker
 var _hand_skeleton : Skeleton3D
@@ -170,7 +196,10 @@ var _ghost_mesh : Node3D
 var _hand_tracking_parent : XRNode3D
 var _palm_collision_shape : CollisionShape3D
 var _digit_collision_shapes : Dictionary
+#endregion
 
+
+#region Public API
 ## Return a XR collision hand ancestor
 static func get_xr_collision_hand(p_node : Node3D) -> XRT2CollisionHand:
 	var parent = p_node.get_parent()
@@ -184,7 +213,21 @@ static func get_xr_collision_hand(p_node : Node3D) -> XRT2CollisionHand:
 	return null
 
 
-## Returns the pose object that handles our tracking
+## Returns the collision parent object for this collision hand.
+## Assumed to be the players body.
+func get_collision_parent() -> CollisionObject3D:
+	var parent = get_parent()
+	while parent:
+		if parent is CollisionObject3D:
+			return parent
+		parent = parent.get_parent()
+
+	return null
+#endregion
+
+
+#region Public Action API
+## Returns the pose object that handles our tracking.
 func get_pose() -> XRPose:
 	if _hand_tracker:
 		var pose : XRPose = _hand_tracker.get_pose("default")
@@ -214,8 +257,39 @@ func get_input(p_action) -> Variant:
 		return _controller_tracker.get_input(p_action)
 
 	return null
+#endregion
 
 
+#region Public Target Override API
+## This function adds a target override. The collision hand will attempt to
+## move to the highest priority target, or the [XRController3D] if no override
+## is specified.
+func add_target_override(target : Node3D, priority : int, offset : Transform3D = Transform3D()) \
+	-> void:
+	# Remove any existing target override from this source
+	var modified := _remove_target_override(target)
+
+	# Insert the target override
+	_insert_target_override(target, priority, offset)
+	modified = true
+
+	# Update the target
+	if modified:
+		_update_target()
+
+
+## This function remove a target override.
+func remove_target_override(target : Node3D) -> void:
+	# Remove the target override
+	var modified := _remove_target_override(target)
+
+	# Update the pose
+	if modified:
+		_update_target()
+#endregion
+
+
+#region Public Skeleton API
 ## Return a string of bone names for our collision hand
 func get_concatenated_bone_names() -> String:
 	if not _hand_mesh:
@@ -245,23 +319,10 @@ func get_bone_transform(bone_name : String) -> Transform3D:
 	var bone_offset : Transform3D = Transform3D(orient_to_godot, Vector3())
 
 	return bone_transform * bone_offset
+#endregion
 
 
-# Validate our properties
-func _validate_property(property: Dictionary):
-	# Always hide these built in properties as we control them
-	if property.name in [ \
-		"gravity_scale", \
-		"mass", \
-		"continuous_cd", \
-		"custom_integrator", \
-		"freeze", \
-		"linear_damp", \
-		"angular_damp" \
-		]:
-		property.usage = PROPERTY_USAGE_NONE
-
-
+#region Private Property Update Functions
 # Check if we need different trackers
 func _update_trackers():
 	var new_hand_tracker : XRPositionalTracker = \
@@ -282,21 +343,35 @@ func _update_trackers():
 			# TODO bind
 			pass
 
-func get_collision_parent() -> CollisionObject3D:
-	var parent = get_parent()
-	while parent:
-		if parent is CollisionObject3D:
-			return parent
-		parent = parent.get_parent()
 
-	return null
+func _update_hand_motion_range():
+	var openxr_interface : OpenXRInterface = XRServer.find_interface("OpenXR")
+	if openxr_interface and openxr_interface.is_initialized():
+		var openxr_hand = OpenXRInterface.HAND_LEFT if hand == 0 else OpenXRInterface.HAND_RIGHT
+		var openxr_motion_range : OpenXRInterface.HandMotionRange
+		match hand_motion_range:
+			0: openxr_motion_range = OpenXRInterface.HAND_MOTION_RANGE_UNOBSTRUCTED
+			1: openxr_motion_range = OpenXRInterface.HAND_MOTION_RANGE_CONFORM_TO_CONTROLLER
+			_: openxr_motion_range = OpenXRInterface.HAND_MOTION_RANGE_UNOBSTRUCTED
 
-# Find any parent collision object and exclude it
-func _exclude_parent() -> void:
-	var parent : CollisionObject3D = get_collision_parent()
-	if parent:
-		add_collision_exception_with(parent)
-		parent.add_collision_exception_with(self)
+		openxr_interface.set_motion_range(openxr_hand, openxr_motion_range)
+#endregion
+
+
+#region Private Godot Node Functions
+# Validate our properties
+func _validate_property(property: Dictionary):
+	# Always hide these built in properties as we control them
+	if property.name in [ \
+		"gravity_scale", \
+		"mass", \
+		"continuous_cd", \
+		"custom_integrator", \
+		"freeze", \
+		"linear_damp", \
+		"angular_damp" \
+		]:
+		property.usage = PROPERTY_USAGE_NONE
 
 
 # Called when the node enters the scene tree for the first time.
@@ -325,14 +400,21 @@ func _ready():
 	top_level = true
 	process_physics_priority = -90
 
-	# Hands shouldn't collide with a parent collision object
-	_exclude_parent()
+	
+	var parent : CollisionObject3D = get_collision_parent()
+	if parent:
+		# Hands shouldn't collide with a parent collision object
+		add_collision_exception_with(parent)
+		parent.add_collision_exception_with(self)
 
 	# Make sure our trackers are and stay correct
 	_update_trackers()
 	XRServer.tracker_added.connect(_update_trackers)
 	XRServer.tracker_removed.connect(_update_trackers)
 	XRServer.tracker_updated.connect(_update_trackers)
+
+	# Update our hand motion range
+	_update_hand_motion_range()
 
 	# Update the target
 	_update_target()
@@ -428,34 +510,10 @@ func _process(_delta):
 				if (_ghost_mesh.global_basis * _hand_mesh.global_basis.inverse()) \
 					.get_rotation_quaternion().get_angle() > deg_to_rad(1.0):
 					_ghost_mesh.visible = true
-
-## This function adds a target override. The collision hand will attempt to
-## move to the highest priority target, or the [XRController3D] if no override
-## is specified.
-func add_target_override(target : Node3D, priority : int, offset : Transform3D = Transform3D()) \
-	-> void:
-	# Remove any existing target override from this source
-	var modified := _remove_target_override(target)
-
-	# Insert the target override
-	_insert_target_override(target, priority, offset)
-	modified = true
-
-	# Update the target
-	if modified:
-		_update_target()
+#endregion
 
 
-## This function remove a target override.
-func remove_target_override(target : Node3D) -> void:
-	# Remove the target override
-	var modified := _remove_target_override(target)
-
-	# Update the pose
-	if modified:
-		_update_target()
-
-
+#region Private Target Override Functions
 # This function inserts a target override into the overrides list by priority
 # order.
 func _insert_target_override( \
@@ -513,8 +571,10 @@ func _update_target() -> void:
 	if _target_overrides.size():
 		_target_override = _target_overrides[0].target
 		_target_offset = _target_overrides[0].offset
+#endregion
 
 
+#region Private Hand Mesh Functions
 # Find the skeleton node child
 func _get_skeleton_node(p_node : Node) -> Skeleton3D:
 	for child in p_node.get_children():
@@ -585,7 +645,9 @@ func _update_hand_meshes():
 
 	# Load new ones
 	var hand_scene : PackedScene
-	if hand == 0:
+	if alternative_hand_scene:
+		hand_scene = alternative_hand_scene
+	elif hand == 0:
 		hand_scene = preload("res://addons/godot-xr-tools2/hands/gltf/LeftHandHumanoid.gltf")
 	else:
 		hand_scene = preload("res://addons/godot-xr-tools2/hands/gltf/RightHandHumanoid.gltf")
@@ -613,8 +675,10 @@ func _update_hand_meshes():
 				preload("res://addons/godot-xr-tools2/hands/gltf/ghost.material"), false)
 
 	hand_mesh_changed.emit()
+#endregion
 
 
+#region Private Collision Functions
 # Remove all our digit collisions
 func _clear_digit_collisions() -> void:
 	for digit in _digit_collision_shapes:
@@ -658,3 +722,4 @@ func _on_skeleton_updated() -> void:
 			collision_node.transform = bone_transform * offset
 
 	skeleton_updated.emit()
+#endregion
