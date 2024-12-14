@@ -37,11 +37,25 @@ extends RigidBody3D
 ##
 ## Note: This works best when used with the palm-pose pose.
 
+#region Signals
 ## Emitted when a new hand mesh was loaded
 signal hand_mesh_changed
 
 ## Emitted when the skeleton is updated
 signal skeleton_updated
+
+## Emitted when a button on this tracker is pressed. Note that many XR runtimes allow other inputs to be mapped to buttons.
+signal button_pressed(action_name: String)
+
+## Emitted when a button on this tracker is released.
+signal button_released(action_name: String)
+
+## Emitted when a trigger or similar input on this tracker changes value.
+signal input_float_changed(action_name: String, value: float)
+
+## Emitted when a thumbstick or thumbpad on this tracker moves.
+signal input_vector2_changed(action_name: String, vector: Vector2)
+#endregion
 
 ## Modes for collision hand
 enum CollisionHandMode {
@@ -175,7 +189,7 @@ class TargetOverride:
 
 #region Private Variables
 # Trackers used
-var _hand_tracker : XRPositionalTracker
+var _hand_tracker : XRHandTracker
 var _hand_skeleton : Skeleton3D
 var _controller_tracker : XRControllerTracker
 
@@ -252,11 +266,21 @@ func get_has_tracking_data() -> bool:
 
 
 ## Returns value for an associated action
-func get_input(p_action) -> Variant:
+func get_input(action_name) -> Variant:
 	if _controller_tracker:
-		return _controller_tracker.get_input(p_action)
+		return _controller_tracker.get_input(action_name)
 
 	return null
+
+
+## Trigger a haptic pulse on this controller
+## Specific to OpenXR:
+## - Frequence of 0.0 choses an optimal frequency for a short pulse
+## - Duration of -1 choses an optimal duration for a short pulse
+func trigger_haptic_pulse(action_name: String, frequency: float = 0.0, amplitude: float = 1.0, duration_sec: float = -1, delay_sec: float = 0):
+	var xr_interface = XRServer.primary_interface
+	if xr_interface and _controller_tracker:
+		xr_interface.trigger_haptic_pulse(action_name, _controller_tracker.name, frequency, amplitude, duration_sec, delay_sec)
 #endregion
 
 
@@ -325,23 +349,27 @@ func get_bone_transform(bone_name : String) -> Transform3D:
 #region Private Property Update Functions
 # Check if we need different trackers
 func _update_trackers():
-	var new_hand_tracker : XRPositionalTracker = \
+	var new_hand_tracker : XRHandTracker = \
 		XRServer.get_tracker("/user/hand_tracker/left" if hand == 0 else "/user/hand_tracker/right")
 	if _hand_tracker != new_hand_tracker:
 		# Just assign it
 		_hand_tracker = new_hand_tracker
 
-	var new_controller_tracker : XRPositionalTracker = \
+	var new_controller_tracker : XRControllerTracker = \
 		XRServer.get_tracker("left_hand" if hand == 0 else "right_hand")
 	if _controller_tracker != new_controller_tracker:
 		if _controller_tracker:
-			# TODO unbind
-			pass
+			_controller_tracker.button_pressed.disconnect(_on_button_pressed)
+			_controller_tracker.button_released.disconnect(_on_button_released)
+			_controller_tracker.input_float_changed.disconnect(_on_input_float_changed)
+			_controller_tracker.input_vector2_changed.disconnect(_on_input_vector2_changed)
 
 		_controller_tracker = new_controller_tracker
 		if _controller_tracker:
-			# TODO bind
-			pass
+			_controller_tracker.button_pressed.connect(_on_button_pressed)
+			_controller_tracker.button_released.connect(_on_button_released)
+			_controller_tracker.input_float_changed.connect(_on_input_float_changed)
+			_controller_tracker.input_vector2_changed.connect(_on_input_vector2_changed)
 
 
 func _update_hand_motion_range():
@@ -722,4 +750,23 @@ func _on_skeleton_updated() -> void:
 			collision_node.transform = bone_transform * offset
 
 	skeleton_updated.emit()
+#endregion
+
+
+#region Signal handling
+func _on_button_pressed(action_name: String):
+	# Just chain this.
+	button_pressed.emit(action_name)
+
+func _on_button_released(action_name: String):
+	# Just chain this.
+	button_released.emit(action_name)
+
+func _on_input_float_changed(action_name: String, value: float):
+	# Just chain this.
+	input_float_changed.emit(action_name, value)
+
+func _on_input_vector2_changed(action_name: String, vector: Vector2):
+	# Just chain this.
+	input_vector2_changed.emit(action_name, vector)
 #endregion
