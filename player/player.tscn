@@ -1,0 +1,90 @@
+[gd_scene load_steps=10 format=3 uid="uid://bv5m3v632mh60"]
+
+[ext_resource type="Script" uid="uid://dywqkeibixdiy" path="res://player/player.gd" id="1_g6k8r"]
+[ext_resource type="PackedScene" uid="uid://xrt2000001a" path="res://addons/godot-xr-tools2/player_rigs/xrt2_dynamic_player_rig.tscn" id="1_rkbax"]
+[ext_resource type="Script" uid="uid://xrt2ebmt58c" path="res://addons/godot-xr-tools2/hands/xrt2_collision_hand.gd" id="2_g1dw6"]
+[ext_resource type="Script" uid="uid://xrt2ebknph2" path="res://addons/godot-xr-tools2/player_rigs/movement_functions/xrt2_direct_movement.gd" id="3_g1dw6"]
+[ext_resource type="Script" uid="uid://xrt2eecske1" path="res://addons/godot-xr-tools2/hands/xrt2_hand_attachment.gd" id="3_qjkh3"]
+[ext_resource type="Script" uid="uid://xrt23qrb4js" path="res://addons/godot-xr-tools2/player_rigs/interaction_functions/xrt2_pickup.gd" id="4_g6k8r"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yw30f"]
+radius = 0.2
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g1dw6"]
+albedo_color = Color(0.696004, 0.389008, 0.319795, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_yw30f"]
+material = SubResource("StandardMaterial3D_g1dw6")
+radius = 0.1
+height = 0.2
+radial_segments = 32
+rings = 16
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_g6k8r")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_yw30f")
+debug_color = Color(0, 0.6, 0.7, 0.42)
+
+[node name="Xrt2DynamicPlayerRig" parent="." instance=ExtResource("1_rkbax")]
+
+[node name="Head" type="MeshInstance3D" parent="Xrt2DynamicPlayerRig/XRCamera3D/Neck" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+layers = 4
+mesh = SubResource("SphereMesh_yw30f")
+
+[node name="LeftHand" parent="Xrt2DynamicPlayerRig" index="1"]
+pose = &"palm_pose"
+
+[node name="RightHand" parent="Xrt2DynamicPlayerRig" index="2"]
+pose = &"palm_pose"
+
+[node name="LeftCollisionHand" type="RigidBody3D" parent="Xrt2DynamicPlayerRig"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, -0.5)
+script = ExtResource("2_g1dw6")
+metadata/_custom_type_script = ExtResource("2_g1dw6")
+
+[node name="LeftHandAttachment" type="Node3D" parent="Xrt2DynamicPlayerRig/LeftCollisionHand"]
+transform = Transform3D(1, -2.22524e-07, 1.8388e-05, 2.22525e-07, 0.999999, -0.00166778, -1.83582e-05, 0.00166769, 0.999998, 3.86425e-08, -1.86975e-05, 0.0271756)
+script = ExtResource("3_qjkh3")
+bone_name = "LeftHand"
+metadata/_custom_type_script = ExtResource("3_qjkh3")
+
+[node name="LeftPickup" type="Node3D" parent="Xrt2DynamicPlayerRig/LeftCollisionHand/LeftHandAttachment"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.02, 0, -0.07)
+script = ExtResource("4_g6k8r")
+metadata/_custom_type_script = ExtResource("4_g6k8r")
+
+[node name="RightCollisionHand" type="RigidBody3D" parent="Xrt2DynamicPlayerRig"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1, -0.5)
+script = ExtResource("2_g1dw6")
+hand = 1
+metadata/_custom_type_script = ExtResource("2_g1dw6")
+
+[node name="RightHandAttachment" type="Node3D" parent="Xrt2DynamicPlayerRig/RightCollisionHand"]
+transform = Transform3D(1, 2.22525e-07, -1.84317e-05, -2.22598e-07, 0.999999, -0.00166774, 1.84019e-05, 0.00166765, 0.999998, -3.86425e-08, -1.86975e-05, 0.0271756)
+script = ExtResource("3_qjkh3")
+bone_name = "RightHand"
+metadata/_custom_type_script = ExtResource("3_qjkh3")
+
+[node name="RightPickup" type="Node3D" parent="Xrt2DynamicPlayerRig/RightCollisionHand/RightHandAttachment"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.02, 0, -0.07)
+script = ExtResource("4_g6k8r")
+metadata/_custom_type_script = ExtResource("4_g6k8r")
+
+[node name="XRT2DirectMovement" type="Node3D" parent="Xrt2DynamicPlayerRig"]
+script = ExtResource("3_g1dw6")
+movement_action = "movement"
+metadata/_custom_type_script = ExtResource("3_g1dw6")
+
+[connection signal="button_pressed" from="Xrt2DynamicPlayerRig/LeftCollisionHand" to="." method="_on_left_hand_button_pressed"]
+[connection signal="button_pressed" from="Xrt2DynamicPlayerRig/RightCollisionHand" to="." method="_on_right_hand_button_pressed"]
+
+[editable path="Xrt2DynamicPlayerRig"]

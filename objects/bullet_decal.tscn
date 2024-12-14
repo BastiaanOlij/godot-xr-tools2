@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://dn7t2s12kno0l"]
+
+[ext_resource type="Script" uid="uid://cas456pcvgc6v" path="res://objects/bullet_decal.gd" id="1_5tf3x"]
+[ext_resource type="Texture2D" uid="uid://ck8b0fja5a1ll" path="res://assets/opengameart.org/bullet_decal/bullet_hole.png" id="1_pmth6"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5tf3x"]
+transparency = 1
+albedo_texture = ExtResource("1_pmth6")
+
+[sub_resource type="QuadMesh" id="QuadMesh_55bql"]
+size = Vector2(0.01, 0.01)
+
+[node name="BulletDecal" type="Node3D"]
+script = ExtResource("1_5tf3x")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+material_override = SubResource("StandardMaterial3D_5tf3x")
+mesh = SubResource("QuadMesh_55bql")
+
+[node name="LifetimeTimer" type="Timer" parent="."]
+wait_time = 30.0
+one_shot = true
+autostart = true
+
+[connection signal="timeout" from="LifetimeTimer" to="." method="_on_lifetime_timer_timeout"]

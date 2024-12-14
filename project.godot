@@ -1,0 +1,53 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="XRT2 test"
+run/main_scene="uid://c0qq4l7lyscqs"
+config/features=PackedStringArray("4.4", "GL Compatibility")
+config/icon="res://icon.svg"
+run/main_scene.android="uid://dxs07a2ucy34v"
+
+[display]
+
+window/size/viewport_width=1900
+window/size/viewport_height=1050
+
+[layer_names]
+
+3d_render/layer_1="Default"
+3d_render/layer_2="HMD only"
+3d_render/layer_3="Spectator only"
+3d_physics/layer_1="Default"
+3d_physics/layer_10="Projectiles (can't pick up)"
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
+environment/defaults/default_clear_color=Color(0, 0, 0, 1)
+
+[xr]
+
+openxr/enabled=true
+openxr/reference_space=2
+openxr/foveation_level=3
+openxr/foveation_dynamic=true
+openxr/extensions/hand_tracking=true
+openxr/extensions/hand_tracking_unobstructed_data_source=true
+openxr/extensions/hand_tracking_controller_data_source=true
+openxr/extensions/hand_interaction_profile=true
+shaders/enabled=true

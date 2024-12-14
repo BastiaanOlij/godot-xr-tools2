@@ -1,0 +1,65 @@
+[gd_scene load_steps=12 format=3 uid="uid://dsxjo6miebrpy"]
+
+[ext_resource type="PackedScene" uid="uid://xrt20000007" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.tscn" id="1_c306w"]
+[ext_resource type="Environment" uid="uid://l4hnsy05gog4" path="res://stages/default_environment.tres" id="2_38rx5"]
+[ext_resource type="PackedScene" uid="uid://bv5m3v632mh60" path="res://player/player.tscn" id="3_82lmn"]
+[ext_resource type="Texture2D" uid="uid://dlbgjparkqtva" path="res://assets/misc/pattern.png" id="4_3seyx"]
+[ext_resource type="PackedScene" uid="uid://b2cyb20vj2cxi" path="res://objects/table.tscn" id="5_5ahed"]
+[ext_resource type="PackedScene" uid="uid://dajkr3cilsked" path="res://objects/box.tscn" id="6_kyxl1"]
+[ext_resource type="PackedScene" uid="uid://bak8mif2gg08j" path="res://objects/pistol.tscn" id="7_2qfg3"]
+[ext_resource type="PackedScene" uid="uid://dn7t2s12kno0l" path="res://objects/bullet_decal.tscn" id="7_jv8ty"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5ahed"]
+albedo_color = Color(0.353771, 0.581494, 0.294261, 1)
+albedo_texture = ExtResource("4_3seyx")
+uv1_scale = Vector3(100, 100, 100)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_kyxl1"]
+material = SubResource("StandardMaterial3D_5ahed")
+size = Vector2(1000, 1000)
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_2qfg3"]
+
+[node name="MainStage" node_paths=PackedStringArray("player_origin") instance=ExtResource("1_c306w")]
+player_origin = NodePath("Player/Xrt2DynamicPlayerRig")
+
+[node name="WorldEnvironment" parent="." index="0"]
+environment = ExtResource("2_38rx5")
+
+[node name="Player" parent="." index="2" instance=ExtResource("3_82lmn")]
+
+[node name="Floor" type="StaticBody3D" parent="." index="3"]
+collision_mask = 513
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" index="0"]
+mesh = SubResource("PlaneMesh_kyxl1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" index="1"]
+shape = SubResource("WorldBoundaryShape3D_2qfg3")
+debug_color = Color(0, 0.6, 0.7, 0.42)
+
+[node name="Table" parent="." index="4" instance=ExtResource("5_5ahed")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.86108)
+collision_mask = 513
+
+[node name="Box01" parent="Table" index="2" instance=ExtResource("6_kyxl1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.220952, 1.38709, -0.139649)
+
+[node name="Box02" parent="Table" index="3" instance=ExtResource("6_kyxl1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00403871, 1.40671, -0.0903311)
+mass = 10.0
+size = Vector3(0.2, 0.2, 0.2)
+
+[node name="Box03" parent="Table" index="4" instance=ExtResource("6_kyxl1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.398112, 1.46048, -0.0732546)
+mass = 20.0
+size = Vector3(0.3, 0.3, 0.3)
+
+[node name="BulletDecal" parent="Table/Box03" index="4" instance=ExtResource("7_jv8ty")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0515044, 0.150752)
+
+[node name="Pistol" parent="Table" index="5" instance=ExtResource("7_2qfg3")]
+transform = Transform3D(1.91069e-15, 4.37114e-08, -1, 1, -4.37114e-08, 0, -4.37114e-08, -1, -4.37114e-08, 0, 1.35374, 0.331949)
+
+[editable path="Player"]
+[editable path="Player/Xrt2DynamicPlayerRig"]

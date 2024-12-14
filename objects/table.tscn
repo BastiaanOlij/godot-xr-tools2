@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://b2cyb20vj2cxi"]
+
+[ext_resource type="Texture2D" uid="uid://dlbgjparkqtva" path="res://assets/misc/pattern.png" id="1_nf3pd"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3seyx"]
+albedo_color = Color(0.32648, 0.554444, 0.814202, 1)
+albedo_texture = ExtResource("1_nf3pd")
+uv1_scale = Vector3(2, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_5ahed"]
+material = SubResource("StandardMaterial3D_3seyx")
+size = Vector3(2, 1.3, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_kyxl1"]
+size = Vector3(2, 1.3, 1)
+
+[node name="Table" type="StaticBody3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+mesh = SubResource("BoxMesh_5ahed")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+shape = SubResource("BoxShape3D_kyxl1")
+debug_color = Color(0, 0.6, 0.7, 0.42)

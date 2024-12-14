@@ -1,0 +1,53 @@
+[gd_scene load_steps=6 format=3 uid="uid://c0qq4l7lyscqs"]
+
+[ext_resource type="PackedScene" uid="uid://xrt2j78g3fc" path="res://addons/godot-xr-tools2/construct/xrt2_construct.tscn" id="1_o7mvy"]
+[ext_resource type="Texture2D" uid="uid://ygxwo3lb7wjj" path="res://assets/misc/splash.png" id="2_8sb5x"]
+[ext_resource type="Script" uid="uid://b221bxa3ukkk0" path="res://construct.gd" id="2_51pj4"]
+[ext_resource type="PackedScene" uid="uid://xrt23kyre42" path="res://addons/godot-xr-tools2/construct/xrt2_spectator_camera.tscn" id="2_hkn0h"]
+[ext_resource type="PackedScene" uid="uid://dxs07a2ucy34v" path="res://main.tscn" id="3_8sb5x"]
+
+[node name="Construct" instance=ExtResource("1_o7mvy")]
+script = ExtResource("2_51pj4")
+
+[node name="DesktopSubViewport" parent="DesktopContainer" index="0"]
+disable_3d = true
+
+[node name="SplashImage" type="TextureRect" parent="DesktopContainer/DesktopSubViewport" index="0"]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_8sb5x")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="UI" type="VBoxContainer" parent="DesktopContainer/DesktopSubViewport" index="1"]
+unique_name_in_owner = true
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 156.0
+offset_bottom = 50.0
+
+[node name="PreviewMode" type="OptionButton" parent="DesktopContainer/DesktopSubViewport/UI" index="0"]
+layout_mode = 2
+selected = 0
+item_count = 1
+popup/item_0/text = "Spectator Cam"
+popup/item_0/id = 0
+
+[node name="FollowPlayer" type="CheckBox" parent="DesktopContainer/DesktopSubViewport/UI" index="1"]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+text = "Follow player"
+
+[node name="Xrt2SpectatorCamera" parent="DesktopContainer/DesktopSubViewport" index="2" instance=ExtResource("2_hkn0h")]
+unique_name_in_owner = true
+transform = Transform3D(-0.976859, -0.0303731, -0.211715, -0.106775, 0.926946, 0.35968, 0.185324, 0.373964, -0.908739, -0.384786, 2.27811, -3.23628)
+
+[node name="Main" parent="VRSubViewport" index="0" instance=ExtResource("3_8sb5x")]
+
+[connection signal="showing_loaded_scene" from="VRSubViewport/Main" to="." method="_on_main_showing_loaded_scene"]
+[connection signal="showing_loading_screen" from="VRSubViewport/Main" to="." method="_on_main_showing_loading_screen"]

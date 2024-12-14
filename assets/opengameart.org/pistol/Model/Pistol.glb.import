@@ -1,0 +1,134 @@
+[remap]
+
+importer="scene"
+importer_version=1
+type="PackedScene"
+uid="uid://cwjmxkyid7lkf"
+path="res://.godot/imported/Pistol.glb-687a83233333b81f523b8a847e62716e.scn"
+
+[deps]
+
+source_file="res://assets/opengameart.org/pistol/Model/Pistol.glb"
+dest_files=["res://.godot/imported/Pistol.glb-687a83233333b81f523b8a847e62716e.scn"]
+
+[params]
+
+nodes/root_type=""
+nodes/root_name=""
+nodes/apply_root_scale=true
+nodes/root_scale=1.0
+nodes/import_as_skeleton_bones=false
+nodes/use_node_type_suffixes=true
+meshes/ensure_tangents=true
+meshes/generate_lods=true
+meshes/create_shadow_meshes=true
+meshes/light_baking=1
+meshes/lightmap_texel_size=0.2
+meshes/force_disable_compression=false
+skins/use_named_skins=true
+animation/import=true
+animation/fps=30
+animation/trimming=false
+animation/remove_immutable_tracks=true
+animation/import_rest_as_RESET=false
+import_script/path=""
+_subresources={
+"materials": {
+"M_PaletteAtlas": {
+"use_external/enabled": true,
+"use_external/path": "res://assets/opengameart.org/pistol/Model/materials/M_PaletteAtlas.tres"
+}
+},
+"meshes": {
+"Pistol_9mm": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 60.0,
+"save_to_file/enabled": true,
+"save_to_file/path": "res://assets/opengameart.org/pistol/Model/meshes/Pistol_9mm.res"
+},
+"Pistol_9mm_001": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 60.0,
+"save_to_file/enabled": true,
+"save_to_file/path": "res://assets/opengameart.org/pistol/Model/meshes/Pistol_9mm_001.res"
+},
+"Pistol_Plane_001": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 60.0,
+"save_to_file/enabled": true,
+"save_to_file/path": "res://assets/opengameart.org/pistol/Model/meshes/Pistol_Plane_001.res"
+},
+"Pistol_Plane_002": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 60.0,
+"save_to_file/enabled": true,
+"save_to_file/path": "res://assets/opengameart.org/pistol/Model/meshes/Pistol_Plane_002.res"
+},
+"Pistol_frame": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 60.0,
+"save_to_file/enabled": true,
+"save_to_file/path": "res://assets/opengameart.org/pistol/Model/meshes/Pistol_frame.res"
+},
+"Pistol_hammer": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 60.0,
+"save_to_file/enabled": true,
+"save_to_file/path": "res://assets/opengameart.org/pistol/Model/meshes/Pistol_hammer.res"
+},
+"Pistol_magazine (empty)": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 60.0,
+"save_to_file/enabled": true,
+"save_to_file/path": "res://assets/opengameart.org/pistol/Model/meshes/Pistol_magazine (empty).res"
+},
+"Pistol_magazine (loaded)": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 60.0,
+"save_to_file/enabled": true,
+"save_to_file/path": "res://assets/opengameart.org/pistol/Model/meshes/Pistol_magazine (loaded).res"
+},
+"Pistol_night sights": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 60.0,
+"save_to_file/enabled": true,
+"save_to_file/path": "res://assets/opengameart.org/pistol/Model/meshes/Pistol_night sights.res"
+},
+"Pistol_slide": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 60.0,
+"save_to_file/enabled": true,
+"save_to_file/path": "res://assets/opengameart.org/pistol/Model/meshes/Pistol_slide.res"
+},
+"Pistol_trigger": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 60.0,
+"save_to_file/enabled": true,
+"save_to_file/path": "res://assets/opengameart.org/pistol/Model/meshes/Pistol_trigger.res"
+}
+}
+}
+gltf/naming_version=1
+gltf/embedded_image_handling=1
