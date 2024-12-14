@@ -56,6 +56,8 @@ jobs:
           do
             # Make sure it ends with .gd
             if [[ $file =~ .gd$ ]]; then
-              gdlint $file
+              if [ -f $file]; then
+                gdlint $file
+              fi
             fi
           done
