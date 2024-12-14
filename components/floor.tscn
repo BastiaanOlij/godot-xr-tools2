@@ -36,12 +36,12 @@ void fragment() {
 render_priority = 0
 shader = SubResource("Shader_pv3lj")
 shader_parameter/albedo = Color(0.0796347, 0.660561, 0, 1)
+shader_parameter/texture_albedo = ExtResource("1_ml584")
 shader_parameter/roughness = 1.0
 shader_parameter/specular = 0.5
 shader_parameter/metallic = 0.0
 shader_parameter/uv1_scale = Vector3(10, 10, 10)
 shader_parameter/uv1_offset = Vector3(0, 0, 0)
-shader_parameter/texture_albedo = ExtResource("1_ml584")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_3t8ge"]
 size = Vector2(100, 100)
@@ -50,6 +50,7 @@ size = Vector2(100, 100)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("WorldBoundaryShape3D_of381")
+debug_color = Color(0, 0.6, 0.7, 0.42)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 material_override = SubResource("ShaderMaterial_beopk")

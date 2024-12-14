@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://d0px0pvdr03o"]
 
-[ext_resource type="Shader" path="res://materials_and_shaders/textured.gdshader" id="1_18xfb"]
+[ext_resource type="Shader" uid="uid://hy6wp5qwpmjk" path="res://materials_and_shaders/textured.gdshader" id="1_18xfb"]
 [ext_resource type="Texture2D" uid="uid://ds8hppgpq3pod" path="res://assets/main/pattern.png" id="2_gpj1g"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_raqf1"]
@@ -10,12 +10,12 @@ size = Vector3(0.1, 2, 2)
 render_priority = 0
 shader = ExtResource("1_18xfb")
 shader_parameter/albedo = Color(0.711893, 0.619228, 0.93258, 1)
+shader_parameter/texture_albedo = ExtResource("2_gpj1g")
 shader_parameter/roughness = 1.0
 shader_parameter/specular = 0.5
 shader_parameter/metallic = 0.0
 shader_parameter/uv1_scale = Vector3(1, 1, 1)
 shader_parameter/uv1_offset = Vector3(0, 0, 0)
-shader_parameter/texture_albedo = ExtResource("2_gpj1g")
 
 [sub_resource type="BoxMesh" id="BoxMesh_3hrng"]
 size = Vector3(0.1, 2, 2)
@@ -25,6 +25,7 @@ size = Vector3(0.1, 2, 2)
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("BoxShape3D_raqf1")
+debug_color = Color(0, 0.6, 0.7, 0.42)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

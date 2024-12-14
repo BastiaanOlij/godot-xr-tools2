@@ -7,8 +7,8 @@ action_type = 2
 toplevel_paths = PackedStringArray("/user/hand/left", "/user/hand/right")
 
 [sub_resource type="OpenXRAction" id="OpenXRAction_uctrj"]
-resource_name = "default_pose"
-localized_name = "Default pose"
+resource_name = "palm_pose"
+localized_name = "Palm pose"
 action_type = 3
 toplevel_paths = PackedStringArray("/user/hand/left", "/user/hand/right")
 

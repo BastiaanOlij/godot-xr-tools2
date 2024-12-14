@@ -1,15 +1,13 @@
-[gd_scene load_steps=20 format=3 uid="uid://7lt82mv6lmxo"]
+[gd_scene load_steps=19 format=3 uid="uid://7lt82mv6lmxo"]
 
 [ext_resource type="PackedScene" uid="uid://xrt20000007" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.tscn" id="1_spd8v"]
 [ext_resource type="PackedScene" uid="uid://xrt2000001a" path="res://addons/godot-xr-tools2/player_rigs/xrt2_dynamic_player_rig.tscn" id="2_f7mcw"]
+[ext_resource type="Shader" uid="uid://xrt2oqik7ik" path="res://addons/godot-xr-tools2/shaders/shaded_no_alpha.gdshader" id="3_6d2rb"]
 [ext_resource type="Script" uid="uid://xrt2ebknph2" path="res://addons/godot-xr-tools2/player_rigs/movement_functions/xrt2_direct_movement.gd" id="3_7f0s7"]
 [ext_resource type="Script" uid="uid://xrt23qrb4js" path="res://addons/godot-xr-tools2/player_rigs/interaction_functions/xrt2_pickup.gd" id="4_l0n08"]
+[ext_resource type="Script" uid="uid://xrt2eecske1" path="res://addons/godot-xr-tools2/hands/xrt2_hand_attachment.gd" id="5_4i4c4"]
 [ext_resource type="Script" uid="uid://xrt2ebmt58c" path="res://addons/godot-xr-tools2/hands/xrt2_collision_hand.gd" id="5_don5u"]
-[ext_resource type="Script" uid="uid://xrt2lvbjedg" path="res://addons/godot-xr-tools2/hands/xrt2_collision_hand_offset.gd" id="6_kqggo"]
-[ext_resource type="Script" uid="uid://da0wtelb4mvm3" path="res://stages/main_stage/ghost_hand.gd" id="7_5eq2v"]
-[ext_resource type="PackedScene" uid="uid://d22k0sp2hinew" path="res://assets/gltf/LeftHandHumanoid.gltf" id="7_l3oid"]
-[ext_resource type="PackedScene" uid="uid://dlswhmq6s52gu" path="res://assets/gltf/RightHandHumanoid.gltf" id="8_8e4u0"]
-[ext_resource type="Material" uid="uid://b6mjiver4vgu3" path="res://stages/main_stage/ghost_hand.material" id="8_64kkr"]
+[ext_resource type="PackedScene" uid="uid://dycgm0a4f87pw" path="res://testing/axis.tscn" id="6_3ltgk"]
 [ext_resource type="PackedScene" uid="uid://dvvlw0k32b8wq" path="res://components/floor.tscn" id="10_n1kwh"]
 [ext_resource type="PackedScene" uid="uid://d0px0pvdr03o" path="res://components/wall.tscn" id="11_qq4ho"]
 [ext_resource type="PackedScene" uid="uid://2tngyui13f4v" path="res://components/table.tscn" id="12_6w5m1"]
@@ -28,11 +26,17 @@ tonemap_mode = 2
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0jk8f"]
 radius = 0.3
 
-[sub_resource type="SphereMesh" id="SphereMesh_i74ts"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_3ltgk"]
+render_priority = 0
+shader = ExtResource("3_6d2rb")
+shader_parameter/albedo = Color(0.910569, 0.585299, 0.39159, 1)
+shader_parameter/metallic = 0.0
+shader_parameter/roughness = 1.0
+shader_parameter/specular = 0.5
+
+[sub_resource type="SphereMesh" id="SphereMesh_4i4c4"]
 radius = 0.1
 height = 0.2
-radial_segments = 32
-rings = 16
 
 [node name="MainStage" node_paths=PackedStringArray("player_origin") instance=ExtResource("1_spd8v")]
 player_origin = NodePath("CharacterBody3D/XRT2DynamicPlayerRig")
@@ -42,6 +46,10 @@ environment = SubResource("Environment_8sh2w")
 
 [node name="SunLight3D" parent="." index="1"]
 shadow_enabled = true
+directional_shadow_split_1 = 0.05
+directional_shadow_split_2 = 0.1
+directional_shadow_split_3 = 0.25
+directional_shadow_max_distance = 40.0
 
 [node name="CharacterBody3D" type="CharacterBody3D" parent="." index="2"]
 
@@ -54,68 +62,53 @@ debug_color = Color(0, 0.6, 0.7, 0.42)
 
 [node name="Head" type="MeshInstance3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/XRCamera3D/Neck" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
-layers = 4
-mesh = SubResource("SphereMesh_i74ts")
+material_override = SubResource("ShaderMaterial_3ltgk")
+mesh = SubResource("SphereMesh_4i4c4")
 
-[node name="XRT2CollisionHand" type="AnimatableBody3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHand" index="0" node_paths=PackedStringArray("hand_skeleton")]
-script = ExtResource("5_don5u")
-hand_skeleton = NodePath("../../LeftHandTracker/XRT2CollisionHandOffset/LeftHandHumanoid2/LeftHandHumanoid/Skeleton3D")
-
-[node name="XRT2Pickup" type="Node3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHand/XRT2CollisionHand" index="0"]
-script = ExtResource("4_l0n08")
-
-[node name="XRT2CollisionHand" type="AnimatableBody3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/RightHand" index="0" node_paths=PackedStringArray("hand_skeleton")]
-script = ExtResource("5_don5u")
-hand_skeleton = NodePath("../../RightHandTracker/XRT2CollisionHandOffset/RightHandHumanoid2/RightHandHumanoid/Skeleton3D")
-
-[node name="XRT2Pickup" type="Node3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/RightHand/XRT2CollisionHand" index="0"]
-script = ExtResource("4_l0n08")
-
-[node name="LeftHandTracker" type="XRNode3D" parent="CharacterBody3D/XRT2DynamicPlayerRig" index="3"]
+[node name="XRT2LeftCollisionHand" type="RigidBody3D" parent="CharacterBody3D/XRT2DynamicPlayerRig" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, -0.5)
-tracker = &"/user/hand_tracker/left"
-show_when_tracked = true
+script = ExtResource("5_don5u")
+hand_motion_range = 1
 
-[node name="XRT2CollisionHandOffset" type="Node3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHandTracker" index="0" node_paths=PackedStringArray("follow_node")]
-script = ExtResource("6_kqggo")
-follow_node = NodePath("../../LeftHand/XRT2CollisionHand")
+[node name="LeftHandAttachment" type="Node3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/XRT2LeftCollisionHand" index="0"]
+transform = Transform3D(1, -2.22524e-07, 1.8388e-05, 2.22525e-07, 0.999999, -0.00166778, -1.83582e-05, 0.00166769, 0.999998, 3.86425e-08, -1.86975e-05, 0.0271756)
+script = ExtResource("5_4i4c4")
+bone_name = "LeftHand"
 
-[node name="LeftHandHumanoid2" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHandTracker/XRT2CollisionHandOffset" index="0" instance=ExtResource("7_l3oid")]
+[node name="XRT2Pickup" type="Node3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/XRT2LeftCollisionHand/LeftHandAttachment" index="0"]
+transform = Transform3D(1, -1.42109e-14, 0, 0, 1, 0, 0, 0, 1, 0.02, 0, -0.08)
+script = ExtResource("4_l0n08")
 
-[node name="XRHandModifier3D" type="XRHandModifier3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHandTracker/XRT2CollisionHandOffset/LeftHandHumanoid2/LeftHandHumanoid/Skeleton3D" index="1"]
+[node name="IndexTipAttachment" type="Node3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/XRT2LeftCollisionHand" index="1"]
+transform = Transform3D(0.919546, -0.0148924, -0.3927, -0.0321112, 0.993092, -0.112853, 0.391668, 0.116383, 0.912716, -0.0111001, 0.0429431, -0.171614)
+script = ExtResource("5_4i4c4")
+bone_name = "LeftIndexTip"
+metadata/_custom_type_script = ExtResource("5_4i4c4")
 
-[node name="GhostLeftHand" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHandTracker" index="1" node_paths=PackedStringArray("offset_node") instance=ExtResource("7_l3oid")]
-script = ExtResource("7_5eq2v")
-offset_node = NodePath("../XRT2CollisionHandOffset")
+[node name="Axis" parent="CharacterBody3D/XRT2DynamicPlayerRig/XRT2LeftCollisionHand/IndexTipAttachment" index="0" instance=ExtResource("6_3ltgk")]
+transform = Transform3D(0.1, 0, 0, 4.65661e-10, 0.1, 0, 3.72529e-09, 1.86265e-09, 0.1, 0, 0, 0)
+visible = false
 
-[node name="LeftHandHumanoidMesh" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHandTracker/GhostLeftHand/LeftHandHumanoid/Skeleton3D" index="0"]
-material_override = ExtResource("8_64kkr")
-
-[node name="XRHandModifier3D" type="XRHandModifier3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/LeftHandTracker/GhostLeftHand/LeftHandHumanoid/Skeleton3D" index="1"]
-
-[node name="RightHandTracker" type="XRNode3D" parent="CharacterBody3D/XRT2DynamicPlayerRig" index="4"]
+[node name="XRT2RightCollisionHand" type="RigidBody3D" parent="CharacterBody3D/XRT2DynamicPlayerRig" index="2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1, -0.5)
-tracker = &"/user/hand_tracker/right"
-show_when_tracked = true
+script = ExtResource("5_don5u")
+hand = 1
 
-[node name="XRT2CollisionHandOffset" type="Node3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/RightHandTracker" index="0" node_paths=PackedStringArray("follow_node")]
-script = ExtResource("6_kqggo")
-follow_node = NodePath("../../RightHand/XRT2CollisionHand")
+[node name="RightHandAttachment" type="Node3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/XRT2RightCollisionHand" index="0"]
+transform = Transform3D(1, 2.22525e-07, -1.84317e-05, -2.22598e-07, 0.999999, -0.00166774, 1.84019e-05, 0.00166765, 0.999998, -3.86425e-08, -1.86975e-05, 0.0271756)
+script = ExtResource("5_4i4c4")
+bone_name = "RightHand"
+metadata/_custom_type_script = ExtResource("5_4i4c4")
 
-[node name="RightHandHumanoid2" parent="CharacterBody3D/XRT2DynamicPlayerRig/RightHandTracker/XRT2CollisionHandOffset" index="0" instance=ExtResource("8_8e4u0")]
+[node name="XRT2Pickup" type="Node3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/XRT2RightCollisionHand/RightHandAttachment" index="0"]
+transform = Transform3D(1, 1.77636e-14, 0, 7.10543e-15, 1, 0, 0, 0, 1, -0.02, 0, -0.08)
+script = ExtResource("4_l0n08")
 
-[node name="XRHandModifier3D" type="XRHandModifier3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/RightHandTracker/XRT2CollisionHandOffset/RightHandHumanoid2/RightHandHumanoid/Skeleton3D" index="1"]
-hand_tracker = &"/user/hand_tracker/right"
+[node name="LeftHand" parent="CharacterBody3D/XRT2DynamicPlayerRig" index="3"]
+pose = &"palm_pose"
 
-[node name="GhostRightHand" parent="CharacterBody3D/XRT2DynamicPlayerRig/RightHandTracker" index="1" node_paths=PackedStringArray("offset_node") instance=ExtResource("8_8e4u0")]
-script = ExtResource("7_5eq2v")
-offset_node = NodePath("../XRT2CollisionHandOffset")
-
-[node name="RightHandHumanoidMesh" parent="CharacterBody3D/XRT2DynamicPlayerRig/RightHandTracker/GhostRightHand/RightHandHumanoid/Skeleton3D" index="0"]
-material_override = ExtResource("8_64kkr")
-
-[node name="XRHandModifier3D" type="XRHandModifier3D" parent="CharacterBody3D/XRT2DynamicPlayerRig/RightHandTracker/GhostRightHand/RightHandHumanoid/Skeleton3D" index="1"]
-hand_tracker = &"/user/hand_tracker/right"
+[node name="RightHand" parent="CharacterBody3D/XRT2DynamicPlayerRig" index="4"]
+pose = &"palm_pose"
 
 [node name="XRT2DirectMovement" type="Node3D" parent="CharacterBody3D/XRT2DynamicPlayerRig" index="5"]
 script = ExtResource("3_7f0s7")
@@ -138,16 +131,16 @@ transform = Transform3D(0.351286, 0, 0.936268, 0, 1, 0, -0.936268, 0, 0.351286, 
 [node name="Table" parent="." index="8" instance=ExtResource("12_6w5m1")]
 
 [node name="Box01" parent="Table" index="6" instance=ExtResource("13_ousus")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0.376393)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.20919, 0.12431)
+mass = 2.0
+size = Vector3(0.2, 0.2, 0.2)
 
 [node name="Box02" parent="Table" index="7" instance=ExtResource("13_ousus")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.144, 1.15, 0.376393)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.409726, 1.34847, 0.208137)
+mass = 10.0
+size = Vector3(0.4, 0.4, 0.4)
 
 [node name="Box03" parent="Table" index="8" instance=ExtResource("13_ousus")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.181614, 1.15, 0.376)
 
 [editable path="CharacterBody3D/XRT2DynamicPlayerRig"]
-[editable path="CharacterBody3D/XRT2DynamicPlayerRig/LeftHandTracker/XRT2CollisionHandOffset/LeftHandHumanoid2"]
-[editable path="CharacterBody3D/XRT2DynamicPlayerRig/LeftHandTracker/GhostLeftHand"]
-[editable path="CharacterBody3D/XRT2DynamicPlayerRig/RightHandTracker/XRT2CollisionHandOffset/RightHandHumanoid2"]
-[editable path="CharacterBody3D/XRT2DynamicPlayerRig/RightHandTracker/GhostRightHand"]
