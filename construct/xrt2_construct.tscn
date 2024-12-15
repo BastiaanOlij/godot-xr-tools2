@@ -19,3 +19,4 @@ render_target_update_mode = 4
 
 [node name="VRSubViewport" type="SubViewport" parent="."]
 unique_name_in_owner = true
+audio_listener_enable_3d = true

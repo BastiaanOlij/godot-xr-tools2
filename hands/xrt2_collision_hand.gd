@@ -209,7 +209,7 @@ var _ghost_mesh : Node3D
 # Skeleton collisions
 var _hand_tracking_parent : XRNode3D
 var _palm_collision_shape : CollisionShape3D
-var _digit_collision_shapes : Dictionary
+var _digit_collision_shapes : Dictionary[String, CollisionShape3D]
 #endregion
 
 
@@ -709,7 +709,7 @@ func _update_hand_meshes():
 #region Private Collision Functions
 # Remove all our digit collisions
 func _clear_digit_collisions() -> void:
-	for digit in _digit_collision_shapes:
+	for digit : String in _digit_collision_shapes:
 		var collision_node = _digit_collision_shapes[digit]
 		remove_child(collision_node)
 		collision_node.queue_free()
