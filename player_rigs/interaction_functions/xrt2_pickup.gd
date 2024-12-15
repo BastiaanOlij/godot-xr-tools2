@@ -56,12 +56,18 @@ class HighlightedBody extends RefCounted:
 	var original_materials : Dictionary[MeshInstance3D, Material]
 	var pickups : Array[XRT2Pickup]
 
+# Class for storing closest info
+class ClosestObject extends RefCounted:
+	var body : PhysicsBody3D
+	var grab_point : XRT2GrabPoint
+
 # Array of all current pickup handlers
 static var _pickup_handlers : Array[XRT2Pickup]
 
 # We only want one hand to highlight
 static var _highlighted_bodies : Dictionary[Node3D, HighlightedBody]
 
+#region Export variables
 ## If ticked we monitor for things we can pick up
 @export var enabled : bool = true:
 	set(value):
@@ -89,7 +95,10 @@ static var _highlighted_bodies : Dictionary[Node3D, HighlightedBody]
 ## If false we need to continously hold our grab button, if true we toggle
 ## Note: with keyboard entry toggle is enforced
 @export var grab_toggle : bool = false
+#endregion
 
+
+#region Private variables
 # Node helpers
 var _xr_origin : XROrigin3D
 var _xr_controller : XRController3D
@@ -120,10 +129,11 @@ var _is_grab : bool = false
 var _was_xr_pressed : bool = false
 
 # What is currently our closest object
-var _closest_object : PhysicsBody3D
+var _closest_object : ClosestObject
 
-# What are we holding
+# What are we holding and by which grab point
 var _picked_up : PhysicsBody3D
+var _grab_point : XRT2GrabPoint
 
 # Original state of picked up object
 var _original_freeze_mode : RigidBody3D.FreezeMode
@@ -136,7 +146,10 @@ var _is_primary : bool = false
 # Our highlight material
 var _highlight_material : ShaderMaterial = \
 	preload("res://addons/godot-xr-tools2/shaders/highlight_by_vertex.material")
+#endregion
 
+
+#region Public functions
 ## Find which pickup handler has picked up this object
 static func picked_up_by(what : PhysicsBody3D) -> XRT2Pickup:
 	var by : XRT2Pickup
@@ -162,6 +175,13 @@ func has_picked_up() -> bool:
 func get_picked_up() -> PhysicsBody3D:
 	if is_instance_valid(_picked_up):
 		return _picked_up
+	return null
+
+
+## Returns the grab point on the object we've picked up
+func get_picked_up_grab_point() -> XRT2GrabPoint:
+	if is_instance_valid(_grab_point):
+		return _grab_point
 	return null
 
 
@@ -197,11 +217,20 @@ func pickup_object(which : PhysicsBody3D):
 
 	if _xr_collision_hand:
 		if _picked_up is RigidBody3D:
-			# Remember our current hand transform
+			# Remember our current hand transform.
 			var hand_transform : Transform3D = _xr_collision_hand.global_transform
 
+			# Find our grab point (if any).
+			# Note, we're already handled our exclusive logic, can ignore that here.
+			_grab_point = _get_closest_grabpoint(_picked_up, global_position)
+
 			# Figure out our grab position
-			var dest_transform : Transform3D = _get_closest_transform(_picked_up, global_position)
+			var dest_transform : Transform3D 
+			if _grab_point:
+				dest_transform = _grab_point.get_hand_transform(global_position)
+			else:
+				dest_transform = _get_default_hand_transform(_picked_up, global_position)
+			
 			var offset = get_parent().global_transform.inverse() * hand_transform
 
 			# Now move our hand in the correct grab position
@@ -239,22 +268,33 @@ func pickup_object(which : PhysicsBody3D):
 			if _picked_up is RigidBody3D:
 				_original_freeze_mode = _picked_up.freeze_mode
 
-				# Don't control with physics engine, we're in control
+				# Don't control with physics engine, we're in control.
 				_picked_up.freeze = true
 				_picked_up.freeze_mode = RigidBody3D.FREEZE_MODE_KINEMATIC
 				_picked_up.collision_layer = 0
 				_picked_up.collision_mask = 0
 
-				# Setup our remote transform and sync location to our current picked up position
+				# Setup our remote transform and sync location to
+				# our current picked up object position.
 				_remote_transform.global_transform = _picked_up.global_transform
 				_remote_transform.remote_path = _picked_up.get_path()
 	
-				# Determine the location we should be holding our object
-				# TODO fix this transform now that we use our root node (see above)
-				var dest_transform : Transform3D = _get_closest_transform(_picked_up, global_position)
+				# Find our grab point (if any).
+				# Note, we're already handled our exclusive logic, can ignore that here.
+				_grab_point = _get_closest_grabpoint(_picked_up, global_position)
+
+				# Figure out our grab position.
+				var dest_transform : Transform3D 
+				if _grab_point:
+					dest_transform = _grab_point.get_hand_transform(global_position)
+				else:
+					dest_transform = _get_default_hand_transform(_picked_up, global_position)
+
+				# Make our transform local to our picked up object, we'll tween to fetch.
 				dest_transform = dest_transform.inverse() * _picked_up.global_transform
 
-				# TODO should adjust our dest_transform to account for any offset in our hand mesh
+				# Adjust our dest_transform to account for any offset in our pickup function
+				dest_transform = transform.inverse() * dest_transform
 
 				if _tween:
 					_tween.kill()
@@ -286,6 +326,7 @@ func drop_held_object( \
 	if not is_instance_valid(_picked_up):
 		# Just in case
 		_picked_up = null
+		_grab_point = null
 		_is_primary = false
 		return
 
@@ -317,6 +358,7 @@ func drop_held_object( \
 
 	# And we're no longer holding something
 	_picked_up = null
+	_grab_point = null
 	_is_primary = false
 
 	var other = picked_up_by(was_picked_up)
@@ -326,8 +368,10 @@ func drop_held_object( \
 	elif _xr_player_object:
 		was_picked_up.add_collision_exception_with(_xr_player_object)
 		_xr_player_object.add_collision_exception_with(was_picked_up)
+#endregion
 
 
+#region Private export variable update functions
 # Update our enabled status
 func _update_enabled():
 	if _collision_sphere:
@@ -351,8 +395,10 @@ func _update_detection_radius():
 	if _editor_mesh_instance:
 		# Just scale it, prevents having to recreate mesh
 		_editor_mesh_instance.scale = Vector3(detection_radius, detection_radius, detection_radius)
+#endregion
 
 
+#region Private Godot functions
 # Verifies if we have a valid configuration.
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
@@ -431,9 +477,10 @@ func _ready():
 	_update_detection_radius()
 
 
-
 func _exit_tree():
-	_remove_highlight(_closest_object)
+	if _closest_object and is_instance_valid(_closest_object.body):
+		_remove_highlight(_closest_object.body)
+
 	drop_held_object()
 
 	# Remove us from the pickup handlers
@@ -441,6 +488,87 @@ func _exit_tree():
 		_pickup_handlers.erase(self)
 
 
+func _process(_delta):
+	# Don't run in editor
+	if Engine.is_editor_hint():
+		return
+
+	# If we don't have a controller ancestor, nothing we can do
+	if not _xr_controller and not _xr_collision_hand:
+		return
+
+	# if we're not tracking, do nothing
+	if not _have_tracking_data():
+		# We do not drop what we hold (right away)
+		return
+
+	# Get some info from our pose
+	var linear_velocity : Vector3 = Vector3()
+	var angular_velocity : Vector3 = Vector3()
+	var pose : XRPose = _get_pose()
+	if pose:
+		linear_velocity = pose.linear_velocity
+		angular_velocity = pose.angular_velocity
+
+	# Object we picked up no longer exists? Drop it
+	if _picked_up and not is_instance_valid(_picked_up):
+		drop_held_object(linear_velocity, angular_velocity)
+
+	# Our pickup handler is no longer enabled? Drop what we're holding
+	if not enabled and _picked_up:
+		drop_held_object(linear_velocity, angular_velocity)
+
+	# Check our grab status
+	var was_grab = _is_grab
+	var xr_grab_float : float = _get_grab_value()
+	var threshold : float = 0.6 if _was_xr_pressed else 0.8
+	var xr_pressed : bool = xr_grab_float > threshold
+	if xr_pressed != _was_xr_pressed:
+		_was_xr_pressed = xr_pressed
+		if grab_toggle:
+			_is_grab = not _is_grab
+		else:
+			_is_grab = xr_pressed
+	elif InputMap.has_action(grab_action) and Input.is_action_just_pressed(grab_action):
+		# Toggle
+		_is_grab = not _is_grab
+
+	if _picked_up:
+		if _is_grab:
+			return
+
+		drop_held_object(linear_velocity, angular_velocity)
+	elif not was_grab and _is_grab and _closest_object and is_instance_valid(_closest_object.body):
+		pickup_object(_closest_object.body)
+		return
+
+	# Update closest object
+	var was_closest_object : ClosestObject = _closest_object
+	_closest_object = _get_closest()
+
+	if was_closest_object and _closest_object and was_closest_object.body == _closest_object.body:
+		# We're done
+		return
+
+	if was_closest_object and is_instance_valid(was_closest_object.body):
+		# Remove highlight
+		_remove_highlight(was_closest_object.body)
+
+	if _closest_object and is_instance_valid(_closest_object.body):
+		# Add highlight
+		if _closest_object.grab_point and _closest_object.grab_point.highlight_mode == 2:
+			# Highlight is disabled
+			return
+
+		if _closest_object.grab_point and _closest_object.grab_point.highlight_mode == 1 and picked_up_by(_closest_object.body):
+			# Don't highlight for two handed pickup
+			return
+
+		_add_highlight(_closest_object.body)
+#endregion
+
+
+#region Private functions
 # Returns true if our pickup feature is attached to the left hand.
 func _is_left_hand() -> bool:
 	if _xr_collision_hand:
@@ -451,44 +579,68 @@ func _is_left_hand() -> bool:
 		return false
 
 
-# Returns a global transform for either our closest applicable grab point
-# or point on collision shape we can grab the object (doesn't work yet)
-func _get_closest_transform(body : PhysicsBody3D, to_point : Vector3) -> Transform3D:
+# Get collision rids for our hand
+func _get_hand_collision_rids() -> Array[RID]:
+	var ret : Array[RID]
+	if _xr_collision_hand:
+		ret.push_back(_xr_collision_hand.get_rid())
+
+	return ret
+
+
+func _get_closest_grabpoint(body : PhysicsBody3D, hand_position : Vector3) -> XRT2GrabPoint:
 	# Check any applicable grab point on the body first
 	var is_left_hand : bool = _is_left_hand()
 	var closest_grab_point : XRT2GrabPoint
 	var closest_dist : float = 9999.99
-	var closest_transform : Transform3D
 	for child in body.get_children():
-		if child is XRT2GrabPoint:
-			# TODO Move this logic into the grab point, so we can create more complex
-			# grab point, like implementing a grab rail or something along those lines
-
+		if child is XRT2GrabPoint and child.enabled:
 			var grab_point : XRT2GrabPoint = child
 			if not grab_point.left_hand and is_left_hand:
 				continue
 			elif not grab_point.right_hand and not is_left_hand:
 				continue
 
-			var dist = (grab_point.global_position - to_point).length_squared()
+			var dist = (grab_point.get_hand_transform(hand_position).origin - hand_position).length_squared()
 			if dist < closest_dist:
 				closest_grab_point = grab_point
-				closest_transform = grab_point.global_transform
 				closest_dist = dist
 
-	if closest_grab_point:
-		return closest_transform
-
-	# TODO If no grab points, we need to find a way to find the closest point on our collision shape
-
-	# For now just return the bodies global transform
-	return body.global_transform
+	return closest_grab_point
 
 
-func _get_closest() -> PhysicsBody3D:
+# Returns a transform for hand positioning using our default logic.
+# Used when there are no grab points.
+func _get_default_hand_transform(body : PhysicsBody3D, hand_position : Vector3) -> Transform3D:
+	var state : PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
+
+	var params : PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
+	params.from = hand_position
+	params.to = body.global_position
+	params.exclude = _get_hand_collision_rids()
+	
+	var result : Dictionary = state.intersect_ray(params)
+	if result.is_empty():
+		# Huh? This shouldn't happen, missing collision shape?
+		return body.global_transform
+	else:
+		# We're assuming no other object was inbetween
+		var is_left_hand : bool = _is_left_hand()
+
+		var t : Transform3D
+		t.basis.x = result['normal']
+		if is_left_hand:
+			t.basis.x = -t.basis.x
+		t.basis.y = t.basis.x.cross(-global_basis.z).normalized()
+		t.basis.z = t.basis.x.cross(t.basis.y).normalized()
+		t.origin = result['position'] + t.basis.y * 0.01
+		return t
+
+
+func _get_closest() -> ClosestObject:
 	var overlapping_bodies = _detection_area.get_overlapping_bodies()
-	var closest_body : PhysicsBody3D
-	var closest_dist : float = 9999.99
+	var closest : ClosestObject
+	var closest_dist : float = 9999999.99
 
 	for body : Node3D in overlapping_bodies:
 		if body.is_ancestor_of(self):
@@ -499,10 +651,8 @@ func _get_closest() -> PhysicsBody3D:
 			continue
 		elif body is RigidBody3D and not body.freeze:
 			# Always include rigidbodies unless frozen
+			# TODO see if we can treat frozen bodies like grabing a static body
 			pass
-		elif picked_up_by(body):
-			# Already picked up, we're excluding rigidbodies from this.
-			continue
 		elif body is StaticBody3D:
 			# TODO implement a system for selectively including these
 			# (or maybe switch on animatable body)
@@ -511,14 +661,36 @@ func _get_closest() -> PhysicsBody3D:
 			# Skip anything else
 			continue
 
+		var by : XRT2Pickup = picked_up_by(body)
+		if by:
+			# Check if it's already been picked up by an exclusive grab
+			var on_grab_point = by.get_picked_up_grab_point()
+			if on_grab_point and on_grab_point.exclusive:
+				# Can't pick this up
+				continue
+
+		# Do we have a grab point?
+		var new_dist : float = 9999999.99
+		var grab_point = _get_closest_grabpoint(body, global_position)
+		if grab_point:
+			if by and grab_point.exclusive:
+				# Two handed not possible
+				continue
+
+			new_dist = (global_position - grab_point.get_hand_transform(global_position).origin).length_squared()
+		else:
+			# TODO should do our raycast to see if there is nothing between us and the object we're picking up
+			
+			new_dist = (global_position - body.global_position).length_squared()
+
 		# See if this is our closest object
-		var new_point = _get_closest_transform(body, global_position).origin
-		var new_dist = (new_point - global_position).length_squared()
 		if new_dist < closest_dist:
-			closest_body = body
+			closest = ClosestObject.new()
+			closest.body = body
+			closest.grab_point = grab_point
 			closest_dist = new_dist
 
-	return closest_body
+	return closest
 
 
 func _highlight_meshes(node : Node3D) -> Dictionary[MeshInstance3D, Material]:
@@ -531,8 +703,8 @@ func _highlight_meshes(node : Node3D) -> Dictionary[MeshInstance3D, Material]:
 				ret[mesh_instance] = mesh_instance.material_overlay
 				mesh_instance.material_overlay = _highlight_material
 
-		if child is Node3D:
-			# Find mesh instances any level deep
+		if child is Node3D and not child is PhysicsBody3D:
+			# Find mesh instances any level deep, but not into a new physics body
 			var dic : Dictionary[MeshInstance3D, Material] = _highlight_meshes(child)
 			ret.merge(dic)
 
@@ -599,74 +771,4 @@ func _get_grab_value() -> float:
 		return _xr_controller.get_float(grab_action)
 
 	return 0.0
-
-
-func _process(_delta):
-	# Don't run in editor
-	if Engine.is_editor_hint():
-		return
-
-	# If we don't have a controller ancestor, nothing we can do
-	if not _xr_controller and not _xr_collision_hand:
-		return
-
-	# if we're not tracking, do nothing
-	if not _have_tracking_data():
-		# We do not drop what we hold (right away)
-		return
-
-	# Get some info from our pose
-	var linear_velocity : Vector3 = Vector3()
-	var angular_velocity : Vector3 = Vector3()
-	var pose : XRPose = _get_pose()
-	if pose:
-		linear_velocity = pose.linear_velocity
-		angular_velocity = pose.angular_velocity
-
-	# Object we picked up no longer exists? Drop it
-	if _picked_up and not is_instance_valid(_picked_up):
-		drop_held_object(linear_velocity, angular_velocity)
-
-	# Our pickup handler is no longer enabled? Drop what we're holding
-	if not enabled and _picked_up:
-		drop_held_object(linear_velocity, angular_velocity)
-
-	# Check our grab status
-	var was_grab = _is_grab
-	var xr_grab_float : float = _get_grab_value()
-	var threshold : float = 0.6 if _was_xr_pressed else 0.8
-	var xr_pressed : bool = xr_grab_float > threshold
-	if xr_pressed != _was_xr_pressed:
-		_was_xr_pressed = xr_pressed
-		if grab_toggle:
-			_is_grab = not _is_grab
-		else:
-			_is_grab = xr_pressed
-	elif InputMap.has_action(grab_action) and Input.is_action_just_pressed(grab_action):
-		# Toggle
-		_is_grab = not _is_grab
-
-	if _picked_up:
-		if _is_grab:
-			return
-
-		drop_held_object(linear_velocity, angular_velocity)
-	elif not was_grab and _is_grab and _closest_object and is_instance_valid(_closest_object):
-		pickup_object(_closest_object)
-		return
-
-	# Update closest object
-	var was_closest_object = _closest_object
-	_closest_object = _get_closest()
-
-	if was_closest_object == _closest_object:
-		# We're done
-		return
-
-	if was_closest_object and is_instance_valid(was_closest_object):
-		# Remove highlight
-		_remove_highlight(was_closest_object)
-
-	if _closest_object and is_instance_valid(_closest_object):
-		# add highlight
-		_add_highlight(_closest_object)
+#endregion

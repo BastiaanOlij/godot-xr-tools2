@@ -36,24 +36,58 @@ extends Node3D
 # TODO for now this is just a bare bone placeholder:
 # - be able to specify a pose for the hand that we'll use, be nice if we can auto generate this.
 
+#region Export variables
+## Enable this grab point.
+@export var enabled : bool = true
+
 ## Left hand can grab this grab point
-@export var left_hand : bool = true
+@export var left_hand : bool = true:
+	set(value):
+		left_hand = value
+
+		if is_inside_tree():
+			_update_show_hand()
 
 ## Right hand can grab this grab point
-@export var right_hand : bool = true
+@export var right_hand : bool = true:
+	set(value):
+		right_hand = value
+
+		if is_inside_tree():
+			_update_show_hand()
+
+## If [code]true[/code] and object is picked up by this grab point,
+## it can not be picked up by another grab point.
+@export var exclusive : bool = false
+
+## Highlight behavior if this grab point is closest.
+@export_enum("Highlight", "Only if not picked up", "Disabled") var highlight_mode : int = 0
 
 ## Visualise our hand
 ## For editor only
-@export_enum("Off","Left","Right") var show_hand : int = 0:
+@export var show_hand : bool = false:
 	set(value):
 		show_hand = value
 
 		if is_inside_tree():
 			_update_show_hand()
+#endregion
 
 
+#region Private variables
 var _hand_mesh : Node3D
+#endregion
 
+#region Public functions
+## Returns the transform for positioning our hand.
+## [code]hand_position[/code] current position of our hand in global space.
+## Returned transform is in global space.
+func get_hand_transform(hand_position : Vector3) -> Transform3D:
+	return global_transform
+#endregion
+
+
+#region Private functions
 func _get_skeleton_node(node : Node3D) -> Skeleton3D:
 	for child in node.get_children():
 		if child is Skeleton3D:
@@ -75,17 +109,22 @@ func _update_show_hand():
 		_hand_mesh.queue_free()
 		_hand_mesh = null
 
-	if show_hand == 0:
+	if not show_hand:
 		return
 
 	var hand_scene : PackedScene
 	var bone_name : String
-	if show_hand == 1:
+	var orient_to_godot : Basis
+	if left_hand:
 		hand_scene = preload("res://addons/godot-xr-tools2/hands/gltf/LeftHandHumanoid.gltf")
 		bone_name = "LeftHand"
-	else:
+		orient_to_godot = Basis.from_euler(Vector3(0.5 * PI, 0.5 * -PI, 0.0))
+	elif right_hand:
 		hand_scene = preload("res://addons/godot-xr-tools2/hands/gltf/RightHandHumanoid.gltf")
 		bone_name = "RightHand"
+		orient_to_godot = Basis.from_euler(Vector3(0.5 * PI, PI, 0.5 * PI))
+	else:
+		return
 
 	_hand_mesh = hand_scene.instantiate()
 	add_child(_hand_mesh, false, Node.INTERNAL_MODE_BACK)
@@ -94,13 +133,13 @@ func _update_show_hand():
 		var bone_idx = skeleton.find_bone(bone_name)
 		if bone_idx != -1:
 			var bone_transform : Transform3D = skeleton.get_bone_global_pose(bone_idx)
-			var orient_to_godot : Basis = Basis.from_euler(Vector3(0.5 * PI, 0.5 * -PI, 0.0)) \
-				if show_hand == 1 else Basis.from_euler(Vector3(0.5 * PI, PI, 0.5 * PI))
 			var bone_offset : Transform3D = Transform3D(orient_to_godot, Vector3())
 			_hand_mesh.transform = (bone_transform * bone_offset).inverse()
 
+
 func _ready():
 	_update_show_hand()
+
 
 # Verifies if we have a valid configuration.
 func _get_configuration_warnings() -> PackedStringArray:
@@ -112,3 +151,4 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 	# Return warnings
 	return warnings
+#endregion
