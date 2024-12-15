@@ -17,6 +17,7 @@ script = ExtResource("1_y1bfr")
 
 [node name="ScreenQuad" type="MeshInstance3D" parent="."]
 visible = false
+layers = 2
 material_override = SubResource("ShaderMaterial_npntl")
 mesh = SubResource("QuadMesh_1n2v3")
 
