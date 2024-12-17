@@ -192,8 +192,8 @@ func is_primary() -> bool:
 
 ## Pick up this object
 func pickup_object(which : PhysicsBody3D):
-	if not which is RigidBody3D:
-		push_warning("Picking up objects other than Rigidbody is currently disabled.")
+	if not which is RigidBody3D and not which is PhysicalBone3D:
+		push_warning("Picking up objects other than Rigidbody and PhysicalBone3D is currently disabled.")
 		return
 
 	# No longer show highlighted
@@ -216,7 +216,7 @@ func pickup_object(which : PhysicsBody3D):
 	_original_collision_mask = _picked_up.collision_mask
 
 	if _xr_collision_hand:
-		if _picked_up is RigidBody3D:
+		if _picked_up is RigidBody3D or _picked_up is PhysicalBone3D:
 			# Remember our current hand transform.
 			var hand_transform : Transform3D = _xr_collision_hand.global_transform
 
@@ -311,6 +311,10 @@ func pickup_object(which : PhysicsBody3D):
 
 	# TODO set pose overrule based on what we've picked up (if applicable)
 
+	# Let object know that we picked it up
+	if _is_primary and _picked_up.has_method("picked_up"):
+		_picked_up.picked_up(self)
+
 ## Drop object we're currently holding
 func drop_held_object( \
 	apply_linear_velocity : Vector3 = Vector3(), apply_angular_velocity : Vector3 = Vector3() \
@@ -334,7 +338,7 @@ func drop_held_object( \
 
 	# Process letting go
 	if _xr_collision_hand:
-		if _picked_up is RigidBody3D:
+		if _picked_up is RigidBody3D or _picked_up is PhysicalBone3D:
 			if _joint:
 				remove_child(_joint)
 				_joint.queue_free()
@@ -368,6 +372,9 @@ func drop_held_object( \
 	elif _xr_player_object:
 		was_picked_up.add_collision_exception_with(_xr_player_object)
 		_xr_player_object.add_collision_exception_with(was_picked_up)
+
+		if was_picked_up.has_method("dropped"):
+			was_picked_up.dropped(self)
 #endregion
 
 
@@ -653,6 +660,9 @@ func _get_closest() -> ClosestObject:
 			# Always include rigidbodies unless frozen
 			# TODO see if we can treat frozen bodies like grabing a static body
 			pass
+		elif body is PhysicalBone3D and _xr_collision_hand:
+			# We support picking up PhysicalBone3D if we're using collision hands
+			pass
 		elif body is StaticBody3D:
 			# TODO implement a system for selectively including these
 			# (or maybe switch on animatable body)
@@ -696,17 +706,23 @@ func _get_closest() -> ClosestObject:
 func _highlight_meshes(node : Node3D) -> Dictionary[MeshInstance3D, Material]:
 	var ret : Dictionary[MeshInstance3D, Material]
 
-	for child in node.get_children():
-		if child is MeshInstance3D:
-			var mesh_instance : MeshInstance3D = child
-			if mesh_instance.visible:
-				ret[mesh_instance] = mesh_instance.material_overlay
-				mesh_instance.material_overlay = _highlight_material
+	if node.has_method("get_highlight_meshes"):
+		var mesh_instances : Array[MeshInstance3D] = node.get_highlight_meshes()
+		for mesh_instance : MeshInstance3D in mesh_instances:
+			ret[mesh_instance] = mesh_instance.material_overlay
+			mesh_instance.material_overlay = _highlight_material
+	else:
+		for child in node.get_children():
+			if child is MeshInstance3D:
+				var mesh_instance : MeshInstance3D = child
+				if mesh_instance.visible:
+					ret[mesh_instance] = mesh_instance.material_overlay
+					mesh_instance.material_overlay = _highlight_material
 
-		if child is Node3D and not child is PhysicsBody3D:
-			# Find mesh instances any level deep, but not into a new physics body
-			var dic : Dictionary[MeshInstance3D, Material] = _highlight_meshes(child)
-			ret.merge(dic)
+			if child is Node3D and not child is PhysicsBody3D:
+				# Find mesh instances any level deep, but not into a new physics body
+				var dic : Dictionary[MeshInstance3D, Material] = _highlight_meshes(child)
+				ret.merge(dic)
 
 	return ret
 
