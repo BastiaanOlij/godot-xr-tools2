@@ -45,7 +45,7 @@ text = "Follow player"
 
 [node name="Xrt2SpectatorCamera" parent="DesktopContainer/DesktopSubViewport" index="2" instance=ExtResource("2_hkn0h")]
 unique_name_in_owner = true
-transform = Transform3D(-0.976859, -0.0303731, -0.211715, -0.106775, 0.926946, 0.35968, 0.185324, 0.373964, -0.908739, -0.384786, 2.27811, -3.23628)
+transform = Transform3D(0.978088, -0.183047, 0.0991846, 0.143528, 0.937958, 0.315649, -0.150809, -0.294497, 0.943678, 0.0235426, 2.27811, 0.726973)
 
 [node name="Main" parent="VRSubViewport" index="0" instance=ExtResource("3_8sb5x")]
 

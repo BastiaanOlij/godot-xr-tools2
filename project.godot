@@ -18,8 +18,8 @@ run/main_scene.android="uid://dxs07a2ucy34v"
 
 [display]
 
-window/size/viewport_width=1900
-window/size/viewport_height=1050
+window/size/viewport_width=1920
+window/size/viewport_height=1080
 
 [layer_names]
 
@@ -35,8 +35,7 @@ window/size/viewport_height=1050
 
 [rendering]
 
-renderer/rendering_method="gl_compatibility"
-renderer/rendering_method.mobile="gl_compatibility"
+renderer/rendering_method="mobile"
 textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_clear_color=Color(0, 0, 0, 1)
 

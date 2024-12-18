@@ -1,13 +1,15 @@
-[gd_resource type="Environment" load_steps=3 format=3 uid="uid://l4hnsy05gog4"]
+[gd_resource type="Environment" load_steps=4 format=3 uid="uid://l4hnsy05gog4"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_6ag4g"]
-sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
-ground_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+[ext_resource type="Texture2D" uid="uid://b4ystu35gghi5" path="res://assets/hdrihaven.com/sunflowers_2k.hdr" id="1_0e5r8"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_g522c"]
+panorama = ExtResource("1_0e5r8")
 
 [sub_resource type="Sky" id="Sky_0e5r8"]
-sky_material = SubResource("ProceduralSkyMaterial_6ag4g")
+sky_material = SubResource("PanoramaSkyMaterial_g522c")
 
 [resource]
 background_mode = 2
 sky = SubResource("Sky_0e5r8")
 tonemap_mode = 2
+tonemap_white = 5.39

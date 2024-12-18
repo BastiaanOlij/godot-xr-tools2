@@ -1,0 +1,98 @@
+[gd_scene load_steps=9 format=3 uid="uid://dsvk4g1s3w1pq"]
+
+[ext_resource type="Shader" uid="uid://xrt2oqik7ik" path="res://addons/godot-xr-tools2/shaders/shaded_no_alpha.gdshader" id="1_5ohw8"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dd1f7"]
+render_priority = 0
+shader = ExtResource("1_5ohw8")
+shader_parameter/albedo = Color(0.779251, 0.830048, 0.914812, 1)
+shader_parameter/metallic = 0.8
+shader_parameter/roughness = 0.3
+shader_parameter/specular = 0.5
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vj5of"]
+render_priority = 0
+shader = ExtResource("1_5ohw8")
+shader_parameter/albedo = Color(0.779251, 0.830048, 0.914812, 1)
+shader_parameter/metallic = 0.8
+shader_parameter/roughness = 0.3
+shader_parameter/specular = 0.5
+
+[sub_resource type="Curve3D" id="Curve3D_2qfg3"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0.0120687, 0.00454021, 0, -0.272683, 0, 0, 0.272683, 0, 0, 2.62056, -0.00944351, 0, 0.00168681, -0.357449, 0, -0.00168681, 0.357449, 0, 3.11864, 0.460446, 0, 0.314571, 0.00840229, 0, -0.277334, -0.0296535, 0, 2.60695, 0.997722),
+"tilts": PackedFloat32Array(0.00192405, 0, 0, 0)
+}
+point_count = 4
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_yccd0"]
+margin = 0.01
+radius = 0.05
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6qnwo"]
+render_priority = 0
+shader = ExtResource("1_5ohw8")
+shader_parameter/albedo = Color(0.768627, 0.384314, 0.215686, 1)
+shader_parameter/metallic = 0.1
+shader_parameter/roughness = 0.8
+shader_parameter/specular = 0.5
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_md01i"]
+material = SubResource("ShaderMaterial_6qnwo")
+radius = 0.3
+height = 1.5
+radial_segments = 16
+rings = 2
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yn2s4"]
+radius = 0.3
+height = 1.5
+
+[node name="BoxingBag" type="Node3D"]
+
+[node name="Base" type="CSGCylinder3D" parent="."]
+height = 0.1
+sides = 32
+cone = true
+material = SubResource("ShaderMaterial_dd1f7")
+
+[node name="Pole" type="CSGPolygon3D" parent="."]
+polygon = PackedVector2Array(-0.05, 0, 0, 0.05, 0.05, 0, 0, -0.05)
+mode = 2
+path_node = NodePath("Path3D")
+path_interval_type = 0
+path_interval = 0.1
+path_simplify_angle = 1.0
+path_rotation = 2
+path_local = true
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = false
+smooth_faces = true
+material = SubResource("ShaderMaterial_vj5of")
+
+[node name="Path3D" type="Path3D" parent="Pole"]
+curve = SubResource("Curve3D_2qfg3")
+
+[node name="Achor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.60191, 1)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Achor"]
+shape = SubResource("SphereShape3D_yccd0")
+debug_color = Color(0, 0.6, 0.7, 0.42)
+
+[node name="PinJoint3D" type="PinJoint3D" parent="Achor"]
+node_a = NodePath("..")
+node_b = NodePath("../Bag")
+
+[node name="Bag" type="RigidBody3D" parent="Achor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.816069, 0.000192642)
+mass = 75.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Achor/Bag"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.074688, 0)
+mesh = SubResource("CapsuleMesh_md01i")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Achor/Bag"]
+shape = SubResource("CapsuleShape3D_yn2s4")
+debug_color = Color(0, 0.6, 0.7, 0.42)

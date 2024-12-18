@@ -1,0 +1,5 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cuc3niscouw1f"]
+
+[resource]
+resource_name = "DarkWood"
+albedo_color = Color(0.228344, 0.1184, 0.0727121, 1)

@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://da0p64wvbn6ii"]
+
+[resource]
+resource_name = "LightSteel"
+albedo_color = Color(0.505154, 0.531218, 0.57484, 1)
+metallic = 0.72
+roughness = 0.15

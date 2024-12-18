@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=3 uid="uid://bcer2q84lyute"]
+
+[ext_resource type="Texture2D" uid="uid://dlbgjparkqtva" path="res://assets/misc/pattern.png" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="2"]
+albedo_color = Color(0.290196, 0.631373, 0.831373, 1)
+albedo_texture = ExtResource("1")
+metallic_specular = 0.2
+uv1_scale = Vector3(3, 8, 3)
+
+[sub_resource type="Curve3D" id="1"]
+bake_interval = 0.01
+_data = {
+"points": PackedVector3Array(0, 0.05, 0, 0, -0.05, 0, 0, 0.1, 0, 0, 0, -0.05, 0, 0, 0.05, 0, 0, 0.1, 0, 0, -0.05, 0, 0, 0.05, 0, 0, 0.9, 0, -0.05, 0, 0, 0.05, 0, 0, 0.1, 1, 0, -0.05, 0, 0, 0.05, 0, 0, 0.9, 1, 0, 0, 0.05, 0, 0, -0.05, 0, 1, 0.9, 0, 0, 0.05, 0, 0, -0.05, 0, 1, 0.1, 0, -0.0495251, -0.000137627, 0, 0.0495251, 0.000137627, 0, 1.0796, 0, 0, -0.0492631, 0.00119275, 0, 0.0492631, -0.00119275, 0, 1.31579, -0.00142884),
+"tilts": PackedFloat32Array(-1.56593, -1.55074, -1.55865, -1.57438, -1.57392, -1.57279, -1.56683, -1.56558, -1.56884)
+}
+point_count = 9
+
+[node name="DisplayTable" type="Node3D"]
+
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.05, -0.5)
+use_collision = true
+polygon = PackedVector2Array(0, 0, 0, 0.05, 1, 0.05, 1, 0)
+mode = 2
+path_node = NodePath("Path3D")
+path_interval_type = 1
+path_interval = 0.05
+path_simplify_angle = 0.1
+path_rotation = 2
+path_local = true
+path_continuous_u = true
+path_u_distance = 3.0
+path_joined = false
+material = SubResource("2")
+
+[node name="Path3D" type="Path3D" parent="CSGPolygon3D"]
+curve = SubResource("1")

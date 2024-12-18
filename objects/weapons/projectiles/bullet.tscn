@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3 uid="uid://blrn3oxkx6oj"]
+
+[ext_resource type="Script" uid="uid://cns2hl0cp4nya" path="res://objects/weapons/projectiles/bullet.gd" id="1_1hbe6"]
+[ext_resource type="PackedScene" uid="uid://dn7t2s12kno0l" path="res://objects/weapons/projectiles/bullet_impact.tscn" id="2_xbcx7"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_3ndsa"]
+radius = 0.005
+height = 0.01
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_xbcx7"]
+margin = 0.001
+radius = 0.01
+
+[node name="Bullet" type="RigidBody3D"]
+collision_layer = 512
+mass = 0.1
+continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 1
+script = ExtResource("1_1hbe6")
+bullet_impact = ExtResource("2_xbcx7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_3ndsa")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_xbcx7")
+debug_color = Color(0, 0.6, 0.7, 0.42)
+
+[node name="LifetimeTimer" type="Timer" parent="."]
+wait_time = 5.0
+one_shot = true
+autostart = true
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="timeout" from="LifetimeTimer" to="." method="_on_lifetime_timer_timeout"]

@@ -1,4 +1,4 @@
-extends CharacterBody3D
+extends Node3D
 
 @export var action_name = "trigger_click"
 

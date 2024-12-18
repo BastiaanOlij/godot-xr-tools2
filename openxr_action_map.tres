@@ -1,4 +1,4 @@
-[gd_resource type="OpenXRActionMap" load_steps=36 format=3 uid="uid://b8n27abp880t7"]
+[gd_resource type="OpenXRActionMap" load_steps=34 format=3 uid="uid://b8n27abp880t7"]
 
 [sub_resource type="OpenXRAction" id="OpenXRAction_6ivru"]
 resource_name = "trigger"
@@ -139,17 +139,9 @@ binding_path = "/user/hand/left/input/palm_ext/pose"
 action = SubResource("OpenXRAction_sopde")
 binding_path = "/user/hand/right/input/palm_ext/pose"
 
-[sub_resource type="OpenXRIPBinding" id="OpenXRIPBinding_5w03k"]
-action = SubResource("OpenXRAction_typ1r")
-binding_path = "/user/hand/left/input/squeeze/value"
-
-[sub_resource type="OpenXRIPBinding" id="OpenXRIPBinding_typ1r"]
-action = SubResource("OpenXRAction_typ1r")
-binding_path = "/user/hand/right/input/squeeze/value"
-
 [sub_resource type="OpenXRInteractionProfile" id="OpenXRInteractionProfile_6ivru"]
 interaction_profile_path = "/interaction_profiles/microsoft/hand_interaction"
-bindings = [SubResource("OpenXRIPBinding_6ivru"), SubResource("OpenXRIPBinding_vfhwq"), SubResource("OpenXRIPBinding_5w03k"), SubResource("OpenXRIPBinding_typ1r")]
+bindings = [SubResource("OpenXRIPBinding_6ivru"), SubResource("OpenXRIPBinding_vfhwq")]
 
 [resource]
 action_sets = [SubResource("OpenXRActionSet_ngwcy")]

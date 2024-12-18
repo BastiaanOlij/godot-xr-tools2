@@ -1,0 +1,196 @@
+[gd_scene load_steps=18 format=3 uid="uid://bak8mif2gg08j"]
+
+[ext_resource type="Script" uid="uid://d3tqj0j6c1tp2" path="res://objects/weapons/pistol/pistol.gd" id="1_3slwv"]
+[ext_resource type="PackedScene" uid="uid://cwjmxkyid7lkf" path="res://assets/opengameart.org/pistol/Model/Pistol.glb" id="1_sh8ei"]
+[ext_resource type="Script" uid="uid://xrt2jog5h0j" path="res://addons/godot-xr-tools2/components/xrt2_grab_point.gd" id="2_kpsdj"]
+[ext_resource type="PackedScene" uid="uid://blrn3oxkx6oj" path="res://objects/weapons/projectiles/bullet.tscn" id="2_ol0k6"]
+[ext_resource type="ArrayMesh" uid="uid://cu7am6akcy6gm" path="res://assets/opengameart.org/pistol/Model/meshes/Pistol_slide.res" id="3_61tmr"]
+[ext_resource type="ArrayMesh" uid="uid://d0kvv2k5rmp60" path="res://assets/opengameart.org/pistol/Model/meshes/Pistol_9mm.res" id="4_xhc33"]
+[ext_resource type="ArrayMesh" uid="uid://c15p6ba7n40hn" path="res://assets/opengameart.org/pistol/Model/meshes/Pistol_night sights.res" id="6_jtu37"]
+[ext_resource type="AudioStream" uid="uid://cfdvbcjhuivju" path="res://assets/freesound.org/154934__klawykogut__empty-gun-shot.wav" id="7_xhc33"]
+[ext_resource type="AudioStream" uid="uid://5ivgf7prew3y" path="res://assets/freesound.org/344142__brokenphono__gunshot-002.wav" id="7_y53g4"]
+[ext_resource type="Material" path="res://assets/freegamearts.tuxfamily.org/flash/muzzle_flash_material.tres" id="8_xhc33"]
+[ext_resource type="AudioStream" uid="uid://bs0e5if1kkykx" path="res://assets/freesound.org/155388__woodmoose__guncock.wav" id="8_ylogw"]
+[ext_resource type="ArrayMesh" uid="uid://cieiwgngfcho0" path="res://assets/freegamearts.tuxfamily.org/flash/muzzleflash.obj" id="9_ylogw"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_61tmr"]
+points = PackedVector3Array(-3.00817e-06, -0.0475787, -0.0419555, -0.00996572, -0.0475787, -0.0395954, -0.00994467, 0.0515991, -0.0424051, -3.00817e-06, 0.0509313, -0.0428546, 0.00994166, 0.0515991, -0.0424051, 0.00996271, -0.0475787, -0.0395954, -0.0119078, -0.0475787, -0.0365127, -0.0099116, 0.0661235, -0.0325792, -0.00513467, 0.0561623, -0.0393225, -0.0153559, -0.045887, -0.0308452, -0.0153559, -0.0265879, -0.0308452, -0.0153559, 0.0441866, -0.00605558, -0.0119078, 0.0661235, -0.0175031, 0.0119047, -0.0475787, -0.0365127, 0.00509258, 0.0561623, -0.0393225, 0.00990859, 0.0661235, -0.0325792, 0.0119047, 0.0661235, -0.0175031, 0.0153529, 0.0441866, -0.00605558, 0.0153529, -0.0265879, -0.0308452, 0.0153529, -0.045887, -0.0308452, -0.0119078, -0.0475787, 0.0184771, -0.0153559, -0.045887, 0.0128096, -0.0153559, 0.0441866, 0.0229084, -0.0119078, 0.0661235, 0.0475696, 0.0119047, -0.0475787, 0.0184771, 0.0119047, 0.0661235, 0.0475696, 0.0153529, 0.0441866, 0.0229084, 0.0153529, -0.045887, 0.0128096, -0.00554954, 0.0248764, 0.0910959, -0.00992964, 0.0521222, 0.116207, -0.00992964, 0.0661235, 0.121168, -0.0153559, 0.0194228, 0.0240644, 0.00992663, 0.0521222, 0.116207, 0.00554653, 0.0248764, 0.0910959, 0.00992663, 0.0661235, 0.121168, 0.0153529, 0.0194228, 0.0240644, -0.00860389, 0.0613933, 0.119626, 0.00860088, 0.0613933, 0.119626)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_3slwv"]
+points = PackedVector3Array(0.000184421, -0.0243948, 0.060298, 0.00523634, -0.0233171, 0.060298, 0.000184421, -0.0243948, 0.108348, -0.00446012, -0.022992, 0.060298, -0.0105665, -0.0121575, -0.090193, 0.0109333, -0.0121575, -0.090193, 0.00764666, -0.0207476, 0.060298, 0.00523634, -0.0233171, 0.108348, 0.000184421, -0.0204404, 0.109958, -0.00446012, -0.022992, 0.108348, -0.00727994, -0.0207476, 0.060298, -0.0105729, -0.0121263, -0.0714086, -0.0106535, 0.0120142, -0.0760606, -0.00518788, 0.0141874, -0.0753147, -0.0052091, -0.0119304, -0.090566, -0.00727994, -0.0207476, 0.108348, -0.0106047, -0.0119215, 0.108348, 0.00557582, -0.0119304, -0.090566, 0.0055546, 0.0141874, -0.0753147, 0.0110224, 0.0120142, -0.0760606, 0.0109396, -0.0121263, -0.0714086, 0.0109715, -0.0119215, 0.108348, 0.00764666, -0.0207476, 0.108348, 0.00293847, -0.0188506, 0.109958, -0.00257175, -0.0188506, 0.109958, -0.0106005, -0.0119526, 0.0527607, -0.0105814, -0.0120729, -0.0373337, -0.0105878, -0.0120239, -0.0137796, -0.0106493, 0.0119786, -0.0555881, -0.0106472, 0.0119653, -0.0458525, -0.0073054, 0.0210987, -0.069858, 0.000184421, 0.0150825, -0.0752951, -0.0106047, 0.0117114, 0.108348, -0.0106281, 0.0118495, 0.0243191, 0.00767212, 0.0210987, -0.069858, 0.010946, -0.0120862, -0.0470694, 0.0110139, 0.0119653, -0.0458525, 0.0109948, 0.0118495, 0.0243191, 0.0109672, -0.0119526, 0.0527607, 0.0109502, -0.0120551, -0.027598, 0.0109481, -0.0120729, -0.0373337, 0.0109715, 0.0117114, 0.108348, 0.00293847, -0.0156666, 0.109958, -0.00257175, -0.0156666, 0.109958, -0.00105681, 0.0182041, 0.0994371, 0.000184421, -0.0140768, 0.109958, -0.00521122, 0.014321, 0.108348, 0.00142353, 0.0182041, 0.0994371, 0.00557794, 0.014321, 0.108348, 0.000184421, 0.015225, 0.108348)
+
+[sub_resource type="Animation" id="Animation_5hnr0"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ShootSound:playing")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Flash:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_j7dy0"]
+resource_name = "Shoot"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ShootSound:playing")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.001),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Flash:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.0134669, 0.0377942),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [false, true, false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_4kkdd"]
+_data = {
+&"RESET": SubResource("Animation_5hnr0"),
+&"Shoot": SubResource("Animation_j7dy0")
+}
+
+[node name="Pistol" type="RigidBody3D"]
+script = ExtResource("1_3slwv")
+bullet_scene = ExtResource("2_ol0k6")
+
+[node name="Pistol2" parent="." instance=ExtResource("1_sh8ei")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0676853, -0.0646974)
+
+[node name="slide" parent="Pistol2/Pistol" index="4"]
+visible = false
+
+[node name="suppressor" parent="Pistol2/Pistol" index="5"]
+visible = false
+
+[node name="BulletInChamber" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00194547, 0.0633333, -0.0338725)
+visible = false
+mesh = ExtResource("4_xhc33")
+skeleton = NodePath("../Pistol2/Pistol/magazine (loaded)/9mm")
+
+[node name="PistolCollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0159232, -0.0528689)
+shape = SubResource("ConvexPolygonShape3D_61tmr")
+debug_color = Color(0, 0.6, 0.7, 0.42)
+
+[node name="XRT2LeftGrabPoint" type="Node3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0.00799199, -0.0284783, -0.112201)
+script = ExtResource("2_kpsdj")
+right_hand = false
+exclusive = true
+highlight_mode = 1
+metadata/_custom_type_script = ExtResource("2_kpsdj")
+
+[node name="XRT2RightGrabPoint" type="Node3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -0.008, -0.0281159, -0.112509)
+script = ExtResource("2_kpsdj")
+left_hand = false
+exclusive = true
+highlight_mode = 1
+metadata/_custom_type_script = ExtResource("2_kpsdj")
+
+[node name="SliderJoint3D" type="SliderJoint3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -0.000184433, 0.0621209, 0.00447188)
+node_a = NodePath("..")
+node_b = NodePath("Slide")
+linear_limit/upper_distance = 0.05
+linear_limit/lower_distance = 0.0
+
+[node name="Slide" type="RigidBody3D" parent="SliderJoint3D"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="SlideMesh" type="MeshInstance3D" parent="SliderJoint3D/Slide"]
+mesh = ExtResource("3_61tmr")
+
+[node name="NightSight" type="MeshInstance3D" parent="SliderJoint3D/Slide/SlideMesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000184482, 0.0170961, 0.0938347)
+mesh = ExtResource("6_jtu37")
+skeleton = NodePath("../../../../Pistol2/Pistol/slide/night sights")
+
+[node name="SlideCollisionShape3D" type="CollisionShape3D" parent="SliderJoint3D/Slide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.34694e-10, -1.86265e-08, 2.42144e-08)
+shape = SubResource("ConvexPolygonShape3D_3slwv")
+debug_color = Color(0, 0.6, 0.7, 0.42)
+
+[node name="XRT2LeftGrabPoint" type="Node3D" parent="SliderJoint3D/Slide"]
+transform = Transform3D(1.91069e-15, -4.37114e-08, 1, -1, -4.37114e-08, 0, 4.37114e-08, -1, -4.37114e-08, 0.12, 0.01, 0.06)
+script = ExtResource("2_kpsdj")
+right_hand = false
+exclusive = true
+highlight_mode = 2
+metadata/_custom_type_script = ExtResource("2_kpsdj")
+
+[node name="XRT2RightGrabPoint" type="Node3D" parent="SliderJoint3D/Slide"]
+transform = Transform3D(1.91069e-15, 4.37114e-08, -1, 1, -4.37114e-08, 0, -4.37114e-08, -1, -4.37114e-08, -0.12, 0.01, 0.06)
+script = ExtResource("2_kpsdj")
+left_hand = false
+exclusive = true
+highlight_mode = 2
+metadata/_custom_type_script = ExtResource("2_kpsdj")
+
+[node name="SlideSound" type="AudioStreamPlayer3D" parent="SliderJoint3D/Slide"]
+stream = ExtResource("8_ylogw")
+bus = &"SFX"
+
+[node name="BulletSpawnPoint" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0659584, 0.16243)
+
+[node name="CooldownTimer" type="Timer" parent="."]
+wait_time = 0.6
+one_shot = true
+
+[node name="NoShootSound" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.44089e-16, 0.0659584, 0.128026)
+stream = ExtResource("7_xhc33")
+bus = &"SFX"
+
+[node name="ShootSound" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.44089e-16, 0.0659584, 0.128026)
+stream = ExtResource("7_y53g4")
+bus = &"SFX"
+
+[node name="Flash" type="MeshInstance3D" parent="."]
+transform = Transform3D(-0.05, 0, -4.37114e-09, 0, 0.05, 0, 4.37114e-09, 0, -0.05, 0, 0.0670912, 0.127648)
+visible = false
+material_override = ExtResource("8_xhc33")
+mesh = ExtResource("9_ylogw")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_4kkdd")
+}
+
+[connection signal="timeout" from="CooldownTimer" to="." method="_on_cooldown_timer_timeout"]
+
+[editable path="Pistol2"]

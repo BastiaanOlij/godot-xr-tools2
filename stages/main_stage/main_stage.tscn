@@ -1,13 +1,14 @@
-[gd_scene load_steps=12 format=3 uid="uid://dsxjo6miebrpy"]
+[gd_scene load_steps=13 format=3 uid="uid://dsxjo6miebrpy"]
 
 [ext_resource type="PackedScene" uid="uid://xrt20000007" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.tscn" id="1_c306w"]
 [ext_resource type="Environment" uid="uid://l4hnsy05gog4" path="res://stages/default_environment.tres" id="2_38rx5"]
 [ext_resource type="PackedScene" uid="uid://bv5m3v632mh60" path="res://player/player.tscn" id="3_82lmn"]
 [ext_resource type="Texture2D" uid="uid://dlbgjparkqtva" path="res://assets/misc/pattern.png" id="4_3seyx"]
-[ext_resource type="PackedScene" uid="uid://b2cyb20vj2cxi" path="res://objects/table.tscn" id="5_5ahed"]
-[ext_resource type="PackedScene" uid="uid://dajkr3cilsked" path="res://objects/box.tscn" id="6_kyxl1"]
-[ext_resource type="PackedScene" uid="uid://bak8mif2gg08j" path="res://objects/pistol.tscn" id="7_2qfg3"]
-[ext_resource type="PackedScene" uid="uid://dn7t2s12kno0l" path="res://objects/bullet_decal.tscn" id="7_jv8ty"]
+[ext_resource type="PackedScene" uid="uid://dajkr3cilsked" path="res://objects/misc/box.tscn" id="6_kyxl1"]
+[ext_resource type="PackedScene" uid="uid://bak8mif2gg08j" path="res://objects/weapons/pistol/pistol.tscn" id="7_2qfg3"]
+[ext_resource type="PackedScene" uid="uid://dsvk4g1s3w1pq" path="res://objects/misc/boxing_bag.tscn" id="8_jv8ty"]
+[ext_resource type="PackedScene" uid="uid://c8ncker4o08cm" path="res://objects/ragdoll/ragdoll.tscn" id="9_m5inh"]
+[ext_resource type="PackedScene" uid="uid://bcer2q84lyute" path="res://objects/misc/display_table.tscn" id="10_6d2rb"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5ahed"]
 albedo_color = Color(0.353771, 0.581494, 0.294261, 1)
@@ -26,7 +27,18 @@ player_origin = NodePath("Player/Xrt2DynamicPlayerRig")
 [node name="WorldEnvironment" parent="." index="0"]
 environment = ExtResource("2_38rx5")
 
+[node name="SunLight3D" parent="." index="1"]
+transform = Transform3D(0.847521, 0.339974, -0.407586, 0, 0.767926, 0.640539, 0.530763, -0.54287, 0.650833, 0, 7.58014, 0)
+shadow_enabled = true
+directional_shadow_max_distance = 30.0
+
 [node name="Player" parent="." index="2" instance=ExtResource("3_82lmn")]
+
+[node name="LeftHandAttachment" parent="Player/Xrt2DynamicPlayerRig/LeftCollisionHand" index="0"]
+transform = Transform3D(1, -2.22524e-07, 1.8388e-05, 2.22525e-07, 0.999999, -0.00166778, -1.83582e-05, 0.00166769, 0.999998, 3.86425e-08, -1.86975e-05, 0.0271756)
+
+[node name="RightHandAttachment" parent="Player/Xrt2DynamicPlayerRig/RightCollisionHand" index="0"]
+transform = Transform3D(1, 2.22525e-07, -1.84317e-05, -2.22598e-07, 0.999999, -0.00166774, 1.84019e-05, 0.00166765, 0.999998, -3.86425e-08, -1.86975e-05, 0.0271756)
 
 [node name="Floor" type="StaticBody3D" parent="." index="3"]
 collision_mask = 513
@@ -38,28 +50,34 @@ mesh = SubResource("PlaneMesh_kyxl1")
 shape = SubResource("WorldBoundaryShape3D_2qfg3")
 debug_color = Color(0, 0.6, 0.7, 0.42)
 
-[node name="Table" parent="." index="4" instance=ExtResource("5_5ahed")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.86108)
-collision_mask = 513
+[node name="DisplayTable01" parent="." index="4" instance=ExtResource("10_6d2rb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -2)
 
-[node name="Box01" parent="Table" index="2" instance=ExtResource("6_kyxl1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.220952, 1.38709, -0.139649)
+[node name="Box01" parent="DisplayTable01" index="0" instance=ExtResource("6_kyxl1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.255367, 1.19948, 0.124626)
+continuous_cd = true
 
-[node name="Box02" parent="Table" index="3" instance=ExtResource("6_kyxl1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00403871, 1.40671, -0.0903311)
+[node name="Box02" parent="DisplayTable01" index="2" instance=ExtResource("6_kyxl1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0235216, 1.23643, 0.0485889)
 mass = 10.0
 size = Vector3(0.2, 0.2, 0.2)
 
-[node name="Box03" parent="Table" index="4" instance=ExtResource("6_kyxl1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.398112, 1.46048, -0.0732546)
+[node name="Box03" parent="DisplayTable01" index="3" instance=ExtResource("6_kyxl1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.317959, 1.28521, 0.0656654)
 mass = 20.0
 size = Vector3(0.3, 0.3, 0.3)
 
-[node name="BulletDecal" parent="Table/Box03" index="4" instance=ExtResource("7_jv8ty")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0515044, 0.150752)
+[node name="DisplayTable02" parent="." index="5" instance=ExtResource("10_6d2rb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -2)
 
-[node name="Pistol" parent="Table" index="5" instance=ExtResource("7_2qfg3")]
-transform = Transform3D(1.91069e-15, 4.37114e-08, -1, 1, -4.37114e-08, 0, -4.37114e-08, -1, -4.37114e-08, 0, 1.35374, 0.331949)
+[node name="Pistol" parent="DisplayTable02" index="1" instance=ExtResource("7_2qfg3")]
+transform = Transform3D(1.91069e-15, 4.37114e-08, -1, 1, -4.37114e-08, 0, -4.37114e-08, -1, -4.37114e-08, 0.119944, 1.16066, 0.360126)
+
+[node name="BoxingBag" parent="." index="6" instance=ExtResource("8_jv8ty")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.89235, 0, -2.2118)
+
+[node name="RagDoll" parent="." index="7" instance=ExtResource("9_m5inh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.559, 0, -2.40494)
 
 [editable path="Player"]
 [editable path="Player/Xrt2DynamicPlayerRig"]

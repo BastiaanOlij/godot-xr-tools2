@@ -1,0 +1,35 @@
+[gd_scene load_steps=6 format=3 uid="uid://capweg2gy3lus"]
+
+[ext_resource type="Script" uid="uid://0ulby33mstqp" path="res://testing/arrow.gd" id="1_y8qnx"]
+[ext_resource type="Shader" uid="uid://xrt2so02d7k" path="res://addons/godot-xr-tools2/shaders/unshaded_no_alpha.gdshader" id="2_luu1r"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_24g3x"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("2_luu1r")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_r2i7l"]
+top_radius = 0.02
+bottom_radius = 0.02
+height = 1.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_wotn1"]
+top_radius = 0.0
+bottom_radius = 0.1
+height = 0.4
+
+[node name="Arrow" type="Node3D"]
+script = ExtResource("1_y8qnx")
+
+[node name="Staff" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+material_override = SubResource("ShaderMaterial_24g3x")
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_r2i7l")
+
+[node name="Head" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+material_override = SubResource("ShaderMaterial_24g3x")
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_wotn1")

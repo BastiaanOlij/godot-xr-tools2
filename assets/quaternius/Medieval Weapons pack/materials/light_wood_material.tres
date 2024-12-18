@@ -1,0 +1,6 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dury3q03jna3a"]
+
+[resource]
+resource_name = "LightWood"
+albedo_color = Color(0.505989, 0.265024, 0.169225, 1)
+metallic = 0.1
