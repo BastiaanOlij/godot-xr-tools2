@@ -45,6 +45,10 @@ var _viewport_texture : ViewportTexture
 # Display on which we show our viewport image
 @onready var _display : MeshInstance3D = $SpectatorCamera3D/Camera/CameraDisplay/Display
 
+## Make this camera current
+func make_current():
+	$SpectatorCamera3D.current = true
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
