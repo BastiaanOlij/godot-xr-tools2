@@ -1,0 +1,80 @@
+[gd_scene load_steps=6 format=3 uid="uid://bk3guk26mqdeo"]
+
+[ext_resource type="PackedScene" uid="uid://bif3shasbpu1a" path="res://assets/kenney.nl/Models/GLTF format/cabinetBedDrawer.glb" id="1_dcpbk"]
+[ext_resource type="Script" uid="uid://xrt2jog5h0j" path="res://addons/godot-xr-tools2/components/xrt2_grab_point.gd" id="2_iyuc4"]
+[ext_resource type="Script" uid="uid://5jdaue6gt8uu" path="res://objects/physics_helpers/springed_hinge_joint_3d.gd" id="3_ske7l"]
+[ext_resource type="Script" uid="uid://cxt6i24d0ld5y" path="res://objects/physics_helpers/springed_slider_joint_3d.gd" id="4_icgga"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_icgga"]
+size = Vector3(0.980965, 0.46228, 0.0854492)
+
+[node name="CabinetBedDrawer" type="Node3D"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="cabinetBedDrawer" parent="." instance=ExtResource("1_dcpbk")]
+
+[node name="door" parent="cabinetBedDrawer/cabinetBedDrawer(Clone)" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.999999, 0.127, 0.273152, -0.00429906)
+
+[node name="CollisionShape3D" parent="cabinetBedDrawer/cabinetBedDrawer(Clone)/door" index="1"]
+transform = Transform3D(1, 0, -7.45058e-07, 0, 1, 0, 2.68221e-07, 0, 1, 0.488331, 0.231018, -0.0412597)
+shape = SubResource("BoxShape3D_icgga")
+
+[node name="XRT2GrabPointLeft" type="Node3D" parent="cabinetBedDrawer/cabinetBedDrawer(Clone)/door" index="2"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.945258, 0.245696, 0.105179)
+script = ExtResource("2_iyuc4")
+right_hand = false
+exclusive = true
+metadata/_custom_type_script = ExtResource("2_iyuc4")
+
+[node name="XRT2GrabPointRight" type="Node3D" parent="cabinetBedDrawer/cabinetBedDrawer(Clone)/door" index="3"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0.67485, 0.274791, 0.0941322)
+script = ExtResource("2_iyuc4")
+left_hand = false
+exclusive = true
+metadata/_custom_type_script = ExtResource("2_iyuc4")
+
+[node name="drawer" parent="cabinetBedDrawer/cabinetBedDrawer(Clone)" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.132752, 0.845356, -0.825348)
+
+[node name="drawer" parent="cabinetBedDrawer/cabinetBedDrawer(Clone)/drawer" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00530088, 0, 0.00398266)
+
+[node name="XRT2GrabPointLeft" type="Node3D" parent="cabinetBedDrawer/cabinetBedDrawer(Clone)/drawer" index="2"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.561728, 0.124002, 0.922465)
+script = ExtResource("2_iyuc4")
+right_hand = false
+exclusive = true
+metadata/_custom_type_script = ExtResource("2_iyuc4")
+
+[node name="XRT2GrabPointRight" type="Node3D" parent="cabinetBedDrawer/cabinetBedDrawer(Clone)/drawer" index="3"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0.394381, 0.124002, 0.937897)
+script = ExtResource("2_iyuc4")
+left_hand = false
+metadata/_custom_type_script = ExtResource("2_iyuc4")
+
+[node name="SpringedHingeJoint3D" type="HingeJoint3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0.122962, 0.263982, 5.37483e-09)
+node_a = NodePath("../cabinetBedDrawer/cabinetBedDrawer(Clone)/StaticBody3D")
+node_b = NodePath("../cabinetBedDrawer/cabinetBedDrawer(Clone)/door")
+angular_limit/enable = true
+angular_limit/upper = 0.0
+script = ExtResource("3_ske7l")
+lower_spring_limit = -1.13446
+lower_torque = 3.0
+higher_spring_limit = -0.436332
+higher_torque = 3.0
+
+[node name="SpringedSliderJoint3D" type="SliderJoint3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.595927, 0.845052, 2.60488e-08)
+node_a = NodePath("../cabinetBedDrawer/cabinetBedDrawer(Clone)/StaticBody3D")
+node_b = NodePath("../cabinetBedDrawer/cabinetBedDrawer(Clone)/drawer")
+linear_limit/upper_distance = 0.0
+linear_limit/lower_distance = -0.75
+script = ExtResource("4_icgga")
+lower_distance = -0.6
+lower_force = 1.0
+upper_distance = -0.15
+upper_force = 1.0
+
+[editable path="cabinetBedDrawer"]

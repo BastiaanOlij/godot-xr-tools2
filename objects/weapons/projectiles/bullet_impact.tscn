@@ -1,25 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://dn7t2s12kno0l"]
+[gd_scene load_steps=4 format=3 uid="uid://dn7t2s12kno0l"]
 
 [ext_resource type="Script" uid="uid://cas456pcvgc6v" path="res://objects/weapons/projectiles/bullet_impact.gd" id="1_5tf3x"]
 [ext_resource type="Texture2D" uid="uid://ck8b0fja5a1ll" path="res://assets/opengameart.org/bullet_decal/bullet_hole.png" id="1_pmth6"]
 [ext_resource type="AudioStream" uid="uid://bs4xc5m1atij6" path="res://assets/freesound.org/660769__madpancake__headshot-sound.ogg" id="3_55bql"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5tf3x"]
-transparency = 1
-albedo_texture = ExtResource("1_pmth6")
-
-[sub_resource type="QuadMesh" id="QuadMesh_55bql"]
-size = Vector2(0.02, 0.02)
-
 [node name="BulletDecal" type="Node3D"]
 script = ExtResource("1_5tf3x")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.002)
-visible = false
-sorting_offset = 0.01
-material_override = SubResource("StandardMaterial3D_5tf3x")
-mesh = SubResource("QuadMesh_55bql")
 
 [node name="Decal" type="Decal" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)

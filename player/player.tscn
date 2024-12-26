@@ -28,7 +28,6 @@ script = ExtResource("1_g6k8r")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("CapsuleShape3D_yw30f")
-debug_color = Color(0, 0.6, 0.7, 0.42)
 
 [node name="Xrt2DynamicPlayerRig" parent="." instance=ExtResource("1_rkbax")]
 

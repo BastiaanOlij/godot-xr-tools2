@@ -1,0 +1,12 @@
+[gd_resource type="StandardMaterial3D" load_steps=3 format=3 uid="uid://bpri8bruqdrj7"]
+
+[ext_resource type="Texture2D" uid="uid://dihevjjfv1qkd" path="res://assets/cc0textures/Wood038/Wood038_2K_Color.jpg" id="1_qeyn6"]
+[ext_resource type="Texture2D" uid="uid://djskhq8wyrfri" path="res://assets/cc0textures/Wood038/Wood038_2K_Normal.jpg" id="2_2xnq2"]
+
+[resource]
+resource_name = "wood"
+cull_mode = 2
+albedo_texture = ExtResource("1_qeyn6")
+normal_enabled = true
+normal_texture = ExtResource("2_2xnq2")
+uv1_scale = Vector3(0.05, 0.05, 0.05)

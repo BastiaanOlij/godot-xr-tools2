@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=3 uid="uid://ua3or7b0xs2o"]
+
+[ext_resource type="PackedScene" uid="uid://jhwirwthe6w3" path="res://assets/kenney.nl/Models/GLTF format/doorway.glb" id="1_cyk0u"]
+[ext_resource type="Script" uid="uid://5jdaue6gt8uu" path="res://objects/physics_helpers/springed_hinge_joint_3d.gd" id="2_ija4l"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_h56sr"]
+size = Vector3(1.26716, 2.93028, 0.128993)
+
+[node name="Door" type="Node3D"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="doorway" parent="." instance=ExtResource("1_cyk0u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.244712, 0, 1.06967e-08)
+
+[node name="doorway(Clone)" parent="doorway" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05031, 0, 0.148176)
+
+[node name="door" parent="doorway/doorway(Clone)" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.169817, 0, -0.143457)
+mass = 5.0
+freeze = true
+
+[node name="door" parent="doorway/doorway(Clone)/door" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0799181, 0, 0.0189552)
+
+[node name="CollisionShape3D" parent="doorway/doorway(Clone)/door" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.559315, 1.47228, 0.0189604)
+shape = SubResource("BoxShape3D_h56sr")
+
+[node name="SpringedHingeJoint3D" type="HingeJoint3D" parent="doorway"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -0.968342, 0, -0.00353054)
+node_a = NodePath("../doorway(Clone)/StaticBody3D")
+node_b = NodePath("../doorway(Clone)/door")
+angular_limit/enable = true
+angular_limit/upper = 0.0
+script = ExtResource("2_ija4l")
+lower_spring_limit = -0.174533
+higher_spring_limit = -1.39626
+metadata/_custom_type_script = ExtResource("2_ija4l")
+
+[editable path="doorway"]

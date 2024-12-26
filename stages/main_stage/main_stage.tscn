@@ -1,25 +1,16 @@
-[gd_scene load_steps=13 format=3 uid="uid://dsxjo6miebrpy"]
+[gd_scene load_steps=12 format=3 uid="uid://dsxjo6miebrpy"]
 
 [ext_resource type="PackedScene" uid="uid://xrt20000007" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.tscn" id="1_c306w"]
 [ext_resource type="Environment" uid="uid://l4hnsy05gog4" path="res://stages/default_environment.tres" id="2_38rx5"]
 [ext_resource type="PackedScene" uid="uid://bv5m3v632mh60" path="res://player/player.tscn" id="3_82lmn"]
-[ext_resource type="Texture2D" uid="uid://dlbgjparkqtva" path="res://assets/misc/pattern.png" id="4_3seyx"]
+[ext_resource type="PackedScene" uid="uid://ddjoxkk8qf8rt" path="res://objects/misc/floor.tscn" id="4_3ltgk"]
 [ext_resource type="PackedScene" uid="uid://dajkr3cilsked" path="res://objects/misc/box.tscn" id="6_kyxl1"]
 [ext_resource type="PackedScene" uid="uid://bak8mif2gg08j" path="res://objects/weapons/pistol/pistol.tscn" id="7_2qfg3"]
 [ext_resource type="PackedScene" uid="uid://dsvk4g1s3w1pq" path="res://objects/misc/boxing_bag.tscn" id="8_jv8ty"]
 [ext_resource type="PackedScene" uid="uid://c8ncker4o08cm" path="res://objects/ragdoll/ragdoll.tscn" id="9_m5inh"]
+[ext_resource type="PackedScene" uid="uid://bk3guk26mqdeo" path="res://objects/furniture/cabinet_bed_drawer.tscn" id="10_3ltgk"]
 [ext_resource type="PackedScene" uid="uid://bcer2q84lyute" path="res://objects/misc/display_table.tscn" id="10_6d2rb"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5ahed"]
-albedo_color = Color(0.353771, 0.581494, 0.294261, 1)
-albedo_texture = ExtResource("4_3seyx")
-uv1_scale = Vector3(100, 100, 100)
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_kyxl1"]
-material = SubResource("StandardMaterial3D_5ahed")
-size = Vector2(1000, 1000)
-
-[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_2qfg3"]
+[ext_resource type="PackedScene" uid="uid://ua3or7b0xs2o" path="res://objects/furniture/door.tscn" id="11_3ltgk"]
 
 [node name="MainStage" node_paths=PackedStringArray("player_origin") instance=ExtResource("1_c306w")]
 player_origin = NodePath("Player/Xrt2DynamicPlayerRig")
@@ -40,15 +31,7 @@ transform = Transform3D(1, -2.22524e-07, 1.8388e-05, 2.22525e-07, 0.999999, -0.0
 [node name="RightHandAttachment" parent="Player/Xrt2DynamicPlayerRig/RightCollisionHand" index="0"]
 transform = Transform3D(1, 2.22525e-07, -1.84317e-05, -2.22598e-07, 0.999999, -0.00166774, 1.84019e-05, 0.00166765, 0.999998, -3.86425e-08, -1.86975e-05, 0.0271756)
 
-[node name="Floor" type="StaticBody3D" parent="." index="3"]
-collision_mask = 513
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" index="0"]
-mesh = SubResource("PlaneMesh_kyxl1")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" index="1"]
-shape = SubResource("WorldBoundaryShape3D_2qfg3")
-debug_color = Color(0, 0.6, 0.7, 0.42)
+[node name="Floor" parent="." index="3" instance=ExtResource("4_3ltgk")]
 
 [node name="DisplayTable01" parent="." index="4" instance=ExtResource("10_6d2rb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -2)
@@ -78,6 +61,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.89235, 0, -2.2118)
 
 [node name="RagDoll" parent="." index="7" instance=ExtResource("9_m5inh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.559, 0, -2.40494)
+
+[node name="CabinetBedDrawer" parent="." index="8" instance=ExtResource("10_3ltgk")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -3.62911, 0, 2.03313)
+
+[node name="Door" parent="." index="9" instance=ExtResource("11_3ltgk")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -4.4711, 0, 3.00976)
 
 [editable path="Player"]
 [editable path="Player/Xrt2DynamicPlayerRig"]
