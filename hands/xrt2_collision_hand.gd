@@ -73,9 +73,6 @@ enum CollisionHandMode {
 # How much displacement is required for the hand to start orienting to a surface
 const ORIENT_DISPLACEMENT := 0.05
 
-# Distance to teleport hands
-const TELEPORT_DISTANCE := 1.0
-
 #region Export variables
 ## Properties related to tracking
 @export_group("Tracking")
@@ -122,6 +119,13 @@ const TELEPORT_DISTANCE := 1.0
 @export var mode : CollisionHandMode = CollisionHandMode.COLLIDE:
 	set(value):
 		mode = value
+		notify_property_list_changed()
+
+## Distance to teleport hands
+@export var teleport_distance : float = 1.0
+
+## Drop held object if teleport distance is reached?
+@export var drop_on_teleport : bool = true
 
 ## Weight of our hand
 @export_range(0.1, 1.0, 0.01, "suffix:kg") var hand_mass : float = 0.4:
@@ -192,6 +196,7 @@ class TargetOverride:
 var _hand_tracker : XRHandTracker
 var _hand_skeleton : Skeleton3D
 var _controller_tracker : XRControllerTracker
+var _pickup : XRT2Pickup
 
 # Sorted stack of TargetOverride
 var _target_overrides : Array[TargetOverride]
@@ -347,6 +352,10 @@ func get_bone_transform(bone_name : String) -> Transform3D:
 
 
 #region Private Property Update Functions
+# React to add/remove/change tracker signal
+func _on_tracker_signal(_tracker_name: StringName, _type: int):
+	_update_trackers()
+
 # Check if we need different trackers
 func _update_trackers():
 	var new_hand_tracker : XRHandTracker = \
@@ -398,9 +407,17 @@ func _validate_property(property: Dictionary):
 		"freeze", \
 		"linear_damp", \
 		"angular_damp" \
-		]:
+	]:
 		property.usage = PROPERTY_USAGE_NONE
 
+	if mode != CollisionHandMode.COLLIDE and property.name in [\
+		"teleport_distance", \
+		"drop_on_teleport", \
+		"hand_mass", \
+		"force_coef", \
+		"torque_coef", \
+	]:
+		property.usage = PROPERTY_USAGE_NONE
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -428,18 +445,20 @@ func _ready():
 	top_level = true
 	process_physics_priority = -90
 
-	
 	var parent : CollisionObject3D = get_collision_parent()
 	if parent:
 		# Hands shouldn't collide with a parent collision object
 		add_collision_exception_with(parent)
 		parent.add_collision_exception_with(self)
 
+	# If we have a pickup function, get it
+	_pickup = XRT2Pickup.get_pickup(self)
+
 	# Make sure our trackers are and stay correct
 	_update_trackers()
-	XRServer.tracker_added.connect(_update_trackers)
-	XRServer.tracker_removed.connect(_update_trackers)
-	XRServer.tracker_updated.connect(_update_trackers)
+	XRServer.tracker_added.connect(_on_tracker_signal)
+	XRServer.tracker_removed.connect(_on_tracker_signal)
+	XRServer.tracker_updated.connect(_on_tracker_signal)
 
 	# Update our hand motion range
 	_update_hand_motion_range()
@@ -501,8 +520,11 @@ func _physics_process(_delta):
 		return
 
 	# Handle too far from target
-	if global_position.distance_to(target.origin) > TELEPORT_DISTANCE:
-		# TODO: if we're holding something, drop it!
+	if global_position.distance_to(target.origin) > teleport_distance:
+		if drop_on_teleport and _pickup:
+			# If we're holding something, drop it!
+			_pickup.drop_held_object()
+
 		freeze = true
 		global_transform = target
 		return

@@ -150,6 +150,18 @@ var _highlight_material : ShaderMaterial = \
 
 
 #region Public functions
+## Find an XRT2Pickup function that is a child of the given parent
+static func get_pickup(parent : Node3D) -> XRT2Pickup:
+	for child in parent.get_children():
+		if child is XRT2Pickup:
+			return child
+
+		var pickup = XRT2Pickup.get_pickup(child)
+		if pickup:
+			return pickup
+
+	return null
+
 ## Find which pickup handler has picked up this object
 static func picked_up_by(what : PhysicsBody3D) -> XRT2Pickup:
 	var by : XRT2Pickup
@@ -645,6 +657,9 @@ func _get_default_hand_transform(body : PhysicsBody3D, hand_position : Vector3) 
 
 
 func _get_closest() -> ClosestObject:
+	if not _detection_area.monitoring:
+		return null
+
 	var overlapping_bodies = _detection_area.get_overlapping_bodies()
 	var closest : ClosestObject
 	var closest_dist : float = 9999999.99
