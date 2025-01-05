@@ -728,6 +728,10 @@ func _highlight_meshes(node : Node3D) -> Dictionary[MeshInstance3D, Material]:
 			mesh_instance.material_overlay = _highlight_material
 	else:
 		for child in node.get_children():
+			if child.is_in_group("xrt2_no_highlight"):
+				# Don't process this node for highlights
+				continue
+
 			if child is MeshInstance3D:
 				var mesh_instance : MeshInstance3D = child
 				if mesh_instance.visible:
