@@ -197,6 +197,7 @@ var _hand_tracker : XRHandTracker
 var _hand_skeleton : Skeleton3D
 var _controller_tracker : XRControllerTracker
 var _pickup : XRT2Pickup
+var _parent_body : CollisionObject3D
 
 # Sorted stack of TargetOverride
 var _target_overrides : Array[TargetOverride]
@@ -445,11 +446,11 @@ func _ready():
 	top_level = true
 	process_physics_priority = -90
 
-	var parent : CollisionObject3D = get_collision_parent()
-	if parent:
+	_parent_body = get_collision_parent()
+	if _parent_body:
 		# Hands shouldn't collide with a parent collision object
-		add_collision_exception_with(parent)
-		parent.add_collision_exception_with(self)
+		add_collision_exception_with(_parent_body)
+		_parent_body.add_collision_exception_with(self)
 
 	# If we have a pickup function, get it
 	_pickup = XRT2Pickup.get_pickup(self)
