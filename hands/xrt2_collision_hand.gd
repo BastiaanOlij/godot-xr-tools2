@@ -131,13 +131,17 @@ const ORIENT_DISPLACEMENT := 0.05
 @export_range(0.1, 1.0, 0.01, "suffix:kg") var hand_mass : float = 0.4:
 	set(value):
 		hand_mass = value
-		mass = value
+		if is_inside_tree():
+			mass = value
 
-## Linear force coef
-@export_range(10.0, 10000.0, 10.0) var force_coef : float = 2000.0
+## Max linear force
+@export_range(1.0, 1000.0, 1.0, "suffix:N") var max_force : float = 500.0
+
+## Factor to apply to required force above maximum
+@export_range(0.0, 1.0, 0.01) var force_falloff_factor : float = 0.5
 
 ## Angular torgue coef
-@export_range(0.1, 100.0, 0.1) var torque_coef : float = 30.0
+# @export_range(0.1, 100.0, 0.1) var torque_coef : float = 30.0
 
 ## Properties related to physical appearance
 @export_group("Appearance")
@@ -172,6 +176,16 @@ const ORIENT_DISPLACEMENT := 0.05
 
 		if _hand_mesh:
 			_update_hand_material(_hand_mesh, material_override, true)
+
+@export var debug_color : Color = Color(Color.RED, 0.9):
+	set(value):
+		debug_color = value
+		if _palm_collision_shape:
+			_palm_collision_shape.debug_color = debug_color
+
+		for bone in _digit_collision_shapes:
+			if _digit_collision_shapes[bone]:
+				_digit_collision_shapes[bone].debug_color = debug_color
 #endregion
 
 ## Target-override class
@@ -195,6 +209,7 @@ class TargetOverride:
 # Trackers used
 var _hand_tracker : XRHandTracker
 var _hand_skeleton : Skeleton3D
+var _ghost_skeleton : Skeleton3D
 var _controller_tracker : XRControllerTracker
 var _pickup : XRT2Pickup
 var _parent_body : CollisionObject3D
@@ -353,10 +368,6 @@ func get_bone_transform(bone_name : String) -> Transform3D:
 
 
 #region Private Property Update Functions
-# React to add/remove/change tracker signal
-func _on_tracker_signal(_tracker_name: StringName, _type: int):
-	_update_trackers()
-
 # Check if we need different trackers
 func _update_trackers():
 	var new_hand_tracker : XRHandTracker = \
@@ -401,13 +412,16 @@ func _update_hand_motion_range():
 func _validate_property(property: Dictionary):
 	# Always hide these built in properties as we control them
 	if property.name in [ \
+		"process_physics_priority", \
 		"gravity_scale", \
 		"mass", \
 		"continuous_cd", \
 		"custom_integrator", \
 		"freeze", \
 		"linear_damp", \
-		"angular_damp" \
+		"linear_damp_mode", \
+		"angular_damp", \
+		"angular_damp_mode" \
 	]:
 		property.usage = PROPERTY_USAGE_NONE
 
@@ -427,13 +441,17 @@ func _ready():
 	_palm_collision_shape.shape = preload("res://addons/godot-xr-tools2/hands/xrt2_hand_palm.shape")
 	# This probably needs to be set based on left or right hand
 	_palm_collision_shape.rotation_degrees = Vector3(0.0, 90, 90)
+	_palm_collision_shape.debug_color = debug_color
 	add_child(_palm_collision_shape, false, Node.INTERNAL_MODE_BACK)
 
 	# Hardcode these values
 	gravity_scale = 0.0
 	continuous_cd = true
-	linear_damp = 100.0
-	angular_damp = 100.0
+	linear_damp_mode = RigidBody3D.DAMP_MODE_REPLACE
+	linear_damp = 500.0
+	angular_damp_mode = RigidBody3D.DAMP_MODE_REPLACE
+	angular_damp = 500.0
+	mass = hand_mass
 
 	# Init our hand meshes
 	_update_hand_meshes()
@@ -452,6 +470,11 @@ func _ready():
 		add_collision_exception_with(_parent_body)
 		_parent_body.add_collision_exception_with(self)
 
+	var dynamic_rig : XRT2DynamicPlayerRig = XRT2DynamicPlayerRig.get_xr_dynamic_player_rig(self)
+	if dynamic_rig:
+		# Connect to any signals we need
+		dynamic_rig.player_moved.connect(_on_player_moved)
+
 	# If we have a pickup function, get it
 	_pickup = XRT2Pickup.get_pickup(self)
 
@@ -469,11 +492,11 @@ func _ready():
 
 
 # Handle physics processing
-func _physics_process(_delta):
+func _physics_process(delta):
 	if Engine.is_editor_hint():
 		return
 
-	# Handle DISABLED or no target
+	# Handle DISABLED or no target.
 	if mode == CollisionHandMode.DISABLED:
 		freeze = true
 		return
@@ -485,14 +508,14 @@ func _physics_process(_delta):
 	else:
 		var found_tracking_data = false
 
-		# Give priority to our hand tracker
+		# Give priority to our hand tracker.
 		if _hand_tracker:
 			var pose : XRPose = _hand_tracker.get_pose("default")
 			if pose and pose.has_tracking_data:
 				target = pose.get_adjusted_transform()
 				found_tracking_data = true
 
-		# Check our controller tracker
+		# Check our controller tracker.
 		if not found_tracking_data and _controller_tracker:
 			var pose : XRPose = _controller_tracker.get_pose(fallback_pose_action)
 			if pose and pose.has_tracking_data:
@@ -501,16 +524,17 @@ func _physics_process(_delta):
 				target = pose.get_adjusted_transform() * target
 				found_tracking_data = true
 
-		# Ignore when controller is not tracking
+		# Ignore when controller is not tracking.
 		if not found_tracking_data:
 			freeze = true
 			return
 
 		# Seeing we're working in global space,
 		# we need to take our parent into account
-		target = get_parent().global_transform * target
+		var parent_transform : Transform3D = get_parent().global_transform 
+		target = parent_transform * target
 
-	# Always place our ghost mesh at our tracked location
+	# Always place our ghost mesh at our tracked location.
 	if _ghost_mesh:
 		_ghost_mesh.global_transform = target
 
@@ -520,7 +544,7 @@ func _physics_process(_delta):
 		global_transform = target
 		return
 
-	# Handle too far from target
+	# Handle too far from target.
 	if global_position.distance_to(target.origin) > teleport_distance:
 		if drop_on_teleport and _pickup:
 			# If we're holding something, drop it!
@@ -530,21 +554,62 @@ func _physics_process(_delta):
 		global_transform = target
 		return
 
-	# We got this far, make sure we're unfrozen and let Godot position our hand
+	# We got this far, make sure we're unfrozen and let Godot position our hand.
 	if freeze:
 		freeze = false
 		linear_velocity = Vector3()
 		angular_velocity = Vector3()
 
-	# Implementation below inspired by Dedm0zaj's physics hand implementation
+	# Implementation below inspired by Dedm0zaj's physics hand implementation.
+	# We're attempting to calculate actual force/torque needed however.
 
-	# Apply force to move hand to tracked location
+	# TODO adjust this correctly if we are holding an object.
+
+	# Grab our rigid body state.
+	var state : PhysicsDirectBodyState3D = PhysicsServer3D.body_get_direct_state(get_rid())
+
+	# Apply force to move hand to tracked location:
+	# acceleration = (distance - current_velocity * t) / (0.5 * t²)
+
+	var factor = 0.5 * delta * delta
+	var current_linear_velocity = linear_velocity  * clamp(1.0 - (linear_damp * delta), 0.0, 1.0)
+
+	# Add our gravity.
+	if state:
+		current_linear_velocity += state.total_gravity * delta
+
+	# Calculate the required force based on our desired movement.
 	var linear_movement : Vector3 = target.origin - global_position
-	apply_central_force(linear_movement * force_coef)
+	var needed_acceleration : Vector3 = (linear_movement - current_linear_velocity * delta) / factor
+	var linear_force : Vector3 = needed_acceleration * mass * 0.5 # No idea why * 0.5???
 
-	var angular_movement : Quaternion = (target.basis * global_basis.inverse()) \
-		.get_rotation_quaternion()
-	apply_torque(angular_movement.get_euler() * torque_coef)
+	# Limit our force.
+	var required_force = linear_force.length()
+	if required_force > max_force:
+		var overflow_force = required_force - max_force
+		linear_force *= (max_force + overflow_force * force_falloff_factor) / required_force
+
+	# Apply force logic.
+	apply_central_force(linear_force)
+
+	# Apply torque to rotate hand to tracked rotation:
+	# Torque = moment_of_inertia * angular_acceleration
+
+	# Get our moment of inertial from our rigidbody state.
+	var moment_of_inertia : Vector3 = Vector3()
+	if state:
+		if state.inverse_inertia != Vector3():
+			moment_of_inertia = Vector3(mass, mass, mass) / state.inverse_inertia
+
+	# Apply our damp so we know our current velocity.
+	var current_angular_velocity : Vector3 = angular_velocity * clamp(1.0 - (angular_damp * delta), 0.0, 1.0)
+
+	# Calculate the needed torque.
+	var angular_movement : Vector3 = (target.basis * global_basis.inverse()).get_euler()
+	var needed_angular_acceleration : Vector3 = (angular_movement - current_angular_velocity * delta) / factor
+	var torque : Vector3 = moment_of_inertia * needed_angular_acceleration * 0.5 # Why 0.5?
+
+	apply_torque(torque)
 
 
 func _process(_delta):
@@ -559,7 +624,7 @@ func _process(_delta):
 				_ghost_mesh.visible = true
 			else:
 				if (_ghost_mesh.global_basis * _hand_mesh.global_basis.inverse()) \
-					.get_rotation_quaternion().get_angle() > deg_to_rad(1.0):
+					.get_rotation_quaternion().get_angle() > deg_to_rad(15.0):
 					_ghost_mesh.visible = true
 #endregion
 
@@ -653,6 +718,7 @@ func _add_hand_modifiers(p_hand_mesh : Node3D) -> void:
 
 	# TODO add fallback modifier
 
+	# TODO add pose override modifier
 
 # Find the mesh_instance node child
 func _get_mesh_instance_node(p_node : Node) -> MeshInstance3D:
@@ -681,13 +747,16 @@ func _update_hand_meshes():
 	_clear_digit_collisions()
 
 	if _hand_skeleton:
-		_hand_skeleton.skeleton_updated.disconnect(_on_skeleton_updated)
 		_hand_skeleton = null
 
 	if _hand_mesh:
 		remove_child(_hand_mesh)
 		_hand_mesh.queue_free()
 		_hand_mesh = null
+
+	if _ghost_skeleton:
+		_ghost_skeleton.skeleton_updated.disconnect(_on_skeleton_updated)
+		_ghost_skeleton = null
 
 	if _ghost_mesh:
 		remove_child(_ghost_mesh)
@@ -708,13 +777,9 @@ func _update_hand_meshes():
 		if _hand_mesh:
 			_hand_mesh.visible = show_hand_mesh
 			add_child(_hand_mesh)
-			_add_hand_modifiers(_hand_mesh)
 			_update_hand_material(_hand_mesh, material_override, true)
 
 			_hand_skeleton = _get_skeleton_node(_hand_mesh)
-			if _hand_skeleton:
-				_hand_skeleton.skeleton_updated.connect(_on_skeleton_updated)
-				_on_skeleton_updated()
 
 		_ghost_mesh = hand_scene.instantiate()
 		if _ghost_mesh:
@@ -723,7 +788,16 @@ func _update_hand_meshes():
 			add_child(_ghost_mesh)
 			_add_hand_modifiers(_ghost_mesh)
 			_update_hand_material(_ghost_mesh, \
-				preload("res://addons/godot-xr-tools2/hands/gltf/ghost.material"), false)
+				preload("res://addons/godot-xr-tools2/hands/gltf/ghost_material.tres"), false)
+
+			# We apply our modifiers to our ghost skeleton,
+			# and then copy them to our hand skeleton.
+			# Eventually this will allow us to restrict the movement
+			# on the hand based on collisions.
+			_ghost_skeleton = _get_skeleton_node(_ghost_mesh)
+			if _ghost_skeleton:
+				_ghost_skeleton.skeleton_updated.connect(_on_skeleton_updated)
+				_on_skeleton_updated()
 
 	hand_mesh_changed.emit()
 #endregion
@@ -737,18 +811,24 @@ func _clear_digit_collisions() -> void:
 		remove_child(collision_node)
 		collision_node.queue_free()
 	_digit_collision_shapes.clear()
+#endregion
 
+
+#region Signal handling
+# React to add/remove/change tracker signal
+func _on_tracker_signal(_tracker_name: StringName, _type: int):
+	_update_trackers()
 
 # Update our skeleton including creating missing digit collisions
 func _on_skeleton_updated() -> void:
-	var bone_count = _hand_skeleton.get_bone_count()
+	var bone_count = _ghost_skeleton.get_bone_count()
 	for i in bone_count:
-		var bone_transform : Transform3D = _hand_skeleton.get_bone_global_pose(i)
+		var bone_transform : Transform3D = _ghost_skeleton.get_bone_global_pose(i)
 		var collision_node : CollisionShape3D
 		var offset : Transform3D
 		offset.origin = Vector3(0.0, 0.015, 0.0) # move to side of object
 
-		var bone_name = _hand_skeleton.get_bone_name(i)
+		var bone_name = _ghost_skeleton.get_bone_name(i)
 		if bone_name == ("LeftHand" if hand == 0 else "RightHand"):
 			offset.origin = Vector3(0.0, 0.025, 0.0) # move to side of object
 			collision_node = _palm_collision_shape
@@ -761,33 +841,51 @@ func _on_skeleton_updated() -> void:
 				collision_node.name = bone_name + "Col"
 				collision_node.shape = \
 					preload("res://addons/godot-xr-tools2/hands/xrt2_hand_digit.shape")
+				collision_node.debug_color = debug_color
 				add_child(collision_node, false, Node.INTERNAL_MODE_BACK)
 				_digit_collision_shapes[bone_name] = collision_node
 
 		if collision_node:
 			# TODO it would require a far more complex approach,
-			# but being able to check if our collision shapes can move to their new locations
-			# would be interesting.
-			# This should probably be a separate modifier that works with this node
+			# but being able to check if our collision shapes
+			# can move to their new locations would be interesting.
 
+			# For now just copy our transform to our collision shape
 			collision_node.transform = bone_transform * offset
 
+		# And copy our bone transform to our hand skeleton.
+		var bone_pose : Transform3D = _ghost_skeleton.get_bone_pose(i)
+		_hand_skeleton.set_bone_pose(i, bone_pose)
+
 	skeleton_updated.emit()
-#endregion
 
 
-#region Signal handling
+func _on_player_moved(from_transform : Transform3D, to_transform : Transform3D, is_teleport : bool):
+	if is_teleport:
+		# TODO this needs to be implemented
+		pass
+	else:
+		# Old logic, no longer applied
+		# var current_local_transform : Transform3D = from_transform.inverse() * global_transform
+		# var target_transform : Transform3D = to_transform * current_local_transform
+		# var delta_movement : Vector3 = target_transform.origin - global_transform.origin
+		pass
+
+
 func _on_button_pressed(action_name: String):
 	# Just chain this.
 	button_pressed.emit(action_name)
+
 
 func _on_button_released(action_name: String):
 	# Just chain this.
 	button_released.emit(action_name)
 
+
 func _on_input_float_changed(action_name: String, value: float):
 	# Just chain this.
 	input_float_changed.emit(action_name, value)
+
 
 func _on_input_vector2_changed(action_name: String, vector: Vector2):
 	# Just chain this.

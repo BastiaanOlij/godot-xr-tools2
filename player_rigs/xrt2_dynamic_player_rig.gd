@@ -24,14 +24,21 @@
 # SOFTWARE.
 #-------------------------------------------------------------------------------
 
+## This player rig is meant for games where the player can move around
 
 @tool
 class_name XRT2DynamicPlayerRig
 extends XROrigin3D
 
-## This player rig is meant for games where the player can move around
+#region Signals
+
+signal player_moved(from_transform : Transform3D, to_transform : Transform3D, is_teleport : bool)
+
+#endregion
+
 const EYE_TO_TOP = 0.08
 
+#region Export variables
 ## Enable move on input, if true we handle our movement providers
 @export var enable_move_on_input : bool = true
 
@@ -43,7 +50,9 @@ const EYE_TO_TOP = 0.08
 			_height_adjust = 0.0
 		elif _xr_camera and is_inside_tree():
 			_calibrate_height()
+#endregion
 
+#region Private Variables
 # Reference to our start XR global script
 var _start_xr : XRT2StartXR
 
@@ -67,8 +76,9 @@ var _starting_transform : Transform3D = Transform3D()
 @onready var _xr_camera : XRCamera3D = $XRCamera3D
 @onready var _neck_position : Node3D = $XRCamera3D/Neck
 @onready var _fade : Node3D = $XRCamera3D/Xrt2Fade
+#endregion
 
-
+#region Public API
 ## Return a XR dynamic player ancestor
 static func get_xr_dynamic_player_rig(p_node : Node3D) -> XRT2DynamicPlayerRig:
 	var parent = p_node.get_parent()
@@ -86,53 +96,10 @@ static func get_xr_dynamic_player_rig(p_node : Node3D) -> XRT2DynamicPlayerRig:
 func register_movement_provider(p_movement_provider : XRT2MovementProvider):
 	if not _movement_providers.has(p_movement_provider):
 		_movement_providers.push_back(p_movement_provider)
+#endregion
 
 
-# User triggered pose recenter.
-func _on_xr_pose_recenter() -> void:
-	if not _start_xr:
-		# Huh? how did we even get the signal?
-		return
-
-	var play_area_mode : XRInterface.PlayAreaMode = _start_xr.get_play_area_mode()
-	if play_area_mode == XRInterface.XR_PLAY_AREA_SITTING:
-		# Using center on HMD could mess things up here
-		push_warning("Dynamic player rig does not work with sitting setting")
-	elif play_area_mode == XRInterface.XR_PLAY_AREA_ROOMSCALE:
-		# This is already handled by the headset, no need to do more!
-		pass
-	else:
-		XRServer.center_on_hmd(XRServer.RESET_BUT_KEEP_TILT, true)
-
-	# XRCamera3D node may not be updated yet, so go straight to the source!
-	var head_tracker : XRPositionalTracker = XRServer.get_tracker("head")
-	if not head_tracker:
-		push_error("Couldn't locate head tracker!")
-		return
-
-	var pose : XRPose = head_tracker.get_pose("default")
-	var head_transform : Transform3D = pose.get_adjusted_transform()
-
-	# Get neck transform in XROrigin3D space
-	var neck_transform = _neck_position.transform * head_transform
-
-	# Reset our XROrigin transform and apply the inverse of the neck position.
-	var new_origin_transform : Transform3D = Transform3D()
-	new_origin_transform.origin.x = -neck_transform.origin.x
-	new_origin_transform.origin.y = 0.0
-	new_origin_transform.origin.z = -neck_transform.origin.z
-	transform = new_origin_transform
-
-	# Reset our parent to our original direction.
-	var parent : CharacterBody3D = get_parent()
-	if parent:
-		parent.transform.basis = _starting_transform.basis
-
-	# Recalibrate our height
-	if target_player_height > 0.0 and _xr_camera:
-		_calibrate_height()
-
-
+#region Private functions
 func _calibrate_height() -> void:
 	# XRCamera3D node may not be updated yet, so go straight to the source!
 	var head_tracker : XRPositionalTracker = XRServer.get_tracker("head")
@@ -146,6 +113,17 @@ func _calibrate_height() -> void:
 	var camera_height = t.origin.y
 	_height_adjust = target_player_height - EYE_TO_TOP - camera_height
 	transform.origin.y = _height_adjust
+#endregion
+
+
+#region Private Godot Node Functions
+# Validate our properties
+func _validate_property(property: Dictionary):
+	# Always hide these built in properties as we control them
+	if property.name in [ \
+		"process_physics_priority", \
+	]:
+		property.usage = PROPERTY_USAGE_NONE
 
 
 # Verifies our staging has a valid configuration.
@@ -205,7 +183,8 @@ func _physics_process(delta):
 		return
 
 	# Remember our current velocity, we'll apply that later
-	var current_velocity = parent.velocity
+	var current_velocity : Vector3 = parent.velocity
+	var current_transform : Transform3D = parent.global_transform
 
 	# Start by rotating the player to face the same way our real player is
 	var camera_basis: Basis = transform.basis * _xr_camera.transform.basis
@@ -268,3 +247,56 @@ func _physics_process(delta):
 		parent.move_and_slide()
 
 		# TODO handle any collision with rigidbodies and transfer momentum
+
+	# Check if we've moved and let anyone who wants to know, know.
+	var delta_transform : Transform3D = parent.global_transform * current_transform.inverse()
+	if delta_transform.origin.length() > 0.001:
+		# TODO also check rotation!
+		player_moved.emit(current_transform, parent.global_transform, false)
+#endregion
+
+#region Signal handling
+# User triggered pose recenter.
+func _on_xr_pose_recenter() -> void:
+	if not _start_xr:
+		# Huh? how did we even get the signal?
+		return
+
+	var play_area_mode : XRInterface.PlayAreaMode = _start_xr.get_play_area_mode()
+	if play_area_mode == XRInterface.XR_PLAY_AREA_SITTING:
+		# Using center on HMD could mess things up here
+		push_warning("Dynamic player rig does not work with sitting setting")
+	elif play_area_mode == XRInterface.XR_PLAY_AREA_ROOMSCALE:
+		# This is already handled by the headset, no need to do more!
+		pass
+	else:
+		XRServer.center_on_hmd(XRServer.RESET_BUT_KEEP_TILT, true)
+
+	# XRCamera3D node may not be updated yet, so go straight to the source!
+	var head_tracker : XRPositionalTracker = XRServer.get_tracker("head")
+	if not head_tracker:
+		push_error("Couldn't locate head tracker!")
+		return
+
+	var pose : XRPose = head_tracker.get_pose("default")
+	var head_transform : Transform3D = pose.get_adjusted_transform()
+
+	# Get neck transform in XROrigin3D space
+	var neck_transform = _neck_position.transform * head_transform
+
+	# Reset our XROrigin transform and apply the inverse of the neck position.
+	var new_origin_transform : Transform3D = Transform3D()
+	new_origin_transform.origin.x = -neck_transform.origin.x
+	new_origin_transform.origin.y = 0.0
+	new_origin_transform.origin.z = -neck_transform.origin.z
+	transform = new_origin_transform
+
+	# Reset our parent to our original direction.
+	var parent : CharacterBody3D = get_parent()
+	if parent:
+		parent.transform.basis = _starting_transform.basis
+
+	# Recalibrate our height
+	if target_player_height > 0.0 and _xr_camera:
+		_calibrate_height()
+#endregion
