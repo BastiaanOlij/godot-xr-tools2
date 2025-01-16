@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://xrt2e4jwblb"]
+
+[ext_resource type="Shader" uid="uid://xrt2weecu2l" path="res://addons/godot-xr-tools2/shaders/unshaded_with_alpha_nodepth.gdshader" id="1_twogd"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_twogd")
+shader_parameter/albedo = Color(0.317647, 0.580392, 1, 0.552941)
