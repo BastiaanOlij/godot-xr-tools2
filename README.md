@@ -1,6 +1,11 @@
 # Godot XR Tools v2 (XRT2)
 
-> **WARNING:** This repo is still a Work in Progress, this toolkit is still missing many features from Godot XR Tools v1 and is short on documentation.
+> **WARNING:** This repo is still a Work in Progress, this toolkit is still missing many features from [Godot XR Tools v1](https://github.com/godotvr/godot-xr-tools) and is short on documentation.
+> If you've found yourself here early, be aware that things may and will drastically change as we deside the way forward.
+> You may find yourself having to make large changes to anything you build using the toolkit.
+> This is by no stretch of the imagination production ready.
+> If you're looking for a toolkit with which to release a game, you should use [Godot XR Tools v1](https://github.com/godotvr/godot-xr-tools).
+> 
 > Check the demo branch for a demo showcasing current features.
 >
 > While under early development this repository is hosted on my personal GitHub space.
@@ -28,7 +33,7 @@ The following branches are in active development:
 |  master   | Current development branch    |  Godot 4.4+     |
 |  demo     | Demo project for XRT2         |  Godot 4.4+     |
 
-> Note, this repo is temporarily hosted on https://github.com/BastiaanOlij but will be moved to https://github.com/GodotVR in due course.
+> Note, this repo is temporarily hosted on https://github.com/BastiaanOlij but will be moved to https://github.com/GodotVR once we're closer to a stable release.
 
 ## How to use
 
@@ -46,7 +51,7 @@ Due to the introduction of UIDs and format changes to some of the resources used
 Stable releases of this plugin can be found in the Godot Asset Library which is accessible from inside of the Godot IDE.
 Simply search for `Godot XR Tools 2`, download the plugin and install it.
 
-> At this point in time there are no stable releases yet.
+> **WARNING** At this point in time there are no stable releases yet.
 
 ### GIT
 
