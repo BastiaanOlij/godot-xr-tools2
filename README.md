@@ -46,12 +46,13 @@ Due to the introduction of UIDs and format changes to some of the resources used
 
 ## Installation
 
+> **WARNING** At this point in time there are no stable releases of this plugin yet.
+> Some of the information presented below only applies once a stable release is available.
+
 ### Godot Asset Library
 
 Stable releases of this plugin can be found in the Godot Asset Library which is accessible from inside of the Godot IDE.
 Simply search for `Godot XR Tools 2`, download the plugin and install it.
-
-> **WARNING** At this point in time there are no stable releases yet.
 
 ### GIT
 
@@ -73,6 +74,8 @@ You can download a stable release from the releases page or use the download opt
 Manually create the `addons/godot-xr-tools2` folder in your project and unzip the contents of Godot XR Tools 2 into that folder. 
 
 ## Upgrading from Godot XR Tools v1
+
+> **WARNING** as we're not even close to feature parity, it is highly advisible to only use XR Tools v2 for new projects for now.
 
 Godot XR Tools 2 is **not** a drop in replacement for Godot XR Tools and if you have a project that far along we recommend not upgrading as you will need to do major refactoring.
 
@@ -116,7 +119,7 @@ See `LICENSE` for the full license.
 
 ### Complying with the license
 
-If you use Godot XR Tools 2 in your project, this license must be accessible to your end users either by reproducing it in a credits/about screen or included as a distributed file. 
+If you use Godot XR Tools 2 in your project, this license must be accessible to your end users either by reproducing it in a credits/about screen or included as a distributed file.
 
 ## About this repository
 
