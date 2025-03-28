@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# xrt2_hand_attachment.gd
+# xrt2_hand_pose.gd
 #-------------------------------------------------------------------------------
 # MIT License
 #
@@ -25,21 +25,20 @@
 #-------------------------------------------------------------------------------
 
 @tool
-class_name XRT2HandAttachment
+class_name XRT2HandPose
 extends Node3D
 
-## XRTools2 Hand Attachment Script
+## XRTools2 Hand Pose Script
 ##
-## This script exposes bone locations for collision hands.
+## This script properly offsets this node to the given action pose
+## related to the collision hand.
 ## This has to be a child of a [XRT2CollisionHand] node.
 
-@export var bone_name : String:
+## Pose action for our pose. Must be a pose that exists in our OpenXR action map.
+## Note, use "aim" and "grip" for your "aim_pose" or "grip_pose" respectively. 
+@export var pose_action : String:
 	set(value):
-		bone_name = value
-		if is_inside_tree():
-			_on_skeleton_updated()
-
-var _updating : bool = false
+		pose_action = value
 
 # Verifies if we have a valid configuration.
 func _get_configuration_warnings() -> PackedStringArray:
@@ -52,49 +51,17 @@ func _get_configuration_warnings() -> PackedStringArray:
 	# Return warnings
 	return warnings
 
-
-# Update our properties
-func _validate_property(property):
-	if (property.name == "bone_name"):
-		var parent = get_parent()
-		if parent and parent is XRT2CollisionHand:
-			property.hint = PROPERTY_HINT_ENUM
-			property.hint_string = parent.get_concatenated_bone_names()
-		else:
-			property.hint = PROPERTY_HINT_NONE
-			property.hint_string = ""
-
-
-func _enter_tree():
-	var parent = get_parent()
-	if parent and parent is XRT2CollisionHand:
-		parent.hand_mesh_changed.connect(_on_hand_mesh_changed)
-		parent.skeleton_updated.connect(_on_skeleton_updated)
-
-	_on_skeleton_updated()
-
-
-func _exit_tree():
-	var parent = get_parent()
-	if parent and parent is XRT2CollisionHand:
-		parent.hand_mesh_changed.disconnect(_on_hand_mesh_changed)
-		parent.skeleton_updated.disconnect(_on_skeleton_updated)
-
-
-func _on_hand_mesh_changed():
-	notify_property_list_changed()
-	_on_skeleton_updated()
-
-
-func _on_skeleton_updated():
-	if _updating:
+func _process(_delta):
+	if Engine.is_editor_hint():
+		# Can't set this in editor
 		return
-	_updating = true
+
+	if not pose_action:
+		return
 
 	var parent = get_parent()
-	if not bone_name.is_empty() and parent and parent is XRT2CollisionHand:
-		transform = parent.get_bone_transform(bone_name)
+	if parent and parent is XRT2CollisionHand:
+		var collision_hand : XRT2CollisionHand = parent
+		transform = collision_hand.get_pose_transform(pose_action)
 	else:
 		transform = Transform3D()
-
-	_updating = false

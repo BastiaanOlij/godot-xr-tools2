@@ -31,11 +31,9 @@ extends RigidBody3D
 
 ## XRTools2 Collision Hand Container Script
 ##
-## This script implements logic for collision hands. Specifically it tracks
-## its ancestor [XRController3D], and can act as a container for hand models
-## and pickup functions.
-##
-## Note: This works best when used with the palm-pose pose.
+## This script implements logic for collision hands.
+## It encompasses all logic for showing an articulated hand mesh,
+## handles its animations, and most importantly, collisions.
 
 #region Signals
 ## Emitted when a new hand mesh was loaded
@@ -346,6 +344,24 @@ func get_concatenated_bone_names() -> String:
 
 	return skeleton.get_concatenated_bone_names()
 
+## Get the transform for the given pose action of the normal tracker
+func get_pose_transform(pose_action : String) -> Transform3D:
+	if _controller_tracker and _hand_tracker:
+		var hand_pose : XRPose = _hand_tracker.get_pose("default")
+		var controller_pose : XRPose = _controller_tracker.get_pose(pose_action)
+		if controller_pose:
+			if hand_pose:
+				# Use our hand controller pose
+
+				# Don't need to do this on our adjusted transforms, just cancels eachother out
+				return hand_pose.get_transform().inverse() * controller_pose.get_transform()
+			elif fallback_pose_action != pose_action:
+				# Use our fallback pose?
+				var fallback_pose : XRPose = _controller_tracker.get_pose(fallback_pose_action)
+				if fallback_pose:
+					return fallback_pose.get_transform().inverse() * controller_pose.get_transform()
+
+	return Transform3D()
 
 ## Get the transform of the given bone local to our collision hand
 func get_bone_transform(bone_name : String) -> Transform3D:

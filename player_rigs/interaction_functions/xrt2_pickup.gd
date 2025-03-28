@@ -51,6 +51,16 @@ extends Node3D
 #   automatically pose the hand correctly if no grab point is specified.
 # - Need to re-introduce grab points with optional finger poses
 
+#region Signals
+
+## Inform that this hand has picked up this object (also if this is the second hand).
+signal picked_up(by : XRT2Pickup, what : PhysicsBody3D)
+
+## Inform that this hand has dropped this object (also if this object is still held by the other hand).
+signal dropped(by : XRT2Pickup, what : PhysicsBody3D)
+
+#endregion
+
 # Class for storing our highlight overrule data
 class HighlightedBody extends RefCounted:
 	var original_materials : Dictionary[MeshInstance3D, Material]
@@ -323,6 +333,9 @@ func pickup_object(which : PhysicsBody3D):
 
 	# TODO set pose overrule based on what we've picked up (if applicable)
 
+	# Send out a signal to let those wanting to know that we picked something up
+	picked_up.emit(self, _picked_up)
+
 	# Let object know that we picked it up
 	if _is_primary and _picked_up.has_method("picked_up"):
 		_picked_up.picked_up(self)
@@ -387,6 +400,10 @@ func drop_held_object( \
 
 		if was_picked_up.has_method("dropped"):
 			was_picked_up.dropped(self)
+
+	# Send out a signal to let those wanting to know that we dropped something
+	dropped.emit(self, was_picked_up)
+
 #endregion
 
 
