@@ -110,6 +110,18 @@ const ORIENT_DISPLACEMENT := 0.05
 @export_custom(PROPERTY_HINT_RANGE, "-360,360,0.1,or_less,or_greater,radians_as_degrees") \
 	var fallback_offset_rotation : Vector3
 
+## Trigger action for our fallback
+@export var trigger_action : String = "trigger"
+
+## Degrees to which to curl our index finger.
+@export_range(0.0, 90.0, 1.0, "radians_as_degrees") var trigger_curl : float = deg_to_rad(45.0)
+
+## Grip action for our fallback
+@export var grip_action : String = "grip"
+
+## Degrees to which to curl our bottom 3 fingers.
+@export_range(0.0, 90.0, 1.0, "radians_as_degrees") var grip_curl : float = deg_to_rad(70.0)
+
 ## Properties related to physics
 @export_group("Physics")
 
@@ -727,12 +739,20 @@ func _add_hand_modifiers(p_hand_mesh : Node3D) -> void:
 		push_error("Couldn't locate skeleton node for " + name)
 		return
 
+	# Add hand tracking modifier
 	var hand_tracking_modifier : XRHandModifier3D = XRHandModifier3D.new()
 	hand_tracking_modifier.hand_tracker = "/user/hand_tracker/left" if hand == 0 \
 		else "/user/hand_tracker/right"
 	skeleton_node.add_child(hand_tracking_modifier)
 
-	# TODO add fallback modifier
+	# Add fallback modifier
+	var hand_fallback_modifier : XRT2HandFallbackModifier3D= XRT2HandFallbackModifier3D.new()
+	hand_fallback_modifier.hand = hand
+	hand_fallback_modifier.trigger_action = trigger_action
+	hand_fallback_modifier.trigger_curl = trigger_curl
+	hand_fallback_modifier.grip_action = grip_action
+	hand_fallback_modifier.grip_curl = grip_curl
+	skeleton_node.add_child(hand_fallback_modifier)
 
 	# TODO add pose override modifier
 
