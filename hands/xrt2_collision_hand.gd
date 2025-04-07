@@ -100,8 +100,8 @@ const ORIENT_DISPLACEMENT := 0.05
 ## Fallback settings used if hand tracking isn't available.
 @export_subgroup("Fallback", "fallback")
 
-## The fallback pose action to use.
-@export var fallback_pose_action : String = "palm_pose"
+## The fallback pose actions to use, in order of checking.
+@export var fallback_pose_actions : Array[String] = [ "palm_pose", "grip" ]
 
 ## The fallback offset position to apply.
 @export var fallback_offset_position : Vector3
@@ -109,6 +109,18 @@ const ORIENT_DISPLACEMENT := 0.05
 ## The fallback offset rotation to apply.
 @export_custom(PROPERTY_HINT_RANGE, "-360,360,0.1,or_less,or_greater,radians_as_degrees") \
 	var fallback_offset_rotation : Vector3
+
+## Trigger action for our fallback
+@export var trigger_action : String = "trigger"
+
+## Degrees to which to curl our index finger.
+@export_range(0.0, 90.0, 1.0, "radians_as_degrees") var trigger_curl : float = deg_to_rad(45.0)
+
+## Grip action for our fallback
+@export var grip_action : String = "grip"
+
+## Degrees to which to curl our bottom 3 fingers.
+@export_range(0.0, 90.0, 1.0, "radians_as_degrees") var grip_curl : float = deg_to_rad(70.0)
 
 ## Properties related to physics
 @export_group("Physics")
@@ -260,6 +272,13 @@ func get_collision_parent() -> CollisionObject3D:
 
 
 #region Public Action API
+## Returns true if hand tracking API is used
+func get_is_hand_tracking() -> bool:
+	if _hand_tracker and _hand_tracker.has_tracking_data:
+		return true
+
+	return false
+
 ## Returns the pose object that handles our tracking.
 func get_pose() -> XRPose:
 	if _hand_tracker:
@@ -268,9 +287,10 @@ func get_pose() -> XRPose:
 			return pose
 
 	if _controller_tracker:
-		var pose : XRPose = _controller_tracker.get_pose(fallback_pose_action)
-		if pose:
-			return pose
+		for fallback_pose_action in fallback_pose_actions:
+			var pose : XRPose = _controller_tracker.get_pose(fallback_pose_action)
+			if pose:
+				return pose
 
 	return null
 
@@ -282,6 +302,26 @@ func get_has_tracking_data() -> bool:
 		return pose.has_tracking_data
 
 	return false
+
+
+## Get the transform for the given pose action of the normal tracker
+func get_pose_transform(pose_action : String) -> Transform3D:
+	if _controller_tracker and _hand_tracker:
+		var controller_pose : XRPose = _controller_tracker.get_pose(pose_action)
+		if controller_pose:
+			var hand_pose : XRPose = get_pose()
+			if hand_pose:
+				# Use our hand controller pose
+				var hand_transform : Transform3D = hand_pose.get_adjusted_transform()
+				if !get_is_hand_tracking():
+					var offset : Transform3D
+					offset.basis = Basis.from_euler(fallback_offset_rotation)
+					offset.origin = fallback_offset_position
+					hand_transform = hand_transform * offset
+
+				return hand_transform.inverse() * controller_pose.get_adjusted_transform()
+
+	return Transform3D()
 
 
 ## Returns value for an associated action
@@ -343,25 +383,6 @@ func get_concatenated_bone_names() -> String:
 		return ""
 
 	return skeleton.get_concatenated_bone_names()
-
-## Get the transform for the given pose action of the normal tracker
-func get_pose_transform(pose_action : String) -> Transform3D:
-	if _controller_tracker and _hand_tracker:
-		var hand_pose : XRPose = _hand_tracker.get_pose("default")
-		var controller_pose : XRPose = _controller_tracker.get_pose(pose_action)
-		if controller_pose:
-			if hand_pose:
-				# Use our hand controller pose
-
-				# Don't need to do this on our adjusted transforms, just cancels eachother out
-				return hand_pose.get_transform().inverse() * controller_pose.get_transform()
-			elif fallback_pose_action != pose_action:
-				# Use our fallback pose?
-				var fallback_pose : XRPose = _controller_tracker.get_pose(fallback_pose_action)
-				if fallback_pose:
-					return fallback_pose.get_transform().inverse() * controller_pose.get_transform()
-
-	return Transform3D()
 
 ## Get the transform of the given bone local to our collision hand
 func get_bone_transform(bone_name : String) -> Transform3D:
@@ -533,12 +554,14 @@ func _physics_process(delta):
 
 		# Check our controller tracker.
 		if not found_tracking_data and _controller_tracker:
-			var pose : XRPose = _controller_tracker.get_pose(fallback_pose_action)
-			if pose and pose.has_tracking_data:
-				target.basis = Basis.from_euler(fallback_offset_rotation)
-				target.origin = fallback_offset_position
-				target = pose.get_adjusted_transform() * target
-				found_tracking_data = true
+			for fallback_pose_action in fallback_pose_actions:
+				var pose : XRPose = _controller_tracker.get_pose(fallback_pose_action)
+				if pose and pose.has_tracking_data:
+					target.basis = Basis.from_euler(fallback_offset_rotation)
+					target.origin = fallback_offset_position
+					target = pose.get_adjusted_transform() * target
+					found_tracking_data = true
+					break
 
 		# Ignore when controller is not tracking.
 		if not found_tracking_data:
@@ -727,12 +750,19 @@ func _add_hand_modifiers(p_hand_mesh : Node3D) -> void:
 		push_error("Couldn't locate skeleton node for " + name)
 		return
 
+	# Add hand tracking modifier
 	var hand_tracking_modifier : XRHandModifier3D = XRHandModifier3D.new()
 	hand_tracking_modifier.hand_tracker = "/user/hand_tracker/left" if hand == 0 \
 		else "/user/hand_tracker/right"
 	skeleton_node.add_child(hand_tracking_modifier)
 
-	# TODO add fallback modifier
+	# Add fallback modifier
+	var hand_fallback_modifier : XRT2HandFallbackModifier3D= XRT2HandFallbackModifier3D.new()
+	hand_fallback_modifier.trigger_action = trigger_action
+	hand_fallback_modifier.trigger_curl = trigger_curl
+	hand_fallback_modifier.grip_action = grip_action
+	hand_fallback_modifier.grip_curl = grip_curl
+	skeleton_node.add_child(hand_fallback_modifier)
 
 	# TODO add pose override modifier
 
