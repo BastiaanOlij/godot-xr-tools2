@@ -56,7 +56,7 @@ var _is_loading : bool = false
 var _must_prompt_for_continue = true
 
 # Node helpers
-@onready var _fade : Node3D = $Fade
+@onready var _fade : XRT2EffectFade = $Fade
 @onready var _xr_origin : XROrigin3D = $Player/XROrigin3D
 @onready var _xr_camera : XRCamera3D = $Player/XROrigin3D/XRCamera3D
 @onready var _loading_screen : Node3D = $LoadingScreen
@@ -122,7 +122,7 @@ func load_scene(p_scene_path : String, user_data = null) -> void:
 		# Fade to black
 		if _tween:
 			_tween.kill()
-		_tween = get_tree().create_tween()
+		_tween = create_tween()
 		_tween.tween_method(_set_fade, 0.0, 1.0, 1.0)
 		await _tween.finished
 
@@ -157,7 +157,7 @@ func load_scene(p_scene_path : String, user_data = null) -> void:
 		# Fade to visible
 		if _tween:
 			_tween.kill()
-		_tween = get_tree().create_tween()
+		_tween = create_tween()
 		_tween.tween_method(_set_fade, 1.0, 0.0, 1.0)
 		await _tween.finished
 
@@ -198,7 +198,7 @@ func load_scene(p_scene_path : String, user_data = null) -> void:
 		# Fade to black
 		if _tween:
 			_tween.kill()
-		_tween = get_tree().create_tween()
+		_tween = create_tween()
 		_tween.tween_method(_set_fade, 0.0, 1.0, 1.0)
 		await _tween.finished
 
@@ -225,7 +225,7 @@ func load_scene(p_scene_path : String, user_data = null) -> void:
 	# Fade to visible
 	if _tween:
 		_tween.kill()
-	_tween = get_tree().create_tween()
+	_tween = create_tween()
 	_tween.tween_method(_set_fade, 1.0, 0.0, 1.0)
 	await _tween.finished
 
