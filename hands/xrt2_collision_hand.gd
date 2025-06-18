@@ -665,6 +665,13 @@ func _process(_delta):
 				if (_ghost_mesh.global_basis * _hand_mesh.global_basis.inverse()) \
 					.get_rotation_quaternion().get_angle() > deg_to_rad(15.0):
 					_ghost_mesh.visible = true
+
+	# Adjust for world scale
+	var world_scale = XRServer.world_scale
+	if _ghost_mesh.visible:
+		_ghost_mesh.scale = Vector3(world_scale, world_scale, world_scale)
+	if _hand_mesh.visible:
+		_hand_mesh.scale = Vector3(world_scale, world_scale, world_scale)
 #endregion
 
 
