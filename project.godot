@@ -11,10 +11,10 @@ config_version=5
 [application]
 
 config/name="Godot XR Tools 2 demo"
-run/main_scene="res://construct.tscn"
-config/features=PackedStringArray("4.4", "Mobile")
+run/main_scene="uid://cj2av4gb40wn4"
+config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
-run/main_scene.android="res://main.tscn"
+run/main_scene.pc="uid://dyclknruy8aqf"
 
 [input]
 
@@ -54,6 +54,7 @@ trigger_click={
 
 renderer/rendering_method="mobile"
 textures/vram_compression/import_etc2_astc=true
+lights_and_shadows/directional_shadow/size=8192
 lights_and_shadows/directional_shadow/size.mobile=4096
 lights_and_shadows/directional_shadow/16_bits=false
 environment/defaults/default_clear_color=Color(0, 0, 0, 1)
