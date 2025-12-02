@@ -1,0 +1,29 @@
+[gd_scene load_steps=2 format=3 uid="uid://bpw8fh2d8fo4m"]
+
+[ext_resource type="PackedScene" uid="uid://d0px0pvdr03o" path="res://components/wall.tscn" id="1_x586f"]
+
+[node name="Stairs" type="Node3D"]
+
+[node name="Step01" parent="." instance=ExtResource("1_x586f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 0)
+size = Vector3(0.75, 0.25, 1.5)
+color = Color(0.91680205, 0.57671726, 0.3172128, 1)
+
+[node name="Step02" parent="." instance=ExtResource("1_x586f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0, 0)
+size = Vector3(0.75, 0.5, 1.5)
+color = Color(0.91680205, 0.57671726, 0.3172128, 1)
+
+[node name="Step03" parent="." instance=ExtResource("1_x586f")]
+size = Vector3(0.75, 0.75, 1.5)
+color = Color(0.91680205, 0.57671726, 0.3172128, 1)
+
+[node name="Step04" parent="." instance=ExtResource("1_x586f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 0, 0)
+size = Vector3(0.75, 1, 1.5)
+color = Color(0.91680205, 0.57671726, 0.3172128, 1)
+
+[node name="Step05" parent="." instance=ExtResource("1_x586f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 0)
+size = Vector3(0.75, 1.25, 1.5)
+color = Color(0.91680205, 0.57671726, 0.3172128, 1)

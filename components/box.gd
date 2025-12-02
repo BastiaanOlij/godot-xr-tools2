@@ -7,6 +7,12 @@ extends RigidBody3D
 		if is_inside_tree():
 			_update_size()
 
+@export var color : Color = Color("e800ed"):
+	set(value):
+		color = value
+		if is_inside_tree():
+			_update_color()
+
 func _update_size():
 	$CollisionShape3D.shape.size = size
 	$MeshInstance3D.mesh.size = size
@@ -14,8 +20,17 @@ func _update_size():
 	$RightGrabPoint.position.x = size.x * 0.5 + 0.025
 	$LeftGrabPoint.position.x = -(size.x * 0.5 + 0.025)
 
+
+func _update_color():
+	var material : ShaderMaterial = $MeshInstance3D.material_override
+	if material:
+		material.set_shader_parameter("albedo", color)
+
+
 func _ready():
 	_update_size()
+	_update_color()
 
-func _process(delta):
+
+func _process(_delta):
 	$Label3D.text = "%0.1f Kg" % [ mass ]

@@ -11,9 +11,10 @@ margin = 0.01
 size = Vector3(0.1, 0.1, 0.1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_xcktd"]
+resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("1_k2m5r")
-shader_parameter/albedo = Color(0.911659, 0.00077837, 0.92895, 1)
+shader_parameter/albedo = Color(0.9098039, 0, 0.92941177, 1)
 shader_parameter/texture_albedo = ExtResource("2_cqel8")
 shader_parameter/roughness = 1.0
 shader_parameter/specular = 0.5
@@ -30,7 +31,6 @@ script = ExtResource("1_ve6ct")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_hxxno")
-debug_color = Color(0, 0.6, 0.7, 0.42)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 material_override = SubResource("ShaderMaterial_xcktd")
