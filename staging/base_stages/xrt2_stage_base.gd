@@ -142,7 +142,9 @@ func _find_xr_origin(node : Node3D) -> XROrigin3D:
 			# Found it!
 			return child
 		elif child is Node3D:
-			return _find_xr_origin(child)
+			var origin_node = _find_xr_origin(child)
+			if origin_node:
+				return origin_node
 
 	# Could not find it
 	return null

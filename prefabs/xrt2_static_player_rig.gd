@@ -1,5 +1,6 @@
+#-------------------------------------------------------------------------------
 # xrt2_static_player_rig.gd
-#
+#-------------------------------------------------------------------------------
 # MIT License
 #
 # Copyright (c) 2024-present Bastiaan Olij, Malcolm A Nixon and contributors
@@ -21,6 +22,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#-------------------------------------------------------------------------------
 
 extends XROrigin3D
 class_name XRT2StaticPlayerRig
@@ -29,7 +31,8 @@ class_name XRT2StaticPlayerRig
 ## or flight simulation.
 ## It is designed on the assumption this node is placed where the players
 ## head should be by default.
-
+##
+## Note: this will probably be redone at some point in time.
 
 ## Maximum distance the players head can be from the origin point before we fade to black.
 @export var max_head_distance : float = 0.5
