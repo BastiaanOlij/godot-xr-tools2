@@ -507,11 +507,6 @@ func _ready():
 		add_collision_exception_with(_parent_body)
 		_parent_body.add_collision_exception_with(self)
 
-	var dynamic_rig : XRT2DynamicPlayerRig = XRT2DynamicPlayerRig.get_xr_dynamic_player_rig(self)
-	if dynamic_rig:
-		# Connect to any signals we need
-		dynamic_rig.player_moved.connect(_on_player_moved)
-
 	# If we have a pickup function, get it
 	_pickup = XRT2Pickup.get_pickup(self)
 
@@ -913,6 +908,7 @@ func _on_skeleton_updated() -> void:
 	skeleton_updated.emit()
 
 
+# TODO: Hook this up, this is now part of our locomotion system.
 func _on_player_moved(from_transform : Transform3D, to_transform : Transform3D, is_teleport : bool):
 	if is_teleport:
 		# TODO this needs to be implemented

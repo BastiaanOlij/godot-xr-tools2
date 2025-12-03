@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://xrt20000008"]
 
-[ext_resource type="Script" uid="uid://xrt2vsjqr85" path="res://addons/godot-xr-tools2/player_rigs/xrt2_static_player_rig.gd" id="1_v7cup"]
+[ext_resource type="Script" uid="uid://xrt2vsjqr85" path="res://addons/godot-xr-tools2/prefabs/xrt2_static_player_rig.gd" id="1_v7cup"]
 [ext_resource type="Script" uid="uid://xrt2nm5hk3x" path="res://addons/godot-xr-tools2/effects/fade/xrt2_fade.gd" id="2_h58fk"]
 
 [node name="Xrt2StaticPlayerRig" type="XROrigin3D"]

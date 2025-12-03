@@ -28,37 +28,48 @@
 class_name XRT2MovementProvider
 extends Node3D
 
+## XRT2MovementProvider is a base class for nodes that provide movement
+## functionality.
+##
+## These nodes are designed to work together with a XRT2LocomotionHandler node.
+
+#region Export variables
 ## If ticked, this movement function is enabled
 @export var enabled : bool = true
+#endregion
 
-@onready var _xr_dynamic_rig : XRT2DynamicPlayerRig = \
-	XRT2DynamicPlayerRig.get_xr_dynamic_player_rig(self)
-
-
+#region Private functions
 # Verifies if we have a valid configuration.
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
 
-	var dynamic_rig = XRT2DynamicPlayerRig.get_xr_dynamic_player_rig(self)
-	if not dynamic_rig:
-		warnings.push_back("This node requires an XRT2DynamicPlayerRig as an anchestor.")
+	var character_body : CharacterBody3D
+	var locomotion_handler : XRT2LocomotionHandler
+	var parent = get_parent()
+	while parent and not character_body:
+		if parent is CharacterBody3D:
+			character_body = parent
+			for child in parent.get_children():
+				if child is XRT2LocomotionHandler:
+					locomotion_handler = child
+		else:
+			parent = parent.get_parent()
+
+	if not character_body:
+		warnings.append("This node must have an CharacterBody3D ancestor")
+	elif not locomotion_handler:
+		warnings.append("Our ancestor CharacterBody3D node must have a XRT2LocomotionHandler node")
 
 	# Return warnings
 	return warnings
 
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	if Engine.is_editor_hint():
-		return
+## Called by our locomotion handler.
+func _process_locomotion(locomotion_handler : XRT2LocomotionHandler, character_body : CharacterBody3D, delta : float) -> void:
+	# TODO: mark as virtual once supported in Godot (4.6 I think)
 
-	if _xr_dynamic_rig:
-		_xr_dynamic_rig.register_movement_provider(self)
-
-
-## Called by player characters physics process.
-func handle_movement(_character_body : CharacterBody3D, _delta : float):
 	# Implement on extended class.
-	# Note: player character will perform move_and_slide and handle gravity,
+	# Note: locomotion handler will perform move_and_slide and handle gravity,
 	# you should implement code that further adjust velocity for this movement.
 	pass
+#endregion

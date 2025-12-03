@@ -77,6 +77,7 @@ func _process(_delta):
 	if Engine.is_editor_hint():
 		return
 
+	# Adjust our viewport
 	if _viewport_texture and _display:
 		var size = _viewport_texture.get_size()
 
@@ -88,3 +89,11 @@ func _process(_delta):
 			width = 0.38
 			height = width * size.y / size.x
 		_display.scale = Vector3(width, height, 1.0)
+
+	# Look towards our player
+	var head_tracker : XRPositionalTracker = XRServer.get_tracker("head")
+	if head_tracker:
+		var pose = head_tracker.get_pose("default")
+		if pose and pose.has_tracking_data:
+			var camera_pos = pose.get_adjusted_transform().origin
+			look_at(XRServer.world_origin * camera_pos)
