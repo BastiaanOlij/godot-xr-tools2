@@ -88,6 +88,8 @@ func _validate_property(property: Dictionary):
 
 # Node was added to our scene tree
 func _enter_tree():
+	super._enter_tree()
+
 	_xr_collision_hand = XRT2CollisionHand.get_xr_collision_hand(self)
 	if not _xr_collision_hand:
 		_xr_controller = XRT2Helper.get_xr_controller(self)
@@ -95,14 +97,16 @@ func _enter_tree():
 
 # Node was removed from our scene tree
 func _exit_tree():
+	super._exit_tree()
+
 	_xr_collision_hand = null
 	_xr_controller = null
 
 
 ## Called by our locomotion handler.
-func _process_locomotion(locomotion_handler : XRT2LocomotionHandler, character_body : CharacterBody3D, delta : float) -> void:
-	# If not enabled, ignore it (shouldn't be called)
-	if !enabled:
+func _process_locomotion(delta : float) -> void:
+	# If not enabled, ignore it.
+	if not enabled or not _character_body or not _locomotion_handler:
 		return
 
 	var movement_input : Vector2 = Vector2()
@@ -140,8 +144,8 @@ func _process_locomotion(locomotion_handler : XRT2LocomotionHandler, character_b
 	if movement_input.x != 0.0 and rotation_speed > 0.0:
 		_accumulated_rotation += -movement_input.x * delta * rotation_speed
 		if abs(_accumulated_rotation) > rotation_step_angle:
-			var player_basis : Basis = character_body.global_basis
-			character_body.global_basis = player_basis.rotated( \
+			var player_basis : Basis = _character_body.global_basis
+			_character_body.global_basis = player_basis.rotated( \
 				player_basis.y, \
 				_accumulated_rotation)
 
@@ -151,18 +155,20 @@ func _process_locomotion(locomotion_handler : XRT2LocomotionHandler, character_b
 		_accumulated_rotation = 0.0
 
 	# Handle movement
-	if locomotion_handler.is_on_floor() and (strafe_movement_speed > 0.0 or forward_movement_speed > 0.0):
+	if _locomotion_handler.is_on_floor() and (strafe_movement_speed > 0.0 or forward_movement_speed > 0.0):
 		# This updates the velocity of our player according to our input
 		# the actual movement is applied in XRT2LocomotionHandler
 
-		var local_velocity : Vector3 = character_body.global_basis.inverse() * character_body.velocity
+		# Make sure we apply our velocity in the local orientation of our character body.
+		var local_velocity : Vector3 = _character_body.global_basis.inverse() * _character_body.velocity
 
-		# Now handle forward/backwards/left/right movement.
+		# Handle forward/backwards/left/right movement.
 		var direction = Vector3(movement_input.x * strafe_movement_speed, 0.0, \
 				-movement_input.y * forward_movement_speed)
 
 		local_velocity.x = move_toward(local_velocity.x, direction.x, delta * movement_acceleration)
 		local_velocity.z = move_toward(local_velocity.z, direction.z, delta * movement_acceleration)
 
-		character_body.velocity = character_body.global_basis * local_velocity
+		# Now apply velocity in global orientation.
+		_character_body.velocity = _character_body.global_basis * local_velocity
 #endregion

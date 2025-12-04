@@ -38,22 +38,28 @@ extends Node3D
 @export var enabled : bool = true
 #endregion
 
+#region Private variables
+var _character_body : CharacterBody3D
+var _locomotion_handler : XRT2LocomotionHandler
+#endregion
+
 #region Private functions
+# Find the locomotion handler related to this character body
+func _get_locomotion_handler(character_body : CharacterBody3D) -> XRT2LocomotionHandler:
+	if character_body:
+		for child in character_body.get_children():
+			if child is XRT2LocomotionHandler:
+				return child
+
+	return null
+
+
 # Verifies if we have a valid configuration.
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
 
-	var character_body : CharacterBody3D
-	var locomotion_handler : XRT2LocomotionHandler
-	var parent = get_parent()
-	while parent and not character_body:
-		if parent is CharacterBody3D:
-			character_body = parent
-			for child in parent.get_children():
-				if child is XRT2LocomotionHandler:
-					locomotion_handler = child
-		else:
-			parent = parent.get_parent()
+	var character_body : CharacterBody3D = XRT2Helper.get_character_body(self)
+	var locomotion_handler : XRT2LocomotionHandler = _get_locomotion_handler(character_body)
 
 	if not character_body:
 		warnings.append("This node must have an CharacterBody3D ancestor")
@@ -64,8 +70,20 @@ func _get_configuration_warnings() -> PackedStringArray:
 	return warnings
 
 
+# Node was added to our scene tree
+func _enter_tree():
+	_character_body = XRT2Helper.get_character_body(self)
+	_locomotion_handler = _get_locomotion_handler(_character_body)
+
+
+# Node was removed from our scene tree
+func _exit_tree():
+	_character_body = null
+	_locomotion_handler = null
+
+
 ## Called by our locomotion handler.
-func _process_locomotion(locomotion_handler : XRT2LocomotionHandler, character_body : CharacterBody3D, delta : float) -> void:
+func _process_locomotion(delta : float) -> void:
 	# TODO: mark as virtual once supported in Godot (4.6 I think)
 
 	# Implement on extended class.
