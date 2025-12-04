@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3 uid="uid://c4tgb1fvpccgb"]
+
+[ext_resource type="PackedScene" uid="uid://d0px0pvdr03o" path="res://components/static_box.tscn" id="1_smwq7"]
+
+[node name="Ramps" type="Node3D"]
+
+[node name="Platform" parent="." instance=ExtResource("1_smwq7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.854)
+size = Vector3(3.1, 1, 1)
+
+[node name="Ramp10" parent="." instance=ExtResource("1_smwq7")]
+transform = Transform3D(1, 0, 0, 0, 0.98480767, -0.17364818, 0, 0.17364818, 0.98480767, 1.125, -0.013, 2.514)
+size = Vector3(0.75, 0.5, 6)
+
+[node name="Ramp20" parent="." instance=ExtResource("1_smwq7")]
+transform = Transform3D(1, 0, 0, 0, 0.93969256, -0.3420201, 0, 0.3420201, 0.93969256, 0.375, -0.325, 1.83)
+size = Vector3(0.75, 0.5, 5)
+
+[node name="Ramp40" parent="." instance=ExtResource("1_smwq7")]
+transform = Transform3D(1, 0, 0, 0, 0.7660443, -0.6427875, 0, 0.6427875, 0.7660443, -0.375, -0.025, 0.09)
+size = Vector3(0.75, 0.5, 2)
+
+[node name="Ramp60" parent="." instance=ExtResource("1_smwq7")]
+transform = Transform3D(1, 0, 0, 0, 0.4999999, -0.8660253, 0, 0.8660253, 0.4999999, -1.125, 0.09449102, -0.41357583)
+size = Vector3(0.75, 0.5, 1.5)

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bpw8fh2d8fo4m"]
 
-[ext_resource type="PackedScene" uid="uid://d0px0pvdr03o" path="res://components/wall.tscn" id="1_x586f"]
+[ext_resource type="PackedScene" uid="uid://d0px0pvdr03o" path="res://components/static_box.tscn" id="1_x586f"]
 
 [node name="Stairs" type="Node3D"]
 

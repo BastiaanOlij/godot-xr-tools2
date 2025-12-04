@@ -1,10 +1,10 @@
-[gd_scene load_steps=18 format=3 uid="uid://7lt82mv6lmxo"]
+[gd_scene load_steps=17 format=3 uid="uid://7lt82mv6lmxo"]
 
 [ext_resource type="PackedScene" uid="uid://xrt20000007" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.tscn" id="1_spd8v"]
 [ext_resource type="PackedScene" uid="uid://dm2d7si17m8vd" path="res://stages/main_stage/world.tscn" id="2_m5inh"]
 [ext_resource type="PackedScene" uid="uid://xrt2qimm3dy" path="res://addons/godot-xr-tools2/prefabs/xrt2_character_body_3d.tscn" id="3_3ltgk"]
 [ext_resource type="Shader" uid="uid://xrt2oqik7ik" path="res://addons/godot-xr-tools2/shaders/shaded_no_alpha.gdshader" id="3_6d2rb"]
-[ext_resource type="Script" uid="uid://xrt2ebknph2" path="res://addons/godot-xr-tools2/player/movement_functions/xrt2_direct_movement.gd" id="3_7f0s7"]
+[ext_resource type="Script" uid="uid://xrt2ebknph2" path="res://addons/godot-xr-tools2/player/movement_providers/xrt2_direct_movement.gd" id="3_7f0s7"]
 [ext_resource type="Script" uid="uid://xrt23qrb4js" path="res://addons/godot-xr-tools2/player/interaction_functions/xrt2_pickup.gd" id="4_l0n08"]
 [ext_resource type="Script" uid="uid://xrt2eecske1" path="res://addons/godot-xr-tools2/hands/xrt2_hand_attachment.gd" id="5_4i4c4"]
 [ext_resource type="Script" uid="uid://xrt2ebmt58c" path="res://addons/godot-xr-tools2/hands/xrt2_collision_hand.gd" id="5_don5u"]
@@ -19,9 +19,6 @@ sky_material = SubResource("ProceduralSkyMaterial_ie47k")
 background_mode = 2
 sky = SubResource("Sky_yknig")
 tonemap_mode = 2
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0jk8f"]
-radius = 0.3
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_3ltgk"]
 render_priority = 0
@@ -58,10 +55,6 @@ directional_shadow_max_distance = 30.0
 [node name="World" parent="." index="2" instance=ExtResource("2_m5inh")]
 
 [node name="XRT2CharacterBody3D" parent="." index="3" instance=ExtResource("3_3ltgk")]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="XRT2CharacterBody3D" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-shape = SubResource("CapsuleShape3D_0jk8f")
 
 [node name="Head" type="MeshInstance3D" parent="XRT2CharacterBody3D/XROrigin3D/XRCamera3D" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, 0.1)

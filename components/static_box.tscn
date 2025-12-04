@@ -1,12 +1,11 @@
 [gd_scene load_steps=7 format=3 uid="uid://d0px0pvdr03o"]
 
 [ext_resource type="Shader" uid="uid://hy6wp5qwpmjk" path="res://materials_and_shaders/textured.gdshader" id="1_18xfb"]
-[ext_resource type="Script" uid="uid://dqm1umx8ljn6g" path="res://components/wall.gd" id="1_xpnm6"]
+[ext_resource type="Script" uid="uid://dqm1umx8ljn6g" path="res://components/static_box.gd" id="1_xpnm6"]
 [ext_resource type="Texture2D" uid="uid://ds8hppgpq3pod" path="res://assets/main/pattern.png" id="2_gpj1g"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_raqf1"]
 resource_local_to_scene = true
-size = Vector3(0.1, 2, 2)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lb2t1"]
 resource_local_to_scene = true
@@ -22,16 +21,15 @@ shader_parameter/uv1_offset = Vector3(0, 0, 0)
 
 [sub_resource type="BoxMesh" id="BoxMesh_3hrng"]
 resource_local_to_scene = true
-size = Vector3(0.1, 2, 2)
 
-[node name="Wall" type="StaticBody3D"]
+[node name="StaticBox" type="StaticBody3D"]
 script = ExtResource("1_xpnm6")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 shape = SubResource("BoxShape3D_raqf1")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 material_override = SubResource("ShaderMaterial_lb2t1")
 mesh = SubResource("BoxMesh_3hrng")
