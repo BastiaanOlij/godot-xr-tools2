@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="XRT2LinearPIDController" load_steps=2 format=3 uid="uid://xrt2dxswf26"]
+
+[ext_resource type="Script" uid="uid://xrt25cxqvsg" path="res://addons/godot-xr-tools2/misc/xrt2_linear_pid_controller.gd" id="1_xjn2i"]
+
+[resource]
+script = ExtResource("1_xjn2i")
+proportional_gain = 75.0
+integral_gain = 10.0
+integral_saturation = 100.0
+derivative_gain = 18.0
+metadata/_custom_type_script = "uid://xrt25cxqvsg"
