@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://djjdpt6vpdljg"]
 
 [ext_resource type="Shader" uid="uid://hy6wp5qwpmjk" path="res://materials_and_shaders/textured.gdshader" id="1_k2m5r"]
-[ext_resource type="Script" uid="uid://ba6wewfa3a1cg" path="res://components/box.gd" id="1_ve6ct"]
+[ext_resource type="Script" uid="uid://ba6wewfa3a1cg" path="res://components/rigid_box.gd" id="1_ve6ct"]
 [ext_resource type="Texture2D" uid="uid://ds8hppgpq3pod" path="res://assets/main/pattern.png" id="2_cqel8"]
 [ext_resource type="Script" uid="uid://xrt2jog5h0j" path="res://addons/godot-xr-tools2/components/xrt2_grab_point.gd" id="3_h7r30"]
 

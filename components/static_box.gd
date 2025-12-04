@@ -1,7 +1,7 @@
 @tool
 extends StaticBody3D
 
-@export var size : Vector3 = Vector3(0.1, 2.0, 2.0):
+@export var size : Vector3 = Vector3(1.0, 1.0, 1.0):
 	set(value):
 		size = value
 		if is_inside_tree():
