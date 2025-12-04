@@ -29,6 +29,7 @@
 class_name XRT2Helper
 extends Node
 
+## Find the ancestor XRController3D node for a given node.
 static func get_xr_controller(p_node : Node3D) -> XRController3D:
 	var parent = p_node.get_parent()
 	while parent:
@@ -41,6 +42,7 @@ static func get_xr_controller(p_node : Node3D) -> XRController3D:
 	return null
 
 
+## Find the ancestor XRNode3D node for a given node.
 static func get_xr_node(p_node : Node3D) -> XRNode3D:
 	var parent = p_node.get_parent()
 	while parent:
@@ -53,10 +55,24 @@ static func get_xr_node(p_node : Node3D) -> XRNode3D:
 	return null
 
 
+## Find the ancestor XROrigin3D node for a given node.
 static func get_xr_origin(p_node : Node3D) -> XROrigin3D:
 	var parent = p_node.get_parent()
 	while parent:
 		if parent is XROrigin3D:
+			return parent
+
+		parent = parent.get_parent()
+
+	# Not found
+	return null
+
+
+## Find the ancestor CharacterBody3D node for a given node.
+static func get_character_body(p_node : Node3D) -> CharacterBody3D:
+	var parent = p_node.get_parent()
+	while parent:
+		if parent is CharacterBody3D:
 			return parent
 
 		parent = parent.get_parent()
