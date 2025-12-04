@@ -129,7 +129,7 @@ func _physics_process(delta) -> void:
 		return
 
 	# Request locomotion input
-	_character_body.propagate_call(&"_process_locomotion", [self, _character_body, delta])
+	_character_body.propagate_call(&"_process_locomotion", [delta])
 
 	# Apply environmental gravity
 	var gravity_state := PhysicsServer3D.body_get_direct_state(_character_body.get_rid())
