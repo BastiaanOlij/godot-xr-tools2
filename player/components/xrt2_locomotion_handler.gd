@@ -24,6 +24,7 @@
 # SOFTWARE.
 #-------------------------------------------------------------------------------
 
+@tool
 class_name XRT2LocomotionHandler
 extends Node3D
 
@@ -44,22 +45,78 @@ extends Node3D
 
 ## If push_rigid_bodies is enabled, provides a strength factor for the impulse
 @export var collision_push_strength_factor : float = 1.0
+
+@export_group("Physics")
+
+## Effects how quickly we stop if we're on a floor and have no additional input
+@export_range(0.01, 0.90, 0.01) var drag_factor = 0.1
 #endregion
 
 #region Private variables
 # Character body node
 var _character_body : CharacterBody3D
+
+# Callbacks for on floor checks
+var _on_floor_callbacks : Array[Callable]
+
+# Callbacks for getting floor friction
+var _floor_friction_callbacks : Array[Callable]
 #endregion
 
 #region Public functions
+## Register an on floor callback
+func register_on_floor_callback(callback : Callable):
+	if not _on_floor_callbacks.has(callback):
+		_on_floor_callbacks.push_back(callback)
+
+
+## Unregister an on floor callback
+func unregister_on_floor_callback(callback : Callable):
+	if _on_floor_callbacks.has(callback):
+		_on_floor_callbacks.erase(callback)
+
+
+## Register an floor friction callback
+func register_floor_friction_callback(callback : Callable):
+	if not _floor_friction_callbacks.has(callback):
+		_floor_friction_callbacks.push_back(callback)
+
+
+## Unregister an floor friction callback
+func unregister_floor_friction_callback(callback : Callable):
+	if _floor_friction_callbacks.has(callback):
+		_floor_friction_callbacks.erase(callback)
+
+
 ## Returns whether our character is on the floor.
 ## We may not be able to rely on CharacterBody3D.is_on_floor.
 func is_on_floor() -> bool:
+	for callback in _on_floor_callbacks:
+		if callback.call():
+			return true
+
 	if not _character_body:
 		return false
 
-	# TODO: Once we implement raycast floor check we need to change this.
 	return _character_body.is_on_floor()
+
+
+## Returns our floor friction
+func get_floor_friction() -> float:
+	var has_floor_friction : bool = false
+	var total_floor_friction : float = 0.0
+
+	# It's likely we only have one callback but...
+	for callback in _floor_friction_callbacks:
+		has_floor_friction = true
+		total_floor_friction += callback.call()
+
+	if has_floor_friction:
+		print(total_floor_friction)
+		return total_floor_friction
+
+	# No callback, assume full friction
+	return 1.0
 #endregion
 
 #region Private functions
@@ -128,12 +185,22 @@ func _physics_process(delta) -> void:
 		set_process(false)
 		return
 
+	# Apply floor friction
+	var floor_friction : float = get_floor_friction()
+	if floor_friction > 0.0:
+		var local_velocity = _character_body.global_basis.inverse() * _character_body.velocity
+
+		# Apply drag (note 60.0 assume 60 fps reference value
+		var factor : float = 1.0 - clamp(floor_friction * 60.0 * delta * drag_factor, 0.0, 1.0)
+		local_velocity *= Vector3(factor, 1.0, factor)
+
+		_character_body.velocity = _character_body.global_basis * local_velocity
+
 	# Request locomotion input
 	_character_body.propagate_call(&"_process_locomotion", [delta])
 
 	# Apply environmental gravity
-	var gravity_state := PhysicsServer3D.body_get_direct_state(_character_body.get_rid())
-	_character_body.velocity += gravity_state.total_gravity * delta
+	_character_body.velocity += _character_body.get_gravity() * delta
 
 	_character_body.move_and_slide()
 

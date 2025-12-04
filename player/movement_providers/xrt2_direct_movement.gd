@@ -155,7 +155,7 @@ func _process_locomotion(delta : float) -> void:
 		_accumulated_rotation = 0.0
 
 	# Handle movement
-	if _locomotion_handler.is_on_floor() and (strafe_movement_speed > 0.0 or forward_movement_speed > 0.0):
+	if _locomotion_handler.is_on_floor() and (strafe_movement_speed > 0.0 or forward_movement_speed > 0.0) and movement_input != Vector2():
 		# This updates the velocity of our player according to our input
 		# the actual movement is applied in XRT2LocomotionHandler
 
