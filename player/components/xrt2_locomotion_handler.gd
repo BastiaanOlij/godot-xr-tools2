@@ -166,6 +166,8 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
 
+	process_physics_priority = -92
+
 	# Get the Character body
 	var parent = get_parent()
 	if parent and parent is CharacterBody3D:

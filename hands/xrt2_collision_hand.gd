@@ -129,6 +129,10 @@ const ORIENT_DISPLACEMENT := 0.05
 @export var mode : CollisionHandMode = CollisionHandMode.COLLIDE:
 	set(value):
 		mode = value
+
+		if _parent_body:
+			_was_parent_basis = _parent_body.global_basis
+
 		notify_property_list_changed()
 
 ## Distance to teleport hands
@@ -137,21 +141,21 @@ const ORIENT_DISPLACEMENT := 0.05
 ## Drop held object if teleport distance is reached?
 @export var drop_on_teleport : bool = true
 
-## Weight of our hand
-@export_range(0.1, 1.0, 0.01, "suffix:kg") var hand_mass : float = 0.4:
-	set(value):
-		hand_mass = value
-		if is_inside_tree():
-			mass = value
+@export_subgroup("Linear PD controller", "linear_")
 
-## Max linear force
-@export_range(1.0, 1000.0, 1.0, "suffix:N") var max_force : float = 500.0
+## Proportional gain for linear movement
+@export var linear_proportional_gain : float = 2500.0
 
-## Factor to apply to required force above maximum
-@export_range(0.0, 1.0, 0.01) var force_falloff_factor : float = 0.5
+## Derivative gain for linear movement.
+@export var linear_derivative_gain : float = 150.0
 
-## Angular torgue coef
-# @export_range(0.1, 100.0, 0.1) var torque_coef : float = 30.0
+@export_subgroup("Rotational PD controller", "rotational_")
+
+## Proportional gain for rotations.
+@export var rotational_proportional_gain : float = 80.0
+
+## Derivative gain for rotations.
+@export var rotational_derivative_gain : float = 1.0
 
 ## Properties related to physical appearance
 @export_group("Appearance")
@@ -223,6 +227,7 @@ var _ghost_skeleton : Skeleton3D
 var _controller_tracker : XRControllerTracker
 var _pickup : XRT2Pickup
 var _parent_body : CollisionObject3D
+var _was_parent_basis : Basis
 
 # Sorted stack of TargetOverride
 var _target_overrides : Array[TargetOverride]
@@ -448,26 +453,25 @@ func _update_hand_motion_range():
 # Validate our properties
 func _validate_property(property: Dictionary):
 	# Always hide these built in properties as we control them
-	if property.name in [ \
-		"process_physics_priority", \
-		"gravity_scale", \
-		"mass", \
-		"continuous_cd", \
-		"custom_integrator", \
-		"freeze", \
-		"linear_damp", \
-		"linear_damp_mode", \
-		"angular_damp", \
-		"angular_damp_mode" \
+	if property.name in [
+		"process_physics_priority",
+		"gravity_scale",
+		"continuous_cd",
+		"custom_integrator",
+		"freeze",
+		"center_of_mass_mode",
+		"center_of_mass",
+		"inertia"
 	]:
 		property.usage = PROPERTY_USAGE_NONE
 
 	if mode != CollisionHandMode.COLLIDE and property.name in [\
-		"teleport_distance", \
-		"drop_on_teleport", \
-		"hand_mass", \
-		"force_coef", \
-		"torque_coef", \
+		"teleport_distance",
+		"drop_on_teleport",
+		"linear_proportional_gain",
+		"linear_derivative_gain",
+		"rotational_proportional_gain",
+		"rotational_derivative_gain"
 	]:
 		property.usage = PROPERTY_USAGE_NONE
 
@@ -482,13 +486,12 @@ func _ready():
 	add_child(_palm_collision_shape, false, Node.INTERNAL_MODE_BACK)
 
 	# Hardcode these values
-	gravity_scale = 0.0
+	gravity_scale = 1.0
 	continuous_cd = true
-	linear_damp_mode = RigidBody3D.DAMP_MODE_REPLACE
-	linear_damp = 500.0
-	angular_damp_mode = RigidBody3D.DAMP_MODE_REPLACE
-	angular_damp = 500.0
-	mass = hand_mass
+	center_of_mass_mode = RigidBody3D.CENTER_OF_MASS_MODE_CUSTOM
+	center_of_mass = Vector3(0.0, 0.0, 0.0)
+	inertia = Vector3(0.01, 0.01, 0.01)
+	# inertia = Vector3(0.0, 0.0, 0.0)
 
 	# Init our hand meshes
 	_update_hand_meshes()
@@ -506,6 +509,9 @@ func _ready():
 		# Hands shouldn't collide with a parent collision object
 		add_collision_exception_with(_parent_body)
 		_parent_body.add_collision_exception_with(self)
+
+		# Store this just in case we need to calculate our parents rotational velocity.
+		_was_parent_basis = _parent_body.global_basis
 
 	# If we have a pickup function, get it
 	_pickup = XRT2Pickup.get_pickup(self)
@@ -588,62 +594,107 @@ func _physics_process(delta):
 		global_transform = target
 		return
 
+	# TODO: If we've grabbed a static body we should skip the logic below,
+	# we will apply push/pull forces to the player body in our pickup handlers.
+	# We should freeze our hands and just keep them where we grabbed the static body.
+
 	# We got this far, make sure we're unfrozen and let Godot position our hand.
+	# Note, if we've picked something up and apply forces to the picked up object,
+	# we want to keep our hands frozen.
 	if freeze:
 		freeze = false
 		linear_velocity = Vector3()
 		angular_velocity = Vector3()
 
-	# Implementation below inspired by Dedm0zaj's physics hand implementation.
-	# We're attempting to calculate actual force/torque needed however.
-
-	# TODO adjust this correctly if we are holding an object.
+	# TODO: One option we may try is to apply our forces to a held object
+	# and override the positioning of the hand instead of applying the forces to the hand.
+	# This also means offsetting target by our grab point.
+	var apply_forces_to : RigidBody3D = self
 
 	# Grab our rigid body state.
-	var state : PhysicsDirectBodyState3D = PhysicsServer3D.body_get_direct_state(get_rid())
+	# var state : PhysicsDirectBodyState3D = PhysicsServer3D.body_get_direct_state(apply_forces_to.get_rid())
 
-	# Apply force to move hand to tracked location:
-	# acceleration = (distance - current_velocity * t) / (0.5 * t²)
+	############################################################################
+	# Get information about our parent body velocities
+	var parent_linear_velocity : Vector3 = Vector3()
+	var parent_angular_velocity : Vector3 = Vector3()
+	if _parent_body:
+		if _parent_body is RigidBody3D:
+			parent_linear_velocity = _parent_body.linear_velocity
+			parent_angular_velocity = _parent_body.angular_velocity
+		elif _parent_body is CharacterBody3D:
+			parent_linear_velocity = _parent_body.velocity
 
-	var factor = 0.5 * delta * delta
-	var current_linear_velocity = linear_velocity  * clamp(1.0 - (linear_damp * delta), 0.0, 1.0)
+			# Calculate our parents angular velocity
+			var parent_delta_basis : Basis = _parent_body.global_basis * _was_parent_basis.inverse()
+			var parent_delta_quad : Quaternion = parent_delta_basis.get_rotation_quaternion()
+			var parent_delta_axis : Vector3 = parent_delta_quad.get_axis().normalized()
+			var parent_delta_angle : float = parent_delta_quad.get_angle() / delta
 
-	# Add our gravity.
-	if state:
-		current_linear_velocity += state.total_gravity * delta
+			parent_angular_velocity = parent_delta_axis * parent_delta_angle
 
-	# Calculate the required force based on our desired movement.
-	var linear_movement : Vector3 = target.origin - global_position
-	var needed_acceleration : Vector3 = (linear_movement - current_linear_velocity * delta) / factor
-	var linear_force : Vector3 = needed_acceleration * mass * 0.5 # No idea why * 0.5???
+	############################################################################
+	# Apply linear motion to hands.
+	var delta_movement = target.origin - apply_forces_to.global_position
+	var lin_velocity = -apply_forces_to.linear_velocity
+	if _parent_body:
+		# Add parent linear velocity
+		lin_velocity += parent_linear_velocity
 
-	# Limit our force.
-	var required_force = linear_force.length()
-	if required_force > max_force:
-		var overflow_force = required_force - max_force
-		linear_force *= (max_force + overflow_force * force_falloff_factor) / required_force
+		# And hand velocity resulting from rotation
+		var angle : float = parent_angular_velocity.length()
+		if angle > 0.0:
+			var q : Quaternion = Quaternion(parent_angular_velocity / angle, angle * delta)
+			var was_position = apply_forces_to.global_position - _parent_body.global_position
+			var new_position = q * was_position
+			lin_velocity += (new_position - was_position) / delta
 
-	# Apply force logic.
-	apply_central_force(linear_force)
+	if delta_movement.length() > 0.0 or lin_velocity.length() > 0.0:
+		# Calculate proportional term
+		var p : Vector3 = delta_movement * linear_proportional_gain
 
-	# Apply torque to rotate hand to tracked rotation:
-	# Torque = moment_of_inertia * angular_acceleration
+		# Calculate derivative term
+		var d : Vector3 = lin_velocity * linear_derivative_gain
 
-	# Get our moment of inertial from our rigidbody state.
-	var moment_of_inertia : Vector3 = Vector3()
-	if state:
-		if state.inverse_inertia != Vector3():
-			moment_of_inertia = Vector3(mass, mass, mass) / state.inverse_inertia
+		var force = p + d
 
-	# Apply our damp so we know our current velocity.
-	var current_angular_velocity : Vector3 = angular_velocity * clamp(1.0 - (angular_damp * delta), 0.0, 1.0)
+		# Apply mass!
+		force *= apply_forces_to.mass
 
-	# Calculate the needed torque.
-	var angular_movement : Vector3 = (target.basis * global_basis.inverse()).get_euler()
-	var needed_angular_acceleration : Vector3 = (angular_movement - current_angular_velocity * delta) / factor
-	var torque : Vector3 = moment_of_inertia * needed_angular_acceleration * 0.5 # Why 0.5?
+		# TODO: Restrict maximum force!
 
-	apply_torque(torque)
+		# Apply force logic.
+		apply_forces_to.apply_central_force(force)
+
+	############################################################################
+	# Apply angular motion to hands.
+	var delta_basis : Basis = target.basis * apply_forces_to.global_basis.inverse()
+	var delta_quad : Quaternion = delta_basis.get_rotation_quaternion()
+	var delta_axis : Vector3 = delta_quad.get_axis().normalized()
+	var delta_angle : float = delta_quad.get_angle()
+	var rot_velocity : Vector3 = -apply_forces_to.angular_velocity
+	if _parent_body:
+		# Localise and add our parents angular velocity
+		rot_velocity += apply_forces_to.global_basis.inverse() * _parent_body.global_basis * parent_angular_velocity
+	if delta_angle != 0.0 or apply_forces_to.angular_velocity.length() != 0.0:
+		# Calculate proportional term
+		var p : Vector3 = delta_axis * delta_angle * rotational_proportional_gain
+
+		# Calculate derivative term
+		var d : Vector3 = rot_velocity * rotational_derivative_gain
+
+		# Add together to get our input
+		var pd = p + d
+
+		# TODO: possibly apply inertia? Especially if we apply forces to held object
+
+		# TODO: restrict maximum torque
+
+		# Apply as our torque
+		apply_forces_to.apply_torque(pd)
+
+	# Remember this in case we need it
+	_was_parent_basis = _parent_body.global_basis
 
 
 func _process(_delta):

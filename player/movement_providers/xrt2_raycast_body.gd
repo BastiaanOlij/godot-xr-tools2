@@ -194,7 +194,6 @@ func _exit_tree():
 
 	super._exit_tree()
 
-
 ## Called by our locomotion handler.
 func _process_locomotion(delta : float) -> void:
 	# If not enabled, ignore it.
@@ -204,18 +203,21 @@ func _process_locomotion(delta : float) -> void:
 	var character_transform_inverse = _character_body.global_transform.inverse()
 
 	# First get our eye level.
-	var head_tracker : XRPositionalTracker = XRServer.get_tracker("head")
-	if not head_tracker:
-		# Don't update if we don't have a head tracker.
-		return
-	var head_pose : XRPose = head_tracker.get_pose("default")
-	if not head_pose or not head_pose.has_tracking_data:
-		# Don't update if there is no tracking data.
-		return
-	var head_position = XRServer.world_origin * head_pose.get_adjusted_transform().origin
-	var eye_level = (character_transform_inverse * head_position).y
+	var eye_level : float = _default_eye_level
+	if _collision_shape:
+		# Get our previous eye level just in case we lost tracking
+		eye_level = _collision_shape.position.y + torso_height * 0.5
 
-	# TODO: Need to react to eye_level being smaller than (torso_height + eye_level * 0.5)
+	var head_tracker : XRPositionalTracker = XRServer.get_tracker("head")
+	if head_tracker:
+		var head_pose : XRPose = head_tracker.get_pose("default")
+		if head_pose and head_pose.has_tracking_data:
+			var head_position = XRServer.world_origin * head_pose.get_adjusted_transform().origin
+			eye_level = (character_transform_inverse * head_position).y
+
+	# TODO: Need to react to eye_level being smaller than (torso_height + eye_level * 0.5),
+	# we should react by "laying down" but for now we just cap it
+	eye_level = max(eye_level, torso_height + eye_level * 0.5)
 
 	# Position our collision.
 	if _collision_shape:
@@ -264,7 +266,7 @@ func _process_locomotion(delta : float) -> void:
 
 			# Use a PID controller to control our height.
 			var pid_factor : float = pid_controller.calculate(delta, collision_height, 0.0)
-			_character_body.velocity -= _character_body.global_basis.y * pid_factor * delta
+			_character_body.velocity -= _character_body.global_basis.y * pid_factor
 
 		_floor_friction = 0.0
 		if _is_on_floor:
