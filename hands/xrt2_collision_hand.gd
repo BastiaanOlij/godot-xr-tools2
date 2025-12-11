@@ -153,6 +153,10 @@ const ORIENT_DISPLACEMENT := 0.05
 ## Angular torgue coef
 # @export_range(0.1, 100.0, 0.1) var torque_coef : float = 30.0
 
+## PID controller that manages the orientation of our hand.
+@export var angular_pd_controller : XRT2AngularPDController \
+	= preload("res://addons/godot-xr-tools2/hands/default_hands_angular_pd_controller.tres")
+
 ## Properties related to physical appearance
 @export_group("Appearance")
 
@@ -448,26 +452,27 @@ func _update_hand_motion_range():
 # Validate our properties
 func _validate_property(property: Dictionary):
 	# Always hide these built in properties as we control them
-	if property.name in [ \
-		"process_physics_priority", \
-		"gravity_scale", \
-		"mass", \
-		"continuous_cd", \
-		"custom_integrator", \
-		"freeze", \
-		"linear_damp", \
-		"linear_damp_mode", \
-		"angular_damp", \
-		"angular_damp_mode" \
+	if property.name in [
+		"process_physics_priority",
+		"gravity_scale",
+		"mass",
+		"continuous_cd",
+		"custom_integrator",
+		"freeze",
+		"linear_damp",
+		"linear_damp_mode",
+		"angular_damp",
+		"angular_damp_mode",
+		"inertia"
 	]:
 		property.usage = PROPERTY_USAGE_NONE
 
 	if mode != CollisionHandMode.COLLIDE and property.name in [\
-		"teleport_distance", \
-		"drop_on_teleport", \
-		"hand_mass", \
-		"force_coef", \
-		"torque_coef", \
+		"teleport_distance",
+		"drop_on_teleport",
+		"hand_mass",
+		"force_coef",
+		"torque_coef",
 	]:
 		property.usage = PROPERTY_USAGE_NONE
 
@@ -482,13 +487,18 @@ func _ready():
 	add_child(_palm_collision_shape, false, Node.INTERNAL_MODE_BACK)
 
 	# Hardcode these values
-	gravity_scale = 0.0
+	gravity_scale = 1.0
 	continuous_cd = true
-	linear_damp_mode = RigidBody3D.DAMP_MODE_REPLACE
-	linear_damp = 500.0
-	angular_damp_mode = RigidBody3D.DAMP_MODE_REPLACE
-	angular_damp = 500.0
+	# linear_damp_mode = RigidBody3D.DAMP_MODE_REPLACE
+	# linear_damp = 500.0
+	# angular_damp_mode = RigidBody3D.DAMP_MODE_REPLACE
+	# angular_damp = 500.0
+	linear_damp_mode = RigidBody3D.DAMP_MODE_COMBINE
+	linear_damp = 0.0
+	angular_damp_mode = RigidBody3D.DAMP_MODE_COMBINE
+	angular_damp = 0.0
 	mass = hand_mass
+	inertia = Vector3(0.01, 0.01, 0.01)
 
 	# Init our hand meshes
 	_update_hand_meshes()
@@ -606,7 +616,7 @@ func _physics_process(delta):
 	# acceleration = (distance - current_velocity * t) / (0.5 * t²)
 
 	var factor = 0.5 * delta * delta
-	var current_linear_velocity = linear_velocity  * clamp(1.0 - (linear_damp * delta), 0.0, 1.0)
+	var current_linear_velocity = linear_velocity * clamp(1.0 - (linear_damp * delta), 0.0, 1.0)
 
 	# Add our gravity.
 	if state:
@@ -626,24 +636,19 @@ func _physics_process(delta):
 	# Apply force logic.
 	apply_central_force(linear_force)
 
-	# Apply torque to rotate hand to tracked rotation:
-	# Torque = moment_of_inertia * angular_acceleration
-
-	# Get our moment of inertial from our rigidbody state.
-	var moment_of_inertia : Vector3 = Vector3()
-	if state:
-		if state.inverse_inertia != Vector3():
-			moment_of_inertia = Vector3(mass, mass, mass) / state.inverse_inertia
-
-	# Apply our damp so we know our current velocity.
-	var current_angular_velocity : Vector3 = angular_velocity * clamp(1.0 - (angular_damp * delta), 0.0, 1.0)
-
-	# Calculate the needed torque.
-	var angular_movement : Vector3 = (target.basis * global_basis.inverse()).get_euler()
-	var needed_angular_acceleration : Vector3 = (angular_movement - current_angular_velocity * delta) / factor
-	var torque : Vector3 = moment_of_inertia * needed_angular_acceleration * 0.5 # Why 0.5?
-
-	apply_torque(torque)
+	# New logic for rotation
+	if angular_pd_controller:
+		var target_local : Basis = target.basis * global_basis.inverse()
+		var target_quat : Quaternion = target_local.get_rotation_quaternion()
+		var target_axis : Vector3 = target_quat.get_axis().normalized()
+		var target_angle : float = target_quat.get_angle()
+		if target_angle != 0.0:
+			var pid : Vector3 = angular_pd_controller.calculate_angular(
+				delta,
+				target_axis * target_angle,
+				angular_velocity
+			)
+			apply_torque(pid * delta)
 
 
 func _process(_delta):
