@@ -120,7 +120,7 @@ var _collision_shape : CollisionShape3D
 var _collision_sphere : SphereShape3D
 
 # When picked up by collision hand
-var _joint : Generic6DOFJoint3D
+var _joint : Joint3D
 
 # When picked up by controller
 var _remote_transform : RemoteTransform3D

@@ -45,13 +45,16 @@ enum DerivativeMeasurement {
 @export var derivative_measurement : DerivativeMeasurement = DerivativeMeasurement.VELOCITY
 @export var derivative_gain = 0.0
 
-var _error_last : float = 0.0
-var _value_last : float = 0.0
+@export var max_output : float = 1.0
+
+var _error_last : Vector3 = Vector3()
+var _value_last : Vector3 = Vector3()
 var _derivative_initialised : bool = false
-var _integral_stored = 0.0
+var _integral_stored : Vector3 = Vector3()
 
 func reset():
 	_derivative_initialised = false
+
 
 func calculate(delta : float, current_value : float, target_value : float) -> float:
 	var error : float = target_value - current_value
@@ -60,15 +63,15 @@ func calculate(delta : float, current_value : float, target_value : float) -> fl
 	var p : float = proportional_gain * error
 
 	# Calculate I term
-	_integral_stored = clamp(_integral_stored + (error * delta), -integral_saturation, integral_saturation)
-	var i : float = integral_gain * _integral_stored
+	_integral_stored.x = clamp(_integral_stored.x + (error * delta), -integral_saturation, integral_saturation)
+	var i : float = integral_gain * _integral_stored.x
 
 	# Calculate D term
-	var error_rate_of_change = (error - _error_last) / delta
-	_error_last = error
+	var error_rate_of_change : float = (error - _error_last.x) / delta
+	_error_last.x = error
 
-	var value_rate_of_change = (current_value - _value_last) / delta
-	_value_last = current_value
+	var value_rate_of_change : float = (current_value - _value_last.x) / delta
+	_value_last.x = current_value
 
 	var derive_measure : float = 0.0
 	if _derivative_initialised:
@@ -80,5 +83,37 @@ func calculate(delta : float, current_value : float, target_value : float) -> fl
 		_derivative_initialised = true
 
 	var d : float = derivative_gain * derive_measure
+
+	return clamp(p + i + d, -max_output * delta, max_output * delta)
+
+
+func calculate_vec3(delta : float, current_value : Vector3, target_value : Vector3) -> Vector3:
+	var error : Vector3 = target_value - current_value
+
+	# Calculate P term
+	var p : Vector3 = error * proportional_gain
+
+	# Calculate I term
+	var saturation : Vector3 = Vector3(integral_saturation, integral_saturation, integral_saturation)
+	_integral_stored = clamp(_integral_stored + (error * delta), -saturation, saturation)
+	var i : Vector3 = _integral_stored * integral_gain
+
+	# Calculate D term
+	var error_rate_of_change : Vector3 = (error - _error_last) / delta
+	_error_last = error
+
+	var value_rate_of_change : Vector3 = (current_value - _value_last) / delta
+	_value_last = current_value
+
+	var derive_measure : Vector3 = Vector3()
+	if _derivative_initialised:
+		if derivative_measurement == DerivativeMeasurement.VELOCITY:
+			derive_measure = -value_rate_of_change
+		else:
+			derive_measure = error_rate_of_change
+	else:
+		_derivative_initialised = true
+
+	var d : Vector3 = derive_measure * derivative_gain
 
 	return p + i + d
