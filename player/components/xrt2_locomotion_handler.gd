@@ -112,7 +112,6 @@ func get_floor_friction() -> float:
 		total_floor_friction += callback.call()
 
 	if has_floor_friction:
-		print(total_floor_friction)
 		return total_floor_friction
 
 	# No callback, assume full friction

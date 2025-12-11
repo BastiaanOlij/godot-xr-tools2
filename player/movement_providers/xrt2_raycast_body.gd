@@ -93,6 +93,10 @@ extends XRT2MovementProvider
 		show_debug_shape = value
 		if _debug_mesh_instance:
 			_debug_mesh_instance.visible = show_debug_shape
+
+## Show some debug information in headset
+@export var debug_show_info : bool = false
+
 #endregion
 
 #region Private variables
@@ -107,6 +111,7 @@ var _capsule_shape : CapsuleShape3D
 # Debug objects to visualise our capsule
 var _debug_mesh_instance : MeshInstance3D
 var _debug_mesh : CapsuleMesh
+var _debug_info : Label3D
 
 # Are we currently on the floor?
 var _is_on_floor : bool = true
@@ -233,6 +238,7 @@ func _process_locomotion(delta : float) -> void:
 	query.from = _character_body.global_transform * Vector3(0.0, eye_level - torso_height - head_height * 0.5, 0.0)
 	query.to = _character_body.global_transform * Vector3(0.0, -raycast_over_extent, 0.0)
 	var collision = state.intersect_ray(query)
+	var collision_height : float = -99.0
 	if collision.is_empty():
 		_is_on_floor = false
 	else:
@@ -240,7 +246,7 @@ func _process_locomotion(delta : float) -> void:
 		# We thus need to mimic the behaviour normally handled by CharacterBody3D
 
 		var collision_object : CollisionObject3D = collision.collider
-		var collision_height : float = (character_transform_inverse * collision.position).y
+		collision_height = (character_transform_inverse * collision.position).y
 		var collision_normal : Vector3 = character_transform_inverse.basis * collision.normal
 		if collision_height < 0.0:
 			_is_on_floor = false
@@ -276,4 +282,19 @@ func _process_locomotion(delta : float) -> void:
 				_floor_friction = physics_material.friction
 			else:
 				_floor_friction = 1.0
+
+	if debug_show_info:
+		if not _debug_info:
+			_debug_info = Label3D.new()
+			_debug_info.pixel_size = 0.002
+			add_child.call_deferred(_debug_info, false, Node.INTERNAL_MODE_BACK)
+
+		_debug_info.position = Vector3(0.0, eye_level, -0.75)
+
+		_debug_info.text = "Eye level: %0.2fm
+Current level: %0.2fm
+" % [ eye_level, eye_level - collision_height ]
+		_debug_info.visible = true
+	elif _debug_info:
+		_debug_info.visible = false
 #endregion
