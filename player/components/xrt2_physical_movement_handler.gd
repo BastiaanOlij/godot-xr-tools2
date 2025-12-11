@@ -73,6 +73,11 @@ extends Node3D
 		fade_layers = value
 		if _xr_fade_effect and is_inside_tree():
 			_xr_fade_effect.layers = fade_layers
+
+@export_group("Debug", "debug_")
+
+## Show some debug information in headset
+@export var debug_show_info : bool = false
 #endregion
 
 #region Private variables
@@ -95,6 +100,7 @@ var _xr_fade_effect : XRT2EffectFade
 var _xr_origin : XROrigin3D
 var _xr_camera : XRCamera3D
 var _character_body : CharacterBody3D
+var _debug_info : Label3D
 #endregion
 
 #region Private functions
@@ -169,7 +175,6 @@ func _ready() -> void:
 
 			_shape_query = PhysicsShapeQueryParameters3D.new()
 			_shape_query.collision_mask = _character_body.collision_mask
-			_shape_query.exclude = [ _character_body.get_rid() ]
 			_shape_query.shape = shape
 
 		for child in _xr_origin.get_children():
@@ -204,6 +209,45 @@ func _exit_tree():
 		openxr_interface.session_visible.disconnect(_on_session_visible)
 		openxr_interface.pose_recentered.disconnect(_on_pose_recentered)
 
+
+func _process(delta) -> void:
+	# Do not run if in the editor
+	if Engine.is_editor_hint():
+		set_physics_process(false)
+		return
+
+	if debug_show_info:
+		var text = ""
+		var head_height : float = 0.0
+
+		if not _debug_info:
+			_debug_info = Label3D.new()
+			_debug_info.pixel_size = 0.002
+			add_child(_debug_info, false, Node.INTERNAL_MODE_BACK)
+
+		var head_tracker : XRPositionalTracker = XRServer.get_tracker("head")
+		if not head_tracker:
+			push_error("Couldn't locate head tracker!")
+			return
+
+		var pose : XRPose = head_tracker.get_pose("default")
+		if pose and pose.has_tracking_data:
+			var t : Transform3D = pose.get_adjusted_transform()
+
+			_debug_info.position = t.origin - t.basis.z * Vector3(0.75, 0.0, 0.75)
+			_debug_info.transform = _debug_info.transform.looking_at(t.origin, Vector3.UP, true)
+
+			head_height = t.origin.y
+
+		text += "Head height: %0.2fm
+Height adjust: %0.2fm
+Eye height: %0.2fm
+" % [ head_height, _height_adjust, head_height + _height_adjust ]
+
+		_debug_info.text = text
+		_debug_info.visible = true
+	elif _debug_info:
+		_debug_info.visible = false
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _physics_process(delta) -> void:
@@ -264,10 +308,16 @@ func _physics_process(delta) -> void:
 		var space = PhysicsServer3D.body_get_space(_character_body.get_rid())
 		var state = PhysicsServer3D.space_get_direct_state(space)
 
+		var exclude : Array[RID] = [ _character_body.get_rid() ]
+		var exceptions : Array[PhysicsBody3D] = _character_body.get_collision_exceptions()
+		for exception in exceptions:
+			exclude.push_back(exception.get_rid())
+
 		var t : Transform3D = Transform3D()
-		t.origin = _xr_origin.global_transform * Vector3(0.0, _xr_camera.position.y, 0.0)
+		t.origin = _character_body.global_transform * Vector3(0.0, _xr_camera.position.y + _height_adjust, 0.0)
 		_shape_query.transform = t
 		_shape_query.motion = _xr_camera.global_position - t.origin
+		_shape_query.exclude = exclude
 
 		var collision = state.cast_motion(_shape_query)
 		var is_colliding : bool = not collision.is_empty() and collision[0] < 1.0
