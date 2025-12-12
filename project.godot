@@ -50,6 +50,10 @@ trigger_click={
 3d_render/layer_2="HMD only"
 3d_render/layer_3="Spectator only"
 
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
 [rendering]
 
 renderer/rendering_method="mobile"
