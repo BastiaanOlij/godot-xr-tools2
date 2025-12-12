@@ -39,11 +39,13 @@ mesh = SubResource("BoxMesh_yjhaw")
 [node name="RightGrabPoint" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.075, 0, 0.0301103)
 script = ExtResource("3_h7r30")
+enabled = false
 left_hand = false
 
 [node name="LeftGrabPoint" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.075, 0, 0.03)
 script = ExtResource("3_h7r30")
+enabled = false
 right_hand = false
 
 [node name="Label3D" type="Label3D" parent="."]

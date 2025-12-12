@@ -16,6 +16,15 @@ config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
 run/main_scene.pc="uid://dyclknruy8aqf"
 
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+
+[filesystem]
+
+import/blender/enabled=false
+
 [input]
 
 move+x={
@@ -49,6 +58,10 @@ trigger_click={
 3d_render/layer_1="Default"
 3d_render/layer_2="HMD only"
 3d_render/layer_3="Spectator only"
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
 
 [rendering]
 

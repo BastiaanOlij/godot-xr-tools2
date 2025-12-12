@@ -1,6 +1,5 @@
 extends XRT2Construct
 
-
 func _on_main_showing_loading_screen():
 	%DesktopSubViewport.disable_3d = true
 	%LoadingImage.visible = true
