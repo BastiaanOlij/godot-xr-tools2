@@ -8,3 +8,6 @@ main_scene = "res://stages/main_stage/main_stage.tscn"
 
 [node name="LoadingScreen" parent="." index="2"]
 splash_screen = ExtResource("2_v8stu")
+
+[node name="StartXR" parent="." index="4"]
+physics_rate_multiplier = 2
