@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://bupahxln4i5pf"]
+
+[ext_resource type="Material" uid="uid://csrmou74coiid" path="res://props/ball_and_chain/ball_and_chain_material.tres" id="1_tkr2x"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mbli6"]
+margin = 0.01
+radius = 0.03
+height = 0.1
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_r34nt"]
+radius = 0.03
+height = 0.1
+
+[node name="ChainLink" type="RigidBody3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("CapsuleShape3D_mbli6")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+material_override = ExtResource("1_tkr2x")
+mesh = SubResource("CapsuleMesh_r34nt")

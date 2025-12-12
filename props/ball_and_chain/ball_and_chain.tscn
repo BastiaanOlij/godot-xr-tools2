@@ -1,0 +1,86 @@
+[gd_scene load_steps=6 format=3 uid="uid://dli41g6lolyef"]
+
+[ext_resource type="Material" uid="uid://csrmou74coiid" path="res://props/ball_and_chain/ball_and_chain_material.tres" id="1_r34nt"]
+[ext_resource type="PackedScene" uid="uid://bupahxln4i5pf" path="res://props/ball_and_chain/chain_link.tscn" id="2_htpog"]
+[ext_resource type="PackedScene" uid="uid://dqexn22mo1ngx" path="res://props/ball_and_chain/ball.tscn" id="3_jnubn"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_qw1p0"]
+margin = 0.01
+radius = 0.04
+height = 0.3
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_b03we"]
+radius = 0.04
+height = 0.3
+
+[node name="BallAndChain" type="RigidBody3D"]
+mass = 0.1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("CapsuleShape3D_qw1p0")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+material_override = ExtResource("1_r34nt")
+mesh = SubResource("CapsuleMesh_b03we")
+
+[node name="Joint01" type="PinJoint3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0, 0)
+node_a = NodePath("..")
+node_b = NodePath("../ChainLink01")
+exclude_nodes_from_collision = false
+
+[node name="ChainLink01" parent="." instance=ExtResource("2_htpog")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0, 0)
+mass = 0.1
+
+[node name="Joint02" type="PinJoint3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 0, 0)
+node_a = NodePath("../ChainLink01")
+node_b = NodePath("../ChainLink02")
+exclude_nodes_from_collision = false
+
+[node name="ChainLink02" parent="." instance=ExtResource("2_htpog")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0, 0)
+mass = 0.1
+
+[node name="Joint03" type="PinJoint3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.35, 0, 0)
+node_a = NodePath("../ChainLink02")
+node_b = NodePath("../ChainLink03")
+exclude_nodes_from_collision = false
+
+[node name="ChainLink03" parent="." instance=ExtResource("2_htpog")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0, 0)
+mass = 0.1
+
+[node name="Joint04" type="PinJoint3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0, 0)
+node_a = NodePath("../ChainLink03")
+node_b = NodePath("../ChainLink04")
+exclude_nodes_from_collision = false
+
+[node name="ChainLink04" parent="." instance=ExtResource("2_htpog")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0)
+mass = 0.1
+
+[node name="Joint05" type="PinJoint3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.55, 0, 0)
+node_a = NodePath("../ChainLink04")
+node_b = NodePath("../ChainLink05")
+exclude_nodes_from_collision = false
+
+[node name="ChainLink05" parent="." instance=ExtResource("2_htpog")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0, 0)
+mass = 0.1
+
+[node name="JointBall" type="PinJoint3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.65, 0, 0)
+node_a = NodePath("../ChainLink05")
+node_b = NodePath("../Ball")
+exclude_nodes_from_collision = false
+
+[node name="Ball" parent="." instance=ExtResource("3_jnubn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.72, 0, 0)
+mass = 2.0

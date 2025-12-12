@@ -1,13 +1,21 @@
-[gd_scene load_steps=12 format=3 uid="uid://dm2d7si17m8vd"]
+[gd_scene load_steps=15 format=3 uid="uid://dm2d7si17m8vd"]
 
 [ext_resource type="PackedScene" uid="uid://dvvlw0k32b8wq" path="res://components/floor.tscn" id="1_c36xp"]
 [ext_resource type="PackedScene" uid="uid://d0px0pvdr03o" path="res://components/static_box.tscn" id="2_s2yy1"]
 [ext_resource type="PackedScene" uid="uid://2tngyui13f4v" path="res://components/table.tscn" id="3_cfwdu"]
 [ext_resource type="PackedScene" uid="uid://djjdpt6vpdljg" path="res://components/rigid_box.tscn" id="4_xu5kv"]
+[ext_resource type="PackedScene" uid="uid://dli41g6lolyef" path="res://props/ball_and_chain/ball_and_chain.tscn" id="5_re04o"]
 [ext_resource type="PackedScene" uid="uid://bpw8fh2d8fo4m" path="res://components/stairs.tscn" id="5_s2yy1"]
 [ext_resource type="PackedScene" uid="uid://c4tgb1fvpccgb" path="res://components/ramps.tscn" id="6_dhxdq"]
 [ext_resource type="ArrayMesh" uid="uid://2iuv58i1suq2" path="res://assets/low-poly-clouds-pack-1/meshes/Cloud_1_Icosphere_044.res" id="6_xu5kv"]
 [ext_resource type="ArrayMesh" uid="uid://de02agai7haih" path="res://assets/low-poly-clouds-pack-1/meshes/Cloud_2_Icosphere_043.res" id="7_dhxdq"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_re04o"]
+radius = 0.01
+
+[sub_resource type="SphereMesh" id="SphereMesh_re04o"]
+radius = 0.01
+height = 0.02
 
 [sub_resource type="MultiMesh" id="MultiMesh_re04o"]
 transform_format = 1
@@ -36,8 +44,108 @@ size = Vector3(0.1, 2, 2)
 
 [node name="Wall02" parent="Walls" instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-0.7743041, 0, -0.632814, 0, 1, 0, 0.632814, 0, -0.7743041, 3.73808, 0, -2.65948)
-size = Vector3(0.1, 2, 2)
+size = Vector3(0.1, 2.2, 2)
 color = Color(0.69357204, 0.538853, 0.30530423, 1)
+
+[node name="10cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.1, 0)
+pixel_size = 0.002
+text = "0.1m"
+
+[node name="20cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.2, 0)
+pixel_size = 0.002
+text = "0.2m"
+
+[node name="30cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.3, 0)
+pixel_size = 0.002
+text = "0.3m"
+
+[node name="40cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.4, 0)
+pixel_size = 0.002
+text = "0.4m"
+
+[node name="50cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.5, 0)
+pixel_size = 0.002
+text = "0.5m"
+
+[node name="60cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.6, 0)
+pixel_size = 0.002
+text = "0.6m"
+
+[node name="70cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.7, 0)
+pixel_size = 0.002
+text = "0.7m"
+
+[node name="80cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.8, 0)
+pixel_size = 0.002
+text = "0.8m"
+
+[node name="90cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.9, 0)
+pixel_size = 0.002
+text = "0.9m"
+
+[node name="100cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1, 0)
+pixel_size = 0.002
+text = "1.0m"
+
+[node name="110cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.1, 0)
+pixel_size = 0.002
+text = "1.1m"
+
+[node name="120cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.2, 0)
+pixel_size = 0.002
+text = "1.2m"
+
+[node name="130cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.3, 0)
+pixel_size = 0.002
+text = "1.3m"
+
+[node name="140cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.4, 0)
+pixel_size = 0.002
+text = "1.4m"
+
+[node name="150cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.5, 0)
+pixel_size = 0.002
+text = "1.5m"
+
+[node name="160cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.6, 0)
+pixel_size = 0.002
+text = "1.6m"
+
+[node name="170cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.7, 0)
+pixel_size = 0.002
+text = "1.7m"
+
+[node name="180cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.8, 0)
+pixel_size = 0.002
+text = "1.8m"
+
+[node name="190cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.9, 0)
+pixel_size = 0.002
+text = "1.9m"
+
+[node name="200cm" type="Label3D" parent="Walls/Wall02"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 2, 0)
+pixel_size = 0.002
+text = "2.0m"
 
 [node name="Wall03" parent="Walls" instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-4.371137e-08, 0, 0.9999996, 0, 1, 0, -0.9999996, 0, -4.371137e-08, 2.0000002, 0, 4.999999)
@@ -169,22 +277,41 @@ transform = Transform3D(0.53519285, 0, 0.84472966, 0, 1, 0, -0.84472966, 0, 0.53
 size = Vector3(0.1, 1, 6)
 color = Color(0.9098039, 0, 0.92941177, 1)
 
+[node name="BallAndChainFixed" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0346768, 1.523355, -1.7327807)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BallAndChainFixed"]
+shape = SubResource("SphereShape3D_re04o")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="BallAndChainFixed"]
+mesh = SubResource("SphereMesh_re04o")
+
+[node name="BallAndChain" parent="BallAndChainFixed" instance=ExtResource("5_re04o")]
+transform = Transform3D(0.015026676, -0.9998871, 0, 0.9998871, 0.015026676, 0, 0, 0, 1, 0, -0.16, 0)
+
+[node name="PinJoint3D" type="PinJoint3D" parent="BallAndChainFixed"]
+node_a = NodePath("..")
+node_b = NodePath("../BallAndChain")
+
 [node name="Table" parent="." instance=ExtResource("3_cfwdu")]
 
 [node name="Box01" parent="Table" instance=ExtResource("4_xu5kv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.20919, 0.12431)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.20919, -0.11729336)
 mass = 2.0
 size = Vector3(0.2, 0.2, 0.2)
 
 [node name="Box02" parent="Table" instance=ExtResource("4_xu5kv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.409726, 1.34847, 0.208137)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.409726, 1.34847, -0.19379187)
 mass = 10.0
 size = Vector3(0.4, 0.4, 0.4)
 color = Color(0.20507804, 0.6172268, 0.78655386, 1)
 
 [node name="Box03" parent="Table" instance=ExtResource("4_xu5kv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.181614, 1.15, 0.376)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24316017, 1.15, -0.07144356)
 color = Color(0.31845716, 0.6472459, 0.45833033, 1)
+
+[node name="BallAndChain" parent="Table" instance=ExtResource("5_re04o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5047982, 1.1754329, 0.16155994)
 
 [node name="Stairs" parent="." instance=ExtResource("5_s2yy1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 1)

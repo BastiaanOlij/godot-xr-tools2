@@ -1,6 +1,7 @@
-[gd_scene load_steps=17 format=3 uid="uid://7lt82mv6lmxo"]
+[gd_scene load_steps=19 format=3 uid="uid://7lt82mv6lmxo"]
 
 [ext_resource type="PackedScene" uid="uid://xrt20000007" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.tscn" id="1_spd8v"]
+[ext_resource type="Script" uid="uid://cftpwaa62ws1q" path="res://stages/main_stage/main_stage.gd" id="2_4i4c4"]
 [ext_resource type="PackedScene" uid="uid://dm2d7si17m8vd" path="res://stages/main_stage/world.tscn" id="2_m5inh"]
 [ext_resource type="PackedScene" uid="uid://xrt2qimm3dy" path="res://addons/godot-xr-tools2/prefabs/xrt2_character_body_3d.tscn" id="3_3ltgk"]
 [ext_resource type="Shader" uid="uid://xrt2oqik7ik" path="res://addons/godot-xr-tools2/shaders/shaded_no_alpha.gdshader" id="3_6d2rb"]
@@ -9,6 +10,7 @@
 [ext_resource type="Script" uid="uid://xrt2eecske1" path="res://addons/godot-xr-tools2/hands/xrt2_hand_attachment.gd" id="5_4i4c4"]
 [ext_resource type="Script" uid="uid://xrt2ebmt58c" path="res://addons/godot-xr-tools2/hands/xrt2_collision_hand.gd" id="5_don5u"]
 [ext_resource type="PackedScene" uid="uid://dycgm0a4f87pw" path="res://testing/axis.tscn" id="6_3ltgk"]
+[ext_resource type="PackedScene" uid="uid://dh13hvk83rh6w" path="res://components/slider.tscn" id="11_3ltgk"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ie47k"]
 
@@ -41,12 +43,15 @@ height = 0.15
 radial_segments = 32
 
 [node name="MainStage" instance=ExtResource("1_spd8v")]
+script = ExtResource("2_4i4c4")
 
 [node name="WorldEnvironment" parent="." index="0"]
 environment = SubResource("Environment_8sh2w")
 
 [node name="SunLight3D" parent="." index="1"]
 shadow_enabled = true
+shadow_bias = 0.01
+shadow_transmittance_bias = 0.005
 directional_shadow_split_1 = 0.05
 directional_shadow_split_2 = 0.1
 directional_shadow_split_3 = 0.25
@@ -61,13 +66,17 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, 0.1)
 layers = 4
 material_override = SubResource("ShaderMaterial_3ltgk")
 mesh = SubResource("SphereMesh_4i4c4")
-skeleton = NodePath("../Neck")
 
 [node name="HMD" type="MeshInstance3D" parent="XRT2CharacterBody3D/XROrigin3D/XRCamera3D/Head" index="0"]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0.02, -0.06)
 layers = 4
 material_override = SubResource("StandardMaterial3D_4i4c4")
 mesh = SubResource("CapsuleMesh_wfvj4")
+
+[node name="HeadShadowCaster" type="MeshInstance3D" parent="XRT2CharacterBody3D/XROrigin3D/XRCamera3D/Head" index="1"]
+layers = 2
+cast_shadow = 3
+mesh = SubResource("SphereMesh_4i4c4")
 
 [node name="XRT2LeftCollisionHand" type="RigidBody3D" parent="XRT2CharacterBody3D/XROrigin3D" index="2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, -0.5)
@@ -88,6 +97,7 @@ bone_name = "LeftHand"
 [node name="XRT2Pickup" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand/LeftHandAttachment" index="0"]
 transform = Transform3D(1, -1.42109e-14, 0, 0, 1, 0, 0, 0, 1, 0.02, 0, -0.08)
 script = ExtResource("4_l0n08")
+detection_radius = 0.1
 
 [node name="IndexTipAttachment" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand" index="2"]
 transform = Transform3D(0.91954595, -0.014892519, -0.39270008, -0.03211107, 0.99309224, -0.11285275, 0.39166808, 0.11638334, 0.9127157, -0.026100121, 0.042943064, -0.13161416)
@@ -119,5 +129,37 @@ metadata/_custom_type_script = "uid://xrt2eecske1"
 [node name="XRT2Pickup" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2RightCollisionHand/RightHandAttachment" index="0"]
 transform = Transform3D(1, 1.77636e-14, 0, 7.10543e-15, 1, 0, 0, 0, 1, -0.02, 0, -0.08)
 script = ExtResource("4_l0n08")
+detection_radius = 0.1
+
+[node name="PosProportionalGainSlider" parent="." index="4" instance=ExtResource("11_3ltgk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.747, 1.1, -1.606)
+lower_value = 1000.0
+upper_value = 10000.0
+value = 2500.0
+prefix = "Positional proportional gain:"
+
+[node name="PosDerivativeGainSlider" parent="." index="5" instance=ExtResource("11_3ltgk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.747, 1.1, -1.7)
+lower_value = 100.0
+upper_value = 500.0
+value = 150.0
+prefix = "Positional derivative gain"
+
+[node name="RotProportionalGainSlider" parent="." index="6" instance=ExtResource("11_3ltgk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.10549736, 1.1, -1.606)
+lower_value = 1.0
+value = 80.0
+prefix = "Rotational proportional gain:"
+
+[node name="RotDerivativeGainSlider" parent="." index="7" instance=ExtResource("11_3ltgk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.10549736, 1.1, -1.7)
+upper_value = 10.0
+value = 1.0
+prefix = "Rotational derivative gain"
+
+[connection signal="value_changed" from="PosProportionalGainSlider" to="." method="_on_positional_proportional_gain_slider_value_changed"]
+[connection signal="value_changed" from="PosDerivativeGainSlider" to="." method="_on_positional_derivative_gain_slider_value_changed"]
+[connection signal="value_changed" from="RotProportionalGainSlider" to="." method="_on_rotational_proportional_gain_slider_value_changed"]
+[connection signal="value_changed" from="RotDerivativeGainSlider" to="." method="_on_rotational_derivative_gain_slider_value_changed"]
 
 [editable path="XRT2CharacterBody3D"]
