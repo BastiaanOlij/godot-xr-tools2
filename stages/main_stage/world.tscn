@@ -296,22 +296,25 @@ node_b = NodePath("../BallAndChain")
 [node name="Table" parent="." instance=ExtResource("3_cfwdu")]
 
 [node name="Box01" parent="Table" instance=ExtResource("4_xu5kv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.20919, -0.11729336)
-mass = 2.0
-size = Vector3(0.2, 0.2, 0.2)
-
-[node name="Box02" parent="Table" instance=ExtResource("4_xu5kv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.409726, 1.34847, -0.19379187)
-mass = 10.0
-size = Vector3(0.4, 0.4, 0.4)
-color = Color(0.20507804, 0.6172268, 0.78655386, 1)
-
-[node name="Box03" parent="Table" instance=ExtResource("4_xu5kv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24316017, 1.15, -0.07144356)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.70814544, 1.15, 0.23178434)
 color = Color(0.31845716, 0.6472459, 0.45833033, 1)
 
-[node name="BallAndChain" parent="Table" instance=ExtResource("5_re04o")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5047982, 1.1754329, 0.16155994)
+[node name="Box02" parent="Table" instance=ExtResource("4_xu5kv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.46485636, 1.20919, 0.18593454)
+mass = 10.0
+size = Vector3(0.2, 0.2, 0.2)
+
+[node name="Box03" parent="Table" instance=ExtResource("4_xu5kv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07488975, 1.2801381, 0.15274632)
+mass = 20.0
+size = Vector3(0.3, 0.3, 0.3)
+color = Color(0.57990265, 0.58945864, 0.31561917, 1)
+
+[node name="Box04" parent="Table" instance=ExtResource("4_xu5kv")]
+transform = Transform3D(0.9997567, 0, 0.022059172, 0, 1, 0, -0.022059172, 0, 0.9997567, 0.41641495, 1.34847, 0.109362245)
+mass = 50.0
+size = Vector3(0.4, 0.4, 0.4)
+color = Color(0.20507804, 0.6172268, 0.78655386, 1)
 
 [node name="Stairs" parent="." instance=ExtResource("5_s2yy1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 1)
