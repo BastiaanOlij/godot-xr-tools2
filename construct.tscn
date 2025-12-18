@@ -41,7 +41,7 @@ popup/item_1/id = 1
 
 [node name="Xrt2SpectatorCamera" parent="DesktopContainer/DesktopSubViewport" index="2" instance=ExtResource("2_hkn0h")]
 unique_name_in_owner = true
-transform = Transform3D(-0.772577, 0.196973, -0.603594, 0.00228937, 0.951519, 0.307582, 0.634916, 0.236249, -0.735573, -0.993, 2.0438, -2.63003)
+transform = Transform3D(-0.772577, 0.196973, -0.603594, 0.00228937, 0.951519, 0.307582, 0.634916, 0.236249, -0.735573, -0.993, 2.0438, -1.355278)
 
 [node name="Xrt2StabilizedCamera" parent="DesktopContainer/DesktopSubViewport" index="3" instance=ExtResource("5_v5hs0")]
 unique_name_in_owner = true

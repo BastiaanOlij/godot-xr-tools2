@@ -9,8 +9,8 @@
 [ext_resource type="Script" uid="uid://xrt23qrb4js" path="res://addons/godot-xr-tools2/player/interaction_functions/xrt2_pickup.gd" id="4_l0n08"]
 [ext_resource type="Script" uid="uid://xrt2eecske1" path="res://addons/godot-xr-tools2/hands/xrt2_hand_attachment.gd" id="5_4i4c4"]
 [ext_resource type="Script" uid="uid://xrt2ebmt58c" path="res://addons/godot-xr-tools2/hands/xrt2_collision_hand.gd" id="5_don5u"]
-[ext_resource type="PackedScene" uid="uid://dycgm0a4f87pw" path="res://testing/axis.tscn" id="6_3ltgk"]
-[ext_resource type="PackedScene" uid="uid://dh13hvk83rh6w" path="res://components/slider.tscn" id="11_3ltgk"]
+[ext_resource type="PackedScene" uid="uid://xrt252f1jo2" path="res://addons/godot-xr-tools2/debug/axis.tscn" id="10_4i4c4"]
+[ext_resource type="PackedScene" uid="uid://xrt2ef8ojbk" path="res://addons/godot-xr-tools2/debug/xrt2_log.tscn" id="11_4i4c4"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ie47k"]
 
@@ -80,6 +80,9 @@ mesh = SubResource("SphereMesh_4i4c4")
 
 [node name="XRT2LeftCollisionHand" type="RigidBody3D" parent="XRT2CharacterBody3D/XROrigin3D" index="2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, -0.5)
+center_of_mass_mode = 1
+inertia = Vector3(0.01, 0.01, 0.01)
+continuous_cd = true
 script = ExtResource("5_don5u")
 hand_motion_range = 1
 grip_action = "grab"
@@ -99,6 +102,7 @@ bone_name = "LeftHand"
 transform = Transform3D(1, -1.42109e-14, 0, 0, 1, 0, 0, 0, 1, 0.02, 0, -0.08)
 script = ExtResource("4_l0n08")
 detection_radius = 0.1
+max_force = 0.0
 
 [node name="IndexTipAttachment" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand" index="2"]
 transform = Transform3D(0.91954595, -0.014892519, -0.39270008, -0.03211107, 0.99309224, -0.11285275, 0.39166808, 0.11638334, 0.9127157, -0.026100121, 0.042943064, -0.13161416)
@@ -106,12 +110,14 @@ script = ExtResource("5_4i4c4")
 bone_name = "LeftIndexTip"
 metadata/_custom_type_script = "uid://xrt2eecske1"
 
-[node name="Axis" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand/IndexTipAttachment" index="0" instance=ExtResource("6_3ltgk")]
-transform = Transform3D(0.1, 0, 0, 4.65661e-10, 0.1, 0, 3.72529e-09, 1.86265e-09, 0.1, 0, 0, 0)
+[node name="Axis" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand/IndexTipAttachment" index="0" instance=ExtResource("10_4i4c4")]
 visible = false
 
 [node name="XRT2RightCollisionHand" type="RigidBody3D" parent="XRT2CharacterBody3D/XROrigin3D" index="3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1, -0.5)
+center_of_mass_mode = 1
+inertia = Vector3(0.01, 0.01, 0.01)
+continuous_cd = true
 script = ExtResource("5_don5u")
 hand = 1
 grip_action = "grab"
@@ -132,36 +138,12 @@ metadata/_custom_type_script = "uid://xrt2eecske1"
 transform = Transform3D(1, 1.77636e-14, 0, 7.10543e-15, 1, 0, 0, 0, 1, -0.02, 0, -0.08)
 script = ExtResource("4_l0n08")
 detection_radius = 0.1
+max_force = 1000.0
 
-[node name="PosProportionalGainSlider" parent="." index="4" instance=ExtResource("11_3ltgk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.747, 1.1, -1.606)
-lower_value = 1000.0
-upper_value = 10000.0
-value = 2500.0
-prefix = "Positional proportional gain:"
-
-[node name="PosDerivativeGainSlider" parent="." index="5" instance=ExtResource("11_3ltgk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.747, 1.1, -1.7)
-lower_value = 100.0
-upper_value = 500.0
-value = 150.0
-prefix = "Positional derivative gain"
-
-[node name="RotProportionalGainSlider" parent="." index="6" instance=ExtResource("11_3ltgk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.10549736, 1.1, -1.606)
-lower_value = 1.0
-value = 80.0
-prefix = "Rotational proportional gain:"
-
-[node name="RotDerivativeGainSlider" parent="." index="7" instance=ExtResource("11_3ltgk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.10549736, 1.1, -1.7)
-upper_value = 10.0
-value = 1.0
-prefix = "Rotational derivative gain"
-
-[connection signal="value_changed" from="PosProportionalGainSlider" to="." method="_on_positional_proportional_gain_slider_value_changed"]
-[connection signal="value_changed" from="PosDerivativeGainSlider" to="." method="_on_positional_derivative_gain_slider_value_changed"]
-[connection signal="value_changed" from="RotProportionalGainSlider" to="." method="_on_rotational_proportional_gain_slider_value_changed"]
-[connection signal="value_changed" from="RotDerivativeGainSlider" to="." method="_on_rotational_derivative_gain_slider_value_changed"]
+[node name="XRT2Log" parent="XRT2CharacterBody3D" index="3" instance=ExtResource("11_4i4c4")]
+transform = Transform3D(0.9854406, 0, 0.17002034, 0, 1, 0, -0.17002034, 0, 0.9854406, -0.19793722, 1.5116211, -1.2153747)
+display_size = Vector2(0.5, 0.5)
+dpi = 30.0
+layers = 2
 
 [editable path="XRT2CharacterBody3D"]

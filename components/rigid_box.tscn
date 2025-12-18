@@ -37,13 +37,13 @@ material_override = SubResource("ShaderMaterial_xcktd")
 mesh = SubResource("BoxMesh_yjhaw")
 
 [node name="RightGrabPoint" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.075, 0, 0.0301103)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.075, 0, 0.049649373)
 script = ExtResource("3_h7r30")
 enabled = false
 left_hand = false
 
 [node name="LeftGrabPoint" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.075, 0, 0.03)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.075, 0, 0.050492674)
 script = ExtResource("3_h7r30")
 enabled = false
 right_hand = false
