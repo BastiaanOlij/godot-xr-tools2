@@ -27,13 +27,29 @@
 class_name XRT2StabilizedCamera
 extends Node3D
 
+## Weight for our position and orientation smoothing.
 @export_range(0.01, 1.0, 0.01) var weight = 0.08
 
-var previous_transform : Transform3D
+## 3D layers to render to our spectator view.
+@export_flags_3d_render var cull_mask = 3:
+	set(new_value):
+		cull_mask = new_value
+		if is_inside_tree():
+			_stabilized_camera.cull_mask = cull_mask
+
+var _previous_transform : Transform3D
+
+@onready var _stabilized_camera : Camera3D = $StabilizedCamera3D
 
 ## Make this camera current
 func make_current():
-	$StabilizedCamera3D.current = true
+	_stabilized_camera.current = true
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	_stabilized_camera.cull_mask = cull_mask
+
 
 # Position for our player
 func _process(delta):
@@ -45,10 +61,9 @@ func _process(delta):
 			camera_transform = camera_transform.looking_at(camera_transform.origin - camera_transform.basis.z)
 			camera_transform.origin += camera_transform.basis.z * 0.01
 
-			if (camera_transform.origin - previous_transform.origin).length() < 0.5:
+			if (camera_transform.origin - _previous_transform.origin).length() < 0.5:
 				# Stabilize logic
-				camera_transform = previous_transform.interpolate_with(camera_transform, weight)
+				camera_transform = _previous_transform.interpolate_with(camera_transform, weight)
 
-
-			$StabilizedCamera3D.global_transform = XRServer.world_origin * camera_transform
-			previous_transform = camera_transform
+			_stabilized_camera.global_transform = XRServer.world_origin * camera_transform
+			_previous_transform = camera_transform

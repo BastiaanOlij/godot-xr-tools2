@@ -36,7 +36,7 @@ shader_parameter/uv_offset = Vector2(0, 0)
 script = ExtResource("1_dbds7")
 
 [node name="SpectatorCamera3D" type="Camera3D" parent="."]
-cull_mask = 1048573
+cull_mask = 5
 
 [node name="Camera" type="Node3D" parent="SpectatorCamera3D"]
 

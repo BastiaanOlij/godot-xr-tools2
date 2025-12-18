@@ -27,42 +27,60 @@
 @tool
 extends Node3D
 
+#region Export variables
 ## If [code]true[/code] the player wearing the headset can see the camera.
 ## Disabling this doesn't effect the desktop view!
 @export var show_camera_in_hmd = true:
 	set(value):
 		show_camera_in_hmd = value
 		if is_inside_tree():
-			$SpectatorCamera3D/Camera.visible = show_camera_in_hmd
+			_update_show_camera_in_hmd()
 
 
+## 3D layers to render to our spectator view
+@export_flags_3d_render var cull_mask = 5:
+	set(new_value):
+		cull_mask = new_value
+		if is_inside_tree():
+			_spectator_camera.cull_mask = cull_mask
+#endregion
+
+#region Private variables
 # Material used to show viewport image
 var _material : ShaderMaterial
 
 # Viewport texture used to show viewport image
 var _viewport_texture : ViewportTexture
 
-# Display on which we show our viewport image
+# Helper variables
+@onready var _spectator_camera : Camera3D = $SpectatorCamera3D
+@onready var _camera_model : Node3D = $SpectatorCamera3D/Camera
 @onready var _display : MeshInstance3D = $SpectatorCamera3D/Camera/CameraDisplay/Display
+#endregion
 
+#region Public functions
 ## Make this camera current
 func make_current():
-	$SpectatorCamera3D.current = true
+	_spectator_camera.current = true
+	_update_show_camera_in_hmd()
+#endregion
+
+#region Private functions
+func _update_show_camera_in_hmd():
+	if _spectator_camera.current or Engine.is_editor_hint():
+		_camera_model.visible = show_camera_in_hmd
+	else:
+		_camera_model.visible = false
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	# Only do our layer checks, if in the editor
+	# Do not run if in the editor
 	if Engine.is_editor_hint():
-		if ProjectSettings.get_setting("layer_names/3d_render/layer_2").is_empty():
-			ProjectSettings.set_setting("layer_names/3d_render/layer_2", "HMD only")
-
-		if ProjectSettings.get_setting("layer_names/3d_render/layer_3").is_empty():
-			ProjectSettings.set_setting("layer_names/3d_render/layer_3", "Spectator only")
-
 		return
 
-	$SpectatorCamera3D/Camera.visible = show_camera_in_hmd
+	_spectator_camera.cull_mask = cull_mask
+	_update_show_camera_in_hmd()
 
 	var vp : Viewport = get_viewport()
 	_material = _display.material_override
@@ -75,6 +93,11 @@ func _ready():
 func _process(_delta):
 	# Do not run if in the editor
 	if Engine.is_editor_hint():
+		return
+
+	# If not the current camera, no need to do this.
+	if not _spectator_camera.current:
+		_camera_model.visible = false
 		return
 
 	# Adjust our viewport
@@ -97,3 +120,4 @@ func _process(_delta):
 		if pose and pose.has_tracking_data:
 			var camera_pos = pose.get_adjusted_transform().origin
 			look_at(XRServer.world_origin * camera_pos)
+#endregion
