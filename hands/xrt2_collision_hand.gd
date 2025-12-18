@@ -130,8 +130,9 @@ const ORIENT_DISPLACEMENT := 0.05
 	set(value):
 		mode = value
 
-		if _parent_body:
-			_was_parent_basis = _parent_body.global_basis
+		var parent : Node3D = get_parent()
+		if parent:
+			_was_parent_basis = parent.global_basis
 
 		notify_property_list_changed()
 
@@ -510,8 +511,10 @@ func _ready():
 		add_collision_exception_with(_parent_body)
 		_parent_body.add_collision_exception_with(self)
 
+	var parent : Node3D = get_parent()
+	if parent:
 		# Store this just in case we need to calculate our parents rotational velocity.
-		_was_parent_basis = _parent_body.global_basis
+		_was_parent_basis = parent.global_basis
 
 	# If we have a pickup function, get it
 	_pickup = XRT2Pickup.get_pickup(self)
@@ -540,6 +543,10 @@ func _physics_process(delta):
 		return
 
 	var target : Transform3D
+	var parent_transform : Transform3D = Transform3D()
+	var parent : Node3D = get_parent()
+	if parent:
+		parent_transform = parent.global_transform 
 
 	if _target_override:
 		target = _target_override.global_transform * _target_offset
@@ -571,7 +578,6 @@ func _physics_process(delta):
 
 		# Seeing we're working in global space,
 		# we need to take our parent into account
-		var parent_transform : Transform3D = get_parent().global_transform 
 		target = parent_transform * target
 
 	# Always place our ghost mesh at our tracked location.
@@ -625,8 +631,9 @@ func _physics_process(delta):
 		elif _parent_body is CharacterBody3D:
 			parent_linear_velocity = _parent_body.velocity
 
-			# Calculate our parents angular velocity
-			var parent_delta_basis : Basis = _parent_body.global_basis * _was_parent_basis.inverse()
+			# Calculate our parents angular velocity.
+			# Our characterbody also includes our physical movement and we would double account for this.
+			var parent_delta_basis : Basis = parent_transform.basis * _was_parent_basis.inverse()
 			var parent_delta_quad : Quaternion = parent_delta_basis.get_rotation_quaternion()
 			var parent_delta_axis : Vector3 = parent_delta_quad.get_axis().normalized()
 			var parent_delta_angle : float = parent_delta_quad.get_angle() / delta
@@ -641,7 +648,8 @@ func _physics_process(delta):
 		# Add parent linear velocity
 		lin_velocity += parent_linear_velocity
 
-		# And hand velocity resulting from rotation
+		# And hand velocity resulting from rotation.
+		# TODO: If stepped rotation is used, we overpower the system, possibly skip!
 		var angle : float = parent_angular_velocity.length()
 		if angle > 0.0:
 			var q : Quaternion = Quaternion(parent_angular_velocity / angle, angle * delta)
@@ -694,7 +702,7 @@ func _physics_process(delta):
 		apply_forces_to.apply_torque(pd)
 
 	# Remember this in case we need it
-	_was_parent_basis = _parent_body.global_basis
+	_was_parent_basis = parent_transform.basis
 
 
 func _process(_delta):
