@@ -1,16 +1,18 @@
-[gd_scene load_steps=6 format=3 uid="uid://dyclknruy8aqf"]
+[gd_scene load_steps=7 format=3 uid="uid://dyclknruy8aqf"]
 
 [ext_resource type="PackedScene" uid="uid://xrt2j78g3fc" path="res://addons/godot-xr-tools2/construct/xrt2_construct.tscn" id="1_o7mvy"]
 [ext_resource type="Script" uid="uid://dms3vksv6tel5" path="res://construct.gd" id="2_8sb5x"]
 [ext_resource type="PackedScene" uid="uid://xrt23kyre42" path="res://addons/godot-xr-tools2/construct/xrt2_spectator_camera.tscn" id="2_hkn0h"]
 [ext_resource type="PackedScene" uid="uid://cj2av4gb40wn4" path="res://main.tscn" id="2_p0jir"]
 [ext_resource type="Texture2D" uid="uid://u6nldwj0320i" path="res://assets/main/splash.png" id="3_51pj4"]
+[ext_resource type="PackedScene" uid="uid://xrt27oxtswc" path="res://addons/godot-xr-tools2/construct/xrt2_stabilized_camera.tscn" id="5_v5hs0"]
 
 [node name="Xrt2Construct" instance=ExtResource("1_o7mvy")]
 script = ExtResource("2_8sb5x")
 
 [node name="DesktopSubViewport" parent="DesktopContainer" index="0"]
 disable_3d = true
+msaa_3d = 2
 
 [node name="LoadingImage" type="TextureRect" parent="DesktopContainer/DesktopSubViewport" index="0"]
 unique_name_in_owner = true
@@ -23,11 +25,32 @@ texture = ExtResource("3_51pj4")
 expand_mode = 2
 stretch_mode = 5
 
-[node name="Xrt2SpectatorCamera" parent="DesktopContainer/DesktopSubViewport" index="1" instance=ExtResource("2_hkn0h")]
+[node name="CameraSelectionDropdown" type="OptionButton" parent="DesktopContainer/DesktopSubViewport" index="1"]
+unique_name_in_owner = true
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 42.0
+offset_bottom = 30.0
+theme_override_font_sizes/font_size = 32
+selected = 0
+item_count = 2
+popup/item_0/text = "Spectator Camera"
+popup/item_0/id = 0
+popup/item_1/text = "Stablilized Camera"
+popup/item_1/id = 1
+
+[node name="Xrt2SpectatorCamera" parent="DesktopContainer/DesktopSubViewport" index="2" instance=ExtResource("2_hkn0h")]
 unique_name_in_owner = true
 transform = Transform3D(-0.772577, 0.196973, -0.603594, 0.00228937, 0.951519, 0.307582, 0.634916, 0.236249, -0.735573, -0.993, 2.0438, -2.63003)
 
+[node name="Xrt2StabilizedCamera" parent="DesktopContainer/DesktopSubViewport" index="3" instance=ExtResource("5_v5hs0")]
+unique_name_in_owner = true
+
+[node name="VRSubViewport" parent="." index="1"]
+msaa_3d = 1
+
 [node name="Main" parent="VRSubViewport" index="0" instance=ExtResource("2_p0jir")]
 
+[connection signal="item_selected" from="DesktopContainer/DesktopSubViewport/CameraSelectionDropdown" to="." method="_on_camera_selection_dropdown_item_selected"]
 [connection signal="showing_loaded_scene" from="VRSubViewport/Main" to="." method="_on_main_showing_loaded_scene"]
 [connection signal="showing_loading_screen" from="VRSubViewport/Main" to="." method="_on_main_showing_loading_screen"]

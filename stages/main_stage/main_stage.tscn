@@ -82,6 +82,7 @@ mesh = SubResource("SphereMesh_4i4c4")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, -0.5)
 script = ExtResource("5_don5u")
 hand_motion_range = 1
+grip_action = "grab"
 
 [node name="XRT2DirectMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand" index="0"]
 script = ExtResource("3_7f0s7")
@@ -113,6 +114,7 @@ visible = false
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1, -0.5)
 script = ExtResource("5_don5u")
 hand = 1
+grip_action = "grab"
 
 [node name="XRT2DirectMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2RightCollisionHand" index="0"]
 script = ExtResource("3_7f0s7")
