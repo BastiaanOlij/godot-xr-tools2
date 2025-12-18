@@ -24,6 +24,9 @@ metadata/_custom_type_script = "uid://xrt2244vo8p"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -0.1)
 cull_mask = 1048571
 
+[node name="OpenXRVisibilityMask" type="OpenXRVisibilityMask" parent="XROrigin3D/XRCamera3D"]
+layers = 2
+
 [node name="LeftHand" type="XRController3D" parent="XROrigin3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, -0.5)
 tracker = &"left_hand"

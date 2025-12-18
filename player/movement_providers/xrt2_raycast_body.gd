@@ -234,9 +234,13 @@ func _process_locomotion(delta : float) -> void:
 	if not state:
 		return
 
+	var exclude : Array[RID] = [ rid ]
+	for exception in _character_body.get_collision_exceptions():
+		exclude.push_back(exception.get_rid())
+
 	var query : PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
 	query.collision_mask = _character_body.collision_mask
-	query.exclude = [ rid ]
+	query.exclude = exclude
 	query.from = _character_body.global_transform * Vector3(0.0, eye_level - torso_height - head_height * 0.5, 0.0)
 	query.to = _character_body.global_transform * Vector3(0.0, -raycast_over_extent, 0.0)
 	var collision = state.intersect_ray(query)
