@@ -129,11 +129,6 @@ const ORIENT_DISPLACEMENT := 0.05
 @export var mode : CollisionHandMode = CollisionHandMode.COLLIDE:
 	set(value):
 		mode = value
-
-		var parent : Node3D = get_parent()
-		if parent:
-			_was_parent_basis = parent.global_basis
-
 		notify_property_list_changed()
 
 ## Distance to teleport hands
@@ -141,22 +136,6 @@ const ORIENT_DISPLACEMENT := 0.05
 
 ## Drop held object if teleport distance is reached?
 @export var drop_on_teleport : bool = true
-
-@export_subgroup("Linear PD controller", "linear_")
-
-## Proportional gain for linear movement
-@export var linear_proportional_gain : float = 2500.0
-
-## Derivative gain for linear movement.
-@export var linear_derivative_gain : float = 150.0
-
-@export_subgroup("Rotational PD controller", "rotational_")
-
-## Proportional gain for rotations.
-@export var rotational_proportional_gain : float = 80.0
-
-## Derivative gain for rotations.
-@export var rotational_derivative_gain : float = 1.0
 
 ## Properties related to physical appearance
 @export_group("Appearance")
@@ -285,6 +264,7 @@ func get_is_hand_tracking() -> bool:
 
 	return false
 
+
 ## Returns the pose object that handles our tracking.
 func get_pose() -> XRPose:
 	if _hand_tracker:
@@ -308,6 +288,35 @@ func get_has_tracking_data() -> bool:
 		return pose.has_tracking_data
 
 	return false
+
+
+## Get our (adjusted) transform from our tracking system.
+func get_tracked_transform(as_global : bool = true) -> Transform3D:
+	var parent_transform : Transform3D = Transform3D()
+	if as_global:
+		var parent : Node3D = get_parent()
+		if parent:
+			parent_transform = parent.global_transform
+	
+	# Give priority to our hand tracker.
+	if _hand_tracker:
+		var pose : XRPose = _hand_tracker.get_pose("default")
+		if pose and pose.has_tracking_data:
+			return parent_transform * pose.get_adjusted_transform()
+
+	# Check our controller tracker.
+	if _controller_tracker:
+		for fallback_pose_action in fallback_pose_actions:
+			var pose : XRPose = _controller_tracker.get_pose(fallback_pose_action)
+			if pose and pose.has_tracking_data:
+				# TODO: if fallback_pose_action == "grip_pose" must adjust angle!!
+
+				var target : Transform3D
+				target.basis = Basis.from_euler(fallback_offset_rotation)
+				target.origin = fallback_offset_position
+				return parent_transform * pose.get_adjusted_transform() * target
+
+	return Transform3D()
 
 
 ## Get the transform for the given pose action of the normal tracker
@@ -390,6 +399,7 @@ func get_concatenated_bone_names() -> String:
 
 	return skeleton.get_concatenated_bone_names()
 
+
 ## Get the transform of the given bone local to our collision hand
 func get_bone_transform(bone_name : String) -> Transform3D:
 	if not _hand_mesh:
@@ -469,10 +479,6 @@ func _validate_property(property: Dictionary):
 	if mode != CollisionHandMode.COLLIDE and property.name in [\
 		"teleport_distance",
 		"drop_on_teleport",
-		"linear_proportional_gain",
-		"linear_derivative_gain",
-		"rotational_proportional_gain",
-		"rotational_derivative_gain"
 	]:
 		property.usage = PROPERTY_USAGE_NONE
 
@@ -537,72 +543,54 @@ func _physics_process(delta):
 	if Engine.is_editor_hint():
 		return
 
-	# Handle DISABLED or no target.
-	if mode == CollisionHandMode.DISABLED:
-		freeze = true
-		return
-
-	var target : Transform3D
 	var parent_transform : Transform3D = Transform3D()
 	var parent : Node3D = get_parent()
 	if parent:
 		parent_transform = parent.global_transform 
 
-	if _target_override:
-		target = _target_override.global_transform * _target_offset
-	else:
-		var found_tracking_data = false
+	# Handle DISABLED.
+	if mode == CollisionHandMode.DISABLED:
+		freeze = true
+		_was_parent_basis = parent_transform.basis
+		return
 
-		# Give priority to our hand tracker.
-		if _hand_tracker:
-			var pose : XRPose = _hand_tracker.get_pose("default")
-			if pose and pose.has_tracking_data:
-				target = pose.get_adjusted_transform()
-				found_tracking_data = true
+	var target : Transform3D = get_tracked_transform()
 
-		# Check our controller tracker.
-		if not found_tracking_data and _controller_tracker:
-			for fallback_pose_action in fallback_pose_actions:
-				var pose : XRPose = _controller_tracker.get_pose(fallback_pose_action)
-				if pose and pose.has_tracking_data:
-					target.basis = Basis.from_euler(fallback_offset_rotation)
-					target.origin = fallback_offset_position
-					target = pose.get_adjusted_transform() * target
-					found_tracking_data = true
-					break
-
-		# Ignore when controller is not tracking.
-		if not found_tracking_data:
-			freeze = true
-			return
-
-		# Seeing we're working in global space,
-		# we need to take our parent into account
-		target = parent_transform * target
+	# Ignore when controller is not tracking (ident transform is very unlikely if we are).
+	if target == Transform3D():
+		freeze = true
+		return
 
 	# Always place our ghost mesh at our tracked location.
 	if _ghost_mesh:
 		_ghost_mesh.global_transform = target
 
+	# If we have a target override, just place it there!
+	if _target_override:
+		freeze = true
+		global_transform = _target_override.global_transform * _target_offset
+		_was_parent_basis = parent_transform.basis
+		return
+
 	# Handle TELEPORT
 	if mode == CollisionHandMode.TELEPORT:
 		freeze = true
 		global_transform = target
+		_was_parent_basis = parent_transform.basis
 		return
 
 	# Handle too far from target.
 	if global_position.distance_to(target.origin) > teleport_distance:
+		# TODO: This should move to our pickup logic now that positioning
+		# is handled there.
 		if drop_on_teleport and _pickup:
 			# If we're holding something, drop it!
 			_pickup.drop_held_object()
 
 		freeze = true
 		global_transform = target
+		_was_parent_basis = parent_transform.basis
 		return
-
-	# TODO: If we've grabbed a static body we should skip the logic below,
-	# we will apply push/pull forces to the player body in our pickup handlers.
-	# We should freeze our hands and just keep them where we grabbed the static body.
 
 	# We got this far, make sure we're unfrozen and let Godot position our hand.
 	# Note, if we've picked something up and apply forces to the picked up object,
@@ -612,19 +600,14 @@ func _physics_process(delta):
 		linear_velocity = Vector3()
 		angular_velocity = Vector3()
 
-	# TODO: One option we may try is to apply our forces to a held object
-	# and override the positioning of the hand instead of applying the forces to the hand.
-	# This also means offsetting target by our grab point.
-	var apply_forces_to : RigidBody3D = self
-
-	# Grab our rigid body state.
-	# var state : PhysicsDirectBodyState3D = PhysicsServer3D.body_get_direct_state(apply_forces_to.get_rid())
-
-	############################################################################
 	# Get information about our parent body velocities
 	var parent_linear_velocity : Vector3 = Vector3()
 	var parent_angular_velocity : Vector3 = Vector3()
+	var parent_global_position : Vector3 = Vector3()
+	var parent_global_basis : Basis = Basis()
 	if _parent_body:
+		parent_global_position = _parent_body.global_position
+		parent_global_basis = _parent_body.global_basis
 		if _parent_body is RigidBody3D:
 			parent_linear_velocity = _parent_body.linear_velocity
 			parent_angular_velocity = _parent_body.angular_velocity
@@ -633,73 +616,20 @@ func _physics_process(delta):
 
 			# Calculate our parents angular velocity.
 			# Our characterbody also includes our physical movement and we would double account for this.
-			var parent_delta_basis : Basis = parent_transform.basis * _was_parent_basis.inverse()
-			var parent_delta_quad : Quaternion = parent_delta_basis.get_rotation_quaternion()
-			var parent_delta_axis : Vector3 = parent_delta_quad.get_axis().normalized()
-			var parent_delta_angle : float = parent_delta_quad.get_angle() / delta
+			parent_angular_velocity = XRT2Helper.rotation_to_axis_angle(_was_parent_basis, parent_transform.basis) / delta
 
-			parent_angular_velocity = parent_delta_axis * parent_delta_angle
+	# TODO: If physics runs at a higher update rate than we get tracking,
+	# we should adjust our proportional value accordingly.
 
-	############################################################################
 	# Apply linear motion to hands.
-	var delta_movement = target.origin - apply_forces_to.global_position
-	var lin_velocity = -apply_forces_to.linear_velocity
-	if _parent_body:
-		# Add parent linear velocity
-		lin_velocity += parent_linear_velocity
+	XRT2Helper.apply_force_to_target(delta, self, target.origin,
+		1.0, parent_linear_velocity, parent_angular_velocity, parent_global_position
+	)
 
-		# And hand velocity resulting from rotation.
-		# TODO: If stepped rotation is used, we overpower the system, possibly skip!
-		var angle : float = parent_angular_velocity.length()
-		if angle > 0.0:
-			var q : Quaternion = Quaternion(parent_angular_velocity / angle, angle * delta)
-			var was_position = apply_forces_to.global_position - _parent_body.global_position
-			var new_position = q * was_position
-			lin_velocity += (new_position - was_position) / delta
-
-	if delta_movement.length() > 0.0 or lin_velocity.length() > 0.0:
-		# Calculate proportional term
-		var p : Vector3 = delta_movement * linear_proportional_gain
-
-		# Calculate derivative term
-		var d : Vector3 = lin_velocity * linear_derivative_gain
-
-		var force = p + d
-
-		# Apply mass!
-		force *= apply_forces_to.mass
-
-		# TODO: Restrict maximum force!
-
-		# Apply force logic.
-		apply_forces_to.apply_central_force(force)
-
-	############################################################################
 	# Apply angular motion to hands.
-	var delta_basis : Basis = target.basis * apply_forces_to.global_basis.inverse()
-	var delta_quad : Quaternion = delta_basis.get_rotation_quaternion()
-	var delta_axis : Vector3 = delta_quad.get_axis().normalized()
-	var delta_angle : float = delta_quad.get_angle()
-	var rot_velocity : Vector3 = -apply_forces_to.angular_velocity
-	if _parent_body:
-		# Localise and add our parents angular velocity
-		rot_velocity += apply_forces_to.global_basis.inverse() * _parent_body.global_basis * parent_angular_velocity
-	if delta_angle != 0.0 or apply_forces_to.angular_velocity.length() != 0.0:
-		# Calculate proportional term
-		var p : Vector3 = delta_axis * delta_angle * rotational_proportional_gain
-
-		# Calculate derivative term
-		var d : Vector3 = rot_velocity * rotational_derivative_gain
-
-		# Add together to get our input
-		var pd = p + d
-
-		# TODO: possibly apply inertia? Especially if we apply forces to held object
-
-		# TODO: restrict maximum torque
-
-		# Apply as our torque
-		apply_forces_to.apply_torque(pd)
+	XRT2Helper.apply_torque_to_target(
+		delta, self, target.basis, 1.0, parent_angular_velocity, parent_global_basis
+	)
 
 	# Remember this in case we need it
 	_was_parent_basis = parent_transform.basis
@@ -787,6 +717,10 @@ func _update_target() -> void:
 	if _target_overrides.size():
 		_target_override = _target_overrides[0].target
 		_target_offset = _target_overrides[0].offset
+
+		if mode != CollisionHandMode.DISABLED:
+			# Reposition to our target override
+			global_transform = _target_override.global_transform * _target_offset
 #endregion
 
 

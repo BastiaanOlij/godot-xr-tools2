@@ -1,0 +1,38 @@
+[gd_scene load_steps=6 format=3 uid="uid://xrt2ef8ojbk"]
+
+[ext_resource type="Script" uid="uid://xrt2vis4a64" path="res://addons/godot-xr-tools2/debug/xrt2_log.gd" id="1_uv23u"]
+[ext_resource type="Shader" uid="uid://xrt2as6gnsr" path="res://addons/godot-xr-tools2/shaders/unshaded_texture_with_alpha.gdshader" id="2_c3c5f"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_etopo"]
+viewport_path = NodePath("SubViewport")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gdpyk"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("2_c3c5f")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/texture_albedo = SubResource("ViewportTexture_etopo")
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/uv_offset = Vector2(0, 0)
+
+[sub_resource type="QuadMesh" id="QuadMesh_uv23u"]
+
+[node name="XRT2Log" type="Node3D"]
+script = ExtResource("1_uv23u")
+
+[node name="Display" type="MeshInstance3D" parent="."]
+material_override = SubResource("ShaderMaterial_gdpyk")
+mesh = SubResource("QuadMesh_uv23u")
+
+[node name="SubViewport" type="SubViewport" parent="."]
+disable_3d = true
+transparent_bg = true
+size = Vector2i(589, 589)
+render_target_update_mode = 4
+
+[node name="RichTextLabel" type="RichTextLabel" parent="SubViewport"]
+offset_right = 589.0
+offset_bottom = 589.0
+bbcode_enabled = true
+text = "[color=blue]This is placeholder text...[/color]"
+scroll_following = true

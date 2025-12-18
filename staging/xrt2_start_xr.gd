@@ -1,5 +1,6 @@
+#-------------------------------------------------------------------------------
 # xrt2_start_xr.gd
-#
+#-------------------------------------------------------------------------------
 # MIT License
 #
 # Copyright (c) 2024-present Bastiaan Olij, Malcolm A Nixon and contributors
@@ -21,6 +22,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#-------------------------------------------------------------------------------
 
 @tool
 class_name XRT2StartXR
@@ -96,11 +98,13 @@ static func get_xr_interface() -> XRInterface:
 	else:
 		return null
 
+
 func get_xr_viewport() -> Viewport:
 	if hmd_viewport:
 		return hmd_viewport
 
 	return get_viewport()
+
 
 # Handle auto-initialization when ready
 func _ready() -> void:
