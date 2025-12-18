@@ -144,6 +144,7 @@ var _closest_object : ClosestObject
 # What are we holding and by which grab point
 var _picked_up : PhysicsBody3D
 var _grab_point : XRT2GrabPoint
+var _grab_offset : Transform3D
 
 # Original state of picked up object
 var _original_freeze_mode : RigidBody3D.FreezeMode
@@ -186,6 +187,17 @@ static func picked_up_by(what : PhysicsBody3D) -> XRT2Pickup:
 	# If we found one, it will be our secondary hand
 	return by
 
+
+## How many hands have picked up this object?
+static func picked_up_count(what : PhysicsBody3D) -> int:
+	var count: int = 0
+	for pickup : XRT2Pickup in _pickup_handlers:
+		if pickup._picked_up == what:
+			count += 1
+
+	return count
+
+
 ## Returns true if we've picked up something (/are holding onto something)
 func has_picked_up() -> bool:
 	if is_instance_valid(_picked_up):
@@ -214,10 +226,6 @@ func is_primary() -> bool:
 
 ## Pick up this object
 func pickup_object(which : PhysicsBody3D):
-	if not which is RigidBody3D and not which is PhysicalBone3D:
-		push_warning("Picking up objects other than Rigidbody and PhysicalBone3D is currently disabled.")
-		return
-
 	# No longer show highlighted
 	_remove_highlight(which)
 
@@ -237,53 +245,56 @@ func pickup_object(which : PhysicsBody3D):
 	_original_collision_layer = _picked_up.collision_layer
 	_original_collision_mask = _picked_up.collision_mask
 
+	# TODO: the way we now make this work for xr_collision_hand can also
+	# be applied for a xr_controller.
+	# We just don't have the target override logic, but we can send a signal
+	# that the user can implement.
+
 	if _xr_collision_hand:
-		if _picked_up is RigidBody3D or _picked_up is PhysicalBone3D:
-			# Remember our current hand transform.
-			var hand_transform : Transform3D = _xr_collision_hand.global_transform
+		# Make a collision exception between hand and picked up object
+		_picked_up.add_collision_exception_with(_xr_collision_hand)
+		_xr_collision_hand.add_collision_exception_with(_picked_up)
 
-			# Find our grab point (if any).
-			# Note, we're already handled our exclusive logic, can ignore that here.
-			_grab_point = _get_closest_grabpoint(_picked_up, global_position)
+		# Remember our current hand transform.
+		var hand_transform : Transform3D = _xr_collision_hand.global_transform
 
-			# Figure out our grab position
-			var dest_transform : Transform3D 
-			if _grab_point:
-				dest_transform = _grab_point.get_hand_transform(global_position)
-			else:
-				dest_transform = _get_default_hand_transform(_picked_up, global_position)
-			
-			var offset = get_parent().global_transform.inverse() * hand_transform
+		# Get the offset between our hand root bone and our hand transform
+		var hand_offset = get_parent().global_transform.inverse() * hand_transform
 
-			# Now move our hand in the correct grab position
-			_xr_collision_hand.global_transform = dest_transform * offset
-			_xr_collision_hand.force_update_transform()
+		# Find our grab point (if any).
+		# Note, we're already handled our exclusive logic, can ignore that here.
+		_grab_point = _get_closest_grabpoint(_picked_up, global_position)
 
-			# Now join our hand and the object we're picking up together
-			_joint = Generic6DOFJoint3D.new()
-			add_child(_joint, false, Node.INTERNAL_MODE_BACK)
-			_joint.node_a = _xr_collision_hand.get_path()
-			_joint.node_b = _picked_up.get_path()
-
-			if _xr_collision_hand._hand_mesh:
-				# Now position our hand mesh where our hand was
-				_xr_collision_hand._hand_mesh.global_transform = hand_transform
-
-				# And tween our hand mesh,
-				# this should animate our hand moving to where we've grabbed it
-				# while at the same time we pull our grabbed object to where our
-				# hand is tracking 
-				if _tween:
-					_tween.kill()
-
-				_tween = _xr_collision_hand._hand_mesh.create_tween()
-
-				# Now tween
-				_tween.tween_property(_xr_collision_hand._hand_mesh, "transform", Transform3D(), 0.1)
-
+		# Figure out our grab position
+		var dest_transform : Transform3D 
+		if _grab_point:
+			dest_transform = _grab_point.get_hand_transform(global_position)
 		else:
-			# TODO implement other types of grab
-			pass
+			dest_transform = _get_default_hand_transform(_picked_up, global_position)
+
+		# Adjust destination by our hand offset
+		dest_transform = dest_transform * hand_offset
+
+		# Apply target override
+		_grab_offset = _picked_up.global_transform.inverse() * dest_transform
+		_xr_collision_hand.add_target_override(_picked_up, 1, _grab_offset)
+
+		# TODO: We should have a nice solution in xr collision hand for this!
+		if _xr_collision_hand._hand_mesh:
+			# Now position our hand mesh where our hand was
+			_xr_collision_hand._hand_mesh.global_transform = hand_transform
+
+			# And tween our hand mesh,
+			# this should animate our hand moving to where we've grabbed it
+			# while at the same time we pull our grabbed object to where our
+			# hand is tracking 
+			if _tween:
+				_tween.kill()
+
+			_tween = _xr_collision_hand._hand_mesh.create_tween()
+
+			# Now tween
+			_tween.tween_property(_xr_collision_hand._hand_mesh, "transform", Transform3D(), 0.1)
 	elif _xr_controller:
 		# Old fashioned pickup, we use remote transform to pickup the object
 		if _is_primary:
@@ -356,6 +367,7 @@ func drop_held_object( \
 		# Just in case
 		_picked_up = null
 		_grab_point = null
+		_grab_offset = Transform3D()
 		_is_primary = false
 		return
 
@@ -363,17 +375,15 @@ func drop_held_object( \
 
 	# Process letting go
 	if _xr_collision_hand:
-		if _picked_up is RigidBody3D or _picked_up is PhysicalBone3D:
-			if _joint:
-				remove_child(_joint)
-				_joint.queue_free()
-				_joint = null
+		# TODO: Delay this until we're not colliding!
+		_picked_up.remove_collision_exception_with(_xr_collision_hand)
+		_xr_collision_hand.remove_collision_exception_with(_picked_up)
 
-			if _tween:
-				_tween.kill()
+		_xr_collision_hand.remove_target_override(_picked_up)
 
-			if _xr_collision_hand._hand_mesh:
-				_xr_collision_hand._hand_mesh.transform = Transform3D()
+		# TODO: should be something on our collision hand
+		if _xr_collision_hand._hand_mesh:
+			_xr_collision_hand._hand_mesh.transform = Transform3D()
 
 	elif _xr_controller:
 		_picked_up.collision_layer = _original_collision_layer
@@ -388,6 +398,7 @@ func drop_held_object( \
 	# And we're no longer holding something
 	_picked_up = null
 	_grab_point = null
+	_grab_offset = Transform3D()
 	_is_primary = false
 
 	var other = picked_up_by(was_picked_up)
@@ -395,8 +406,9 @@ func drop_held_object( \
 		# If it isn't already primary, this is now our primary
 		other._is_primary = true
 	elif _xr_player_object:
-		was_picked_up.add_collision_exception_with(_xr_player_object)
-		_xr_player_object.add_collision_exception_with(was_picked_up)
+		# TODO: Delay this until we're not colliding!
+		was_picked_up.remove_collision_exception_with(_xr_player_object)
+		_xr_player_object.remove_collision_exception_with(was_picked_up)
 
 		if was_picked_up.has_method("dropped"):
 			was_picked_up.dropped(self)
@@ -478,6 +490,8 @@ func _ready():
 
 		_update_detection_radius()
 		return
+
+	process_physics_priority = -91
 
 	_xr_origin = XRT2Helper.get_xr_origin(self)
 	_xr_collision_hand = XRT2CollisionHand.get_xr_collision_hand(self)
@@ -601,6 +615,51 @@ func _process(_delta):
 			return
 
 		_add_highlight(_closest_object.body)
+
+
+func _physics_process(delta):
+	# Don't run in editor
+	if Engine.is_editor_hint():
+		return
+
+	if not _picked_up:
+		return
+
+	var target : Transform3D
+	if _xr_collision_hand:
+		target = _xr_collision_hand.get_tracked_transform()
+	elif _xr_controller:
+		target = _xr_controller.global_transform
+	else:
+		return
+
+	if _picked_up is RigidBody3D or _picked_up is PhysicalBone3D:
+		var global_target: Transform3D = target * _grab_offset.inverse()
+
+		# TODO: Get information about our parent body velocities
+		var parent_linear_velocity : Vector3 = Vector3()
+		var parent_angular_velocity : Vector3 = Vector3()
+		var parent_global_position : Vector3 = Vector3()
+		var parent_global_basis : Basis = Basis()
+
+		# If we're holding this with multiple hands, we apply proportionally.
+		var held_by_no_of_hands : float = picked_up_count(_picked_up)
+		var proportion: float = 1.0 / held_by_no_of_hands
+
+		# Apply linear motion to picked up object.
+		XRT2Helper.apply_force_to_target(delta, _picked_up, global_target.origin, proportion,
+			parent_linear_velocity, parent_angular_velocity, parent_global_position
+		)
+
+		# Apply angular motion to picked up object.
+		XRT2Helper.apply_torque_to_target(
+			delta, _picked_up, global_target.basis, proportion,
+			parent_angular_velocity, parent_global_basis
+		)
+	else:
+		# TODO: If static body, apply forces to player!
+		pass
+
 #endregion
 
 
@@ -650,6 +709,8 @@ func _get_closest_grabpoint(body : PhysicsBody3D, hand_position : Vector3) -> XR
 func _get_default_hand_transform(body : PhysicsBody3D, hand_position : Vector3) -> Transform3D:
 	var state : PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
 
+	# TODO: Change this to shape cast using our area collision shape
+
 	var params : PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
 	params.from = hand_position
 	params.to = body.global_position
@@ -695,10 +756,10 @@ func _get_closest() -> ClosestObject:
 		elif body is PhysicalBone3D and _xr_collision_hand:
 			# We support picking up PhysicalBone3D if we're using collision hands
 			pass
-		elif body is StaticBody3D:
+		elif body is StaticBody3D and _xr_collision_hand:
 			# TODO implement a system for selectively including these
 			# (or maybe switch on animatable body)
-			continue
+			pass
 		else:
 			# Skip anything else
 			continue
