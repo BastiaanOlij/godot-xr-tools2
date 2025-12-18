@@ -301,7 +301,7 @@ mass = 2.0
 size = Vector3(0.2, 0.2, 0.2)
 
 [node name="Box02" parent="Table" instance=ExtResource("4_xu5kv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.409726, 1.34847, -0.19379187)
+transform = Transform3D(0.9997567, 0, 0.022059172, 0, 1, 0, -0.022059172, 0, 0.9997567, 0.409726, 1.34847, -0.19379187)
 mass = 10.0
 size = Vector3(0.4, 0.4, 0.4)
 color = Color(0.20507804, 0.6172268, 0.78655386, 1)
