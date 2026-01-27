@@ -112,7 +112,7 @@ func _calibrate_height() -> void:
 	# XRCamera3D node may not be updated yet, so go straight to the source!
 	var head_tracker : XRPositionalTracker = XRServer.get_tracker("head")
 	if not head_tracker:
-		push_error("Couldn't locate head tracker!")
+		push_error("XRT2: Couldn't locate head tracker!")
 		return
 
 	var pose : XRPose = head_tracker.get_pose("default")
@@ -121,6 +121,8 @@ func _calibrate_height() -> void:
 
 		var camera_height = t.origin.y
 		_height_adjust = player_target_eye_height - camera_height
+
+		print_verbose("XRT2: Height adjust set to %0.2fm" % [ _height_adjust ])
 
 		_xr_origin.transform.origin.y = _height_adjust
 		_height_calibrated = true
@@ -227,7 +229,7 @@ func _process(delta) -> void:
 
 		var head_tracker : XRPositionalTracker = XRServer.get_tracker("head")
 		if not head_tracker:
-			push_error("Couldn't locate head tracker!")
+			push_error("XRT2: Couldn't locate head tracker!")
 			return
 
 		var pose : XRPose = head_tracker.get_pose("default")
@@ -350,7 +352,7 @@ func _on_pose_recentered() -> void:
 
 	if openxr_interface.xr_play_area_mode == XRInterface.XR_PLAY_AREA_SITTING:
 		# Using center on HMD could mess things up here
-		push_warning("Physical movement pose reset doesn't work with sitting setting")
+		push_warning("XRT2: Physical movement pose reset doesn't work with sitting setting")
 		return
 	elif openxr_interface.xr_play_area_mode == XRInterface.XR_PLAY_AREA_ROOMSCALE:
 		# This is already handled by the headset, no need to do more!
@@ -361,7 +363,7 @@ func _on_pose_recentered() -> void:
 	# XRCamera3D node may not be updated yet, so go straight to the source!
 	var head_tracker : XRPositionalTracker = XRServer.get_tracker("head")
 	if not head_tracker:
-		push_error("Couldn't locate head tracker!")
+		push_error("XRT2: Couldn't locate head tracker!")
 		return
 
 	var pose : XRPose = head_tracker.get_pose("default")
