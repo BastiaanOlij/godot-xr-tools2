@@ -30,8 +30,8 @@ The following branches are in active development:
 
 |  Branch   |  Description                  |  Godot version  |
 |-----------|-------------------------------|-----------------|
-|  master   | Current development branch    |  Godot 4.4+     |
-|  demo     | Demo project for XRT2         |  Godot 4.4+     |
+|  master   | Current development branch    |  Godot 4.6+     |
+|  demo     | Demo project for XRT2         |  Godot 4.6+     |
 
 > Note, this repo is temporarily hosted on https://github.com/BastiaanOlij but will be moved to https://github.com/GodotVR once we're closer to a stable release.
 
@@ -39,10 +39,6 @@ The following branches are in active development:
 
 Documentation for this plugin will become available at a later date when the plugin is more complete.
 For now check out [the demo branch](https://github.com/BastiaanOlij/godot-xr-tools2/tree/demo) in this repository.
-
-## Requirements
-
-Due to the introduction of UIDs and format changes to some of the resources used for OpenXR, the minimum version of Godot that needs to be used for this plugin is Godot 4.4.
 
 ## Installation
 

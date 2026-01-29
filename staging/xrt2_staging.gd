@@ -70,7 +70,7 @@ func _ready() -> void:
 		return
 
 	# We start by loading our main level scene
-	load_scene(main_scene)
+	load_scene.call_deferred(main_scene)
 
 
 # Verifies our staging has a valid configuration.

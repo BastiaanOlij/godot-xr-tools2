@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://xrt27oxtswc"]
+[gd_scene format=3 uid="uid://xrt27oxtswc"]
 
-[ext_resource type="Script" uid="uid://xrt23dlfj0r" path="res://addons/godot-xr-tools2/construct/xrt2_stabilized_camera.gd" id="1_0aj8h"]
+[ext_resource type="Script" uid="uid://xrt23dlfj0r" path="res://addons/godot-xr-tools2/spectator/xrt2_stabilized_camera.gd" id="1_0aj8h"]
 
 [node name="Xrt2StabilizedCamera" type="Node3D"]
 script = ExtResource("1_0aj8h")
