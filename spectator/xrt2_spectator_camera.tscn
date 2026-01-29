@@ -1,6 +1,6 @@
-[gd_scene load_steps=10 format=3 uid="uid://xrt23kyre42"]
+[gd_scene format=3 uid="uid://xrt23kyre42"]
 
-[ext_resource type="Script" uid="uid://xrt2dafnu3w" path="res://addons/godot-xr-tools2/construct/xrt2_spectator_camera.gd" id="1_dbds7"]
+[ext_resource type="Script" uid="uid://xrt2dafnu3w" path="res://addons/godot-xr-tools2/spectator/xrt2_spectator_camera.gd" id="1_dbds7"]
 [ext_resource type="Shader" uid="uid://xrt2oqik7ik" path="res://addons/godot-xr-tools2/shaders/shaded_no_alpha.gdshader" id="1_luqx8"]
 [ext_resource type="Shader" uid="uid://xrt2lfbdmdk" path="res://addons/godot-xr-tools2/shaders/unshaded_texture_no_alpha.gdshader" id="3_gcvm6"]
 
@@ -32,15 +32,15 @@ shader_parameter/uv_offset = Vector2(0, 0)
 
 [sub_resource type="QuadMesh" id="QuadMesh_impty"]
 
-[node name="Xrt2SpectatorCamera" type="Node3D"]
+[node name="Xrt2SpectatorCamera" type="Node3D" unique_id=1993441974]
 script = ExtResource("1_dbds7")
 
-[node name="SpectatorCamera3D" type="Camera3D" parent="."]
+[node name="SpectatorCamera3D" type="Camera3D" parent="." unique_id=915169835]
 cull_mask = 5
 
-[node name="Camera" type="Node3D" parent="SpectatorCamera3D"]
+[node name="Camera" type="Node3D" parent="SpectatorCamera3D" unique_id=2088867825]
 
-[node name="CameraLens" type="MeshInstance3D" parent="SpectatorCamera3D/Camera"]
+[node name="CameraLens" type="MeshInstance3D" parent="SpectatorCamera3D/Camera" unique_id=746915265]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0.05)
 layers = 2
 material_override = SubResource("ShaderMaterial_4ym2f")
@@ -48,7 +48,7 @@ cast_shadow = 0
 mesh = SubResource("CylinderMesh_dbds7")
 skeleton = NodePath("../..")
 
-[node name="CameraBody" type="MeshInstance3D" parent="SpectatorCamera3D/Camera"]
+[node name="CameraBody" type="MeshInstance3D" parent="SpectatorCamera3D/Camera" unique_id=156633276]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
 layers = 2
 material_override = SubResource("ShaderMaterial_4ym2f")
@@ -56,7 +56,7 @@ cast_shadow = 0
 mesh = SubResource("BoxMesh_brmuf")
 skeleton = NodePath("../..")
 
-[node name="CameraDisplay" type="MeshInstance3D" parent="SpectatorCamera3D/Camera"]
+[node name="CameraDisplay" type="MeshInstance3D" parent="SpectatorCamera3D/Camera" unique_id=377963510]
 transform = Transform3D(0.980319, 0, 0.197418, 0, 1, 0, -0.197418, 0, 0.980319, 0.31924, 0, 0.157601)
 layers = 2
 material_override = SubResource("ShaderMaterial_4ym2f")
@@ -64,7 +64,7 @@ cast_shadow = 0
 mesh = SubResource("BoxMesh_yqcti")
 skeleton = NodePath("../..")
 
-[node name="Display" type="MeshInstance3D" parent="SpectatorCamera3D/Camera/CameraDisplay"]
+[node name="Display" type="MeshInstance3D" parent="SpectatorCamera3D/Camera/CameraDisplay" unique_id=35598694]
 transform = Transform3D(-0.38, 0, -1.50996e-07, 0, 0.18, 0, 5.73784e-08, 0, -1, 0.00580734, 0, -0.0288376)
 layers = 2
 material_override = SubResource("ShaderMaterial_0gxnl")
