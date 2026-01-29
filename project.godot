@@ -8,11 +8,15 @@
 
 config_version=5
 
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
 [application]
 
 config/name="Godot XR Tools 2 demo"
 run/main_scene="uid://cj2av4gb40wn4"
-config/features=PackedStringArray("4.5", "Mobile")
+config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 run/main_scene.pc="uid://dyclknruy8aqf"
 
@@ -20,6 +24,8 @@ run/main_scene.pc="uid://dyclknruy8aqf"
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
+window/size/viewport_width.minimum_spectator=512
+window/size/viewport_height.minimum_spectator=512
 
 [filesystem]
 
@@ -71,6 +77,7 @@ lights_and_shadows/directional_shadow/size=8192
 lights_and_shadows/directional_shadow/size.mobile=4096
 lights_and_shadows/directional_shadow/16_bits=false
 anti_aliasing/quality/msaa_3d=1
+anti_aliasing/quality/use_debanding=true
 environment/defaults/default_clear_color=Color(0, 0, 0, 1)
 anti_aliasing/quality/msaa_3d.pc=0
 
@@ -82,3 +89,4 @@ openxr/foveation_level=3
 openxr/foveation_dynamic=true
 openxr/extensions/hand_interaction_profile=true
 shaders/enabled=true
+openxr/extensions/meta/color_space/starting_color_space=3

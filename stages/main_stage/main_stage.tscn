@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://7lt82mv6lmxo"]
+[gd_scene format=3 uid="uid://7lt82mv6lmxo"]
 
 [ext_resource type="PackedScene" uid="uid://xrt20000007" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.tscn" id="1_spd8v"]
 [ext_resource type="Script" uid="uid://cftpwaa62ws1q" path="res://stages/main_stage/main_stage.gd" id="2_4i4c4"]
@@ -42,7 +42,7 @@ radius = 0.05
 height = 0.15
 radial_segments = 32
 
-[node name="MainStage" instance=ExtResource("1_spd8v")]
+[node name="MainStage" unique_id=1924971845 instance=ExtResource("1_spd8v")]
 script = ExtResource("2_4i4c4")
 
 [node name="WorldEnvironment" parent="." index="0"]
@@ -57,90 +57,82 @@ directional_shadow_split_2 = 0.1
 directional_shadow_split_3 = 0.25
 directional_shadow_max_distance = 30.0
 
-[node name="World" parent="." index="2" instance=ExtResource("2_m5inh")]
+[node name="World" parent="." index="2" unique_id=42292334 instance=ExtResource("2_m5inh")]
 
-[node name="XRT2CharacterBody3D" parent="." index="3" instance=ExtResource("3_3ltgk")]
+[node name="XRT2CharacterBody3D" parent="." index="3" unique_id=1387237929 instance=ExtResource("3_3ltgk")]
 
-[node name="Head" type="MeshInstance3D" parent="XRT2CharacterBody3D/XROrigin3D/XRCamera3D" index="0"]
+[node name="Head" type="MeshInstance3D" parent="XRT2CharacterBody3D/XROrigin3D/XRCamera3D" index="0" unique_id=645685516]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, 0.1)
 layers = 4
 material_override = SubResource("ShaderMaterial_3ltgk")
 mesh = SubResource("SphereMesh_4i4c4")
 
-[node name="HMD" type="MeshInstance3D" parent="XRT2CharacterBody3D/XROrigin3D/XRCamera3D/Head" index="0"]
+[node name="HMD" type="MeshInstance3D" parent="XRT2CharacterBody3D/XROrigin3D/XRCamera3D/Head" index="0" unique_id=1680958940]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0.02, -0.06)
 layers = 4
 material_override = SubResource("StandardMaterial3D_4i4c4")
 mesh = SubResource("CapsuleMesh_wfvj4")
 
-[node name="HeadShadowCaster" type="MeshInstance3D" parent="XRT2CharacterBody3D/XROrigin3D/XRCamera3D/Head" index="1"]
+[node name="HeadShadowCaster" type="MeshInstance3D" parent="XRT2CharacterBody3D/XROrigin3D/XRCamera3D/Head" index="1" unique_id=1647640304]
 layers = 2
 cast_shadow = 3
 mesh = SubResource("SphereMesh_4i4c4")
 
-[node name="XRT2LeftCollisionHand" type="RigidBody3D" parent="XRT2CharacterBody3D/XROrigin3D" index="2"]
+[node name="XRT2LeftCollisionHand" type="RigidBody3D" parent="XRT2CharacterBody3D/XROrigin3D" index="2" unique_id=2023116865]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, -0.5)
-center_of_mass_mode = 1
-inertia = Vector3(0.01, 0.01, 0.01)
-continuous_cd = true
 script = ExtResource("5_don5u")
 hand_motion_range = 1
 grip_action = "grab"
 
-[node name="XRT2DirectMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand" index="0"]
+[node name="XRT2DirectMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand" index="0" unique_id=1416942326]
 script = ExtResource("3_7f0s7")
 movement_action = "move"
 forward_movement_speed = 0.0
 movement_acceleration = 0.0
 
-[node name="LeftHandAttachment" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand" index="1"]
+[node name="LeftHandAttachment" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand" index="1" unique_id=345731134]
 transform = Transform3D(0.99999994, -3.417338e-07, 1.8328423e-05, 4.0133915e-07, 0.99999845, -0.0016677812, -1.8358156e-05, 0.0016677516, 0.99999833, -0.0149999615, -1.8697472e-05, 0.067175575)
 script = ExtResource("5_4i4c4")
 bone_name = "LeftHand"
 
-[node name="XRT2Pickup" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand/LeftHandAttachment" index="0"]
+[node name="XRT2Pickup" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand/LeftHandAttachment" index="0" unique_id=1189634809]
 transform = Transform3D(1, -1.42109e-14, 0, 0, 1, 0, 0, 0, 1, 0.02, 0, -0.08)
 script = ExtResource("4_l0n08")
 detection_radius = 0.1
-max_force = 0.0
 
-[node name="IndexTipAttachment" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand" index="2"]
+[node name="IndexTipAttachment" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand" index="2" unique_id=1677449161]
 transform = Transform3D(0.91954595, -0.014892519, -0.39270008, -0.03211107, 0.99309224, -0.11285275, 0.39166808, 0.11638334, 0.9127157, -0.026100121, 0.042943064, -0.13161416)
 script = ExtResource("5_4i4c4")
 bone_name = "LeftIndexTip"
 metadata/_custom_type_script = "uid://xrt2eecske1"
 
-[node name="Axis" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand/IndexTipAttachment" index="0" instance=ExtResource("10_4i4c4")]
+[node name="Axis" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand/IndexTipAttachment" index="0" unique_id=1368027190 instance=ExtResource("10_4i4c4")]
 visible = false
 
-[node name="XRT2RightCollisionHand" type="RigidBody3D" parent="XRT2CharacterBody3D/XROrigin3D" index="3"]
+[node name="XRT2RightCollisionHand" type="RigidBody3D" parent="XRT2CharacterBody3D/XROrigin3D" index="3" unique_id=291624326]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1, -0.5)
-center_of_mass_mode = 1
-inertia = Vector3(0.01, 0.01, 0.01)
-continuous_cd = true
 script = ExtResource("5_don5u")
 hand = 1
 grip_action = "grab"
 
-[node name="XRT2DirectMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2RightCollisionHand" index="0"]
+[node name="XRT2DirectMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2RightCollisionHand" index="0" unique_id=424588044]
 script = ExtResource("3_7f0s7")
 movement_action = "move"
 rotation_speed = 0.0
 strafe_movement_speed = 2.5
 
-[node name="RightHandAttachment" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2RightCollisionHand" index="1"]
+[node name="RightHandAttachment" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2RightCollisionHand" index="1" unique_id=1910468099]
 transform = Transform3D(0.99999994, 3.417346e-07, -1.8372135e-05, -4.0141205e-07, 0.99999845, -0.0016677375, 1.8401866e-05, 0.0016677079, 0.99999833, 0.0149999615, -1.8697472e-05, 0.067175575)
 script = ExtResource("5_4i4c4")
 bone_name = "RightHand"
 metadata/_custom_type_script = "uid://xrt2eecske1"
 
-[node name="XRT2Pickup" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2RightCollisionHand/RightHandAttachment" index="0"]
+[node name="XRT2Pickup" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2RightCollisionHand/RightHandAttachment" index="0" unique_id=1254830859]
 transform = Transform3D(1, 1.77636e-14, 0, 7.10543e-15, 1, 0, 0, 0, 1, -0.02, 0, -0.08)
 script = ExtResource("4_l0n08")
 detection_radius = 0.1
-max_force = 1000.0
 
-[node name="XRT2Log" parent="XRT2CharacterBody3D" index="3" instance=ExtResource("11_4i4c4")]
+[node name="XRT2Log" parent="XRT2CharacterBody3D" index="3" unique_id=2103358672 instance=ExtResource("11_4i4c4")]
 transform = Transform3D(0.9854406, 0, 0.17002034, 0, 1, 0, -0.17002034, 0, 0.9854406, -0.19793722, 1.5116211, -1.2153747)
 display_size = Vector2(0.5, 0.5)
 dpi = 30.0
