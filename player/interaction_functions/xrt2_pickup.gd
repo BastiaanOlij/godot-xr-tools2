@@ -253,6 +253,16 @@ func get_controller_target() -> Transform3D:
 
 ## Pick up this object
 func pickup_object(which : PhysicsBody3D):
+	# Get our current tracker position
+	var target : Transform3D
+	if _xr_collision_hand:
+		target = _xr_collision_hand.global_transform
+	elif _xr_controller:
+		target = _xr_controller.global_transform
+	else:
+		push_error("Controller not found!")
+		return
+
 	# No longer show highlighted
 	_remove_highlight(which)
 
@@ -286,34 +296,33 @@ func pickup_object(which : PhysicsBody3D):
 		_picked_up.add_collision_exception_with(_xr_collision_hand)
 		_xr_collision_hand.add_collision_exception_with(_picked_up)
 
-		# Remember our current hand transform.
-		var hand_transform : Transform3D = _xr_collision_hand.global_transform
+	# Find our grab point (if any).
+	# Note, we're already handled our exclusive logic, can ignore that here.
+	_grab_point = _get_closest_grabpoint(_picked_up, global_position)
 
-		# Get the offset between our hand root bone and our hand transform
-		var hand_offset = get_parent().global_transform.inverse() * hand_transform
+	# Figure out our grab position
+	var grab_transform : Transform3D 
+	if _grab_point:
+		grab_transform = _grab_point.get_hand_transform(global_position)
+	else:
+		grab_transform = _get_default_hand_transform(_picked_up, global_position)
+	var local_grab_transform: Transform3D = _picked_up.global_transform.inverse() * grab_transform
 
-		# Find our grab point (if any).
-		# Note, we're already handled our exclusive logic, can ignore that here.
-		_grab_point = _get_closest_grabpoint(_picked_up, global_position)
+	# Calculate the offset between our controller position, and the object we picked up.
+	var target_offset: Transform3D = get_parent().global_transform.inverse() * target
 
-		# Figure out our grab position
-		var dest_transform : Transform3D 
-		if _grab_point:
-			dest_transform = _grab_point.get_hand_transform(global_position)
-		else:
-			dest_transform = _get_default_hand_transform(_picked_up, global_position)
+	_grab_offset = local_grab_transform * target_offset
 
-		# Adjust destination by our hand offset
-		dest_transform = dest_transform * hand_offset
-
+	if _xr_collision_hand:
 		# Apply target override
-		_grab_offset = _picked_up.global_transform.inverse() * dest_transform
 		_xr_collision_hand.add_target_override(_picked_up, 1, _grab_offset)
+
+		# TODO set pose overrule based on what we've picked up (if applicable)
 
 		# TODO: We should add a nicer solution in xr collision hand for this!
 		if _xr_collision_hand._hand_mesh:
 			# Now position our hand mesh where our hand was
-			_xr_collision_hand._hand_mesh.global_transform = hand_transform
+			_xr_collision_hand._hand_mesh.global_transform = target
 
 			# And tween our hand mesh,
 			# this should animate our hand moving to where we've grabbed it
@@ -327,54 +336,8 @@ func pickup_object(which : PhysicsBody3D):
 			# Now tween
 			_tween.tween_property(_xr_collision_hand._hand_mesh, "transform", Transform3D(), 0.1)
 	elif _xr_controller:
-		# Old fashioned pickup, we use remote transform to pickup the object
-		# TODO replace this with similar solution as collision hands node.
-		if _is_primary:
-			if _picked_up is RigidBody3D:
-				_original_freeze_mode = _picked_up.freeze_mode
-
-				# Don't control with physics engine, we're in control.
-				_picked_up.freeze = true
-				_picked_up.freeze_mode = RigidBody3D.FREEZE_MODE_KINEMATIC
-				_picked_up.collision_layer = 0
-				_picked_up.collision_mask = 0
-
-				# Setup our remote transform and sync location to
-				# our current picked up object position.
-				_remote_transform.global_transform = _picked_up.global_transform
-				_remote_transform.remote_path = _picked_up.get_path()
-	
-				# Find our grab point (if any).
-				# Note, we're already handled our exclusive logic, can ignore that here.
-				_grab_point = _get_closest_grabpoint(_picked_up, global_position)
-
-				# Figure out our grab position.
-				var dest_transform : Transform3D 
-				if _grab_point:
-					dest_transform = _grab_point.get_hand_transform(global_position)
-				else:
-					dest_transform = _get_default_hand_transform(_picked_up, global_position)
-
-				# Make our transform local to our picked up object, we'll tween to fetch.
-				dest_transform = dest_transform.inverse() * _picked_up.global_transform
-
-				# Adjust our dest_transform to account for any offset in our pickup function
-				dest_transform = transform.inverse() * dest_transform
-
-				if _tween:
-					_tween.kill()
-
-				_tween = _remote_transform.create_tween()
-
-				# Now tween
-				_tween.tween_property(_remote_transform, "transform", dest_transform, 0.1)
-
-			# TODO implement logic for other type of physics bodies
-		else:
-			# TODO implement secondary pickup
-			pass
-
-	# TODO set pose overrule based on what we've picked up (if applicable)
+		# TODO, should sent signal to controller we've now picked up this object.
+		pass
 
 	# Send out a signal to let those wanting to know that we picked something up
 	picked_up.emit(self, _picked_up)
@@ -388,10 +351,6 @@ func pickup_object(which : PhysicsBody3D):
 func drop_held_object( \
 	apply_linear_velocity : Vector3 = Vector3(), apply_angular_velocity : Vector3 = Vector3() \
 	) -> void:
-	# Make sure we clear some initial state
-	if _remote_transform:
-		_remote_transform.remote_path = NodePath()
-
 	if _tween:
 		_tween.kill()
 		_tween = null
@@ -417,16 +376,9 @@ func drop_held_object( \
 		# TODO: should be something on our collision hand
 		if _xr_collision_hand._hand_mesh:
 			_xr_collision_hand._hand_mesh.transform = Transform3D()
-
 	elif _xr_controller:
-		_picked_up.collision_layer = _original_collision_layer
-		_picked_up.collision_mask = _original_collision_mask
-
-		if _picked_up is RigidBody3D:
-			_picked_up.freeze_mode = _original_freeze_mode
-			_picked_up.freeze = false
-			_picked_up.linear_velocity = apply_linear_velocity
-			_picked_up.angular_velocity = apply_angular_velocity
+		# TODO: tell controller we are no longer holding this.
+		pass
 
 	# And we're no longer holding something
 	_picked_up = null
@@ -491,7 +443,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 		warnings.push_back("This node requires an XRController3D or XRT2CollisionHand as an anchestor.")
 
 	if xr_collision_hand:
-		var bone_name = "LeftHand" if xr_collision_hand.hand == 0 else "RightHand"
+		var bone_name = "LeftMiddleMetacarpal" if xr_collision_hand.hand == 0 else "RightMiddleMetacarpal"
 		var parent = get_parent()
 		if not parent is XRT2HandAttachment:
 			warnings.push_back("This node's parent should be an XRT2HandAttachment when used with XRT2CollisionHand.")

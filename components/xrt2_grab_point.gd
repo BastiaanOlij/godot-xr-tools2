@@ -83,6 +83,8 @@ var _hand_mesh : Node3D
 ## [code]hand_position[/code] current position of our hand in global space.
 ## Returned transform is in global space.
 func get_hand_transform(hand_position : Vector3) -> Transform3D:
+	# Note: Default grab point we return our position as is,
+	# but we'll eventually support grab rails and such.
 	return global_transform
 #endregion
 
@@ -112,16 +114,19 @@ func _update_show_hand():
 	if not show_hand:
 		return
 
+	# Note, our root bone can be misoriented in different runtimes.
+	# Our Palm bone is really unreliable between different runtimes.
+	# Our Middle Metacarpal bone is fairly trustworthy to position our hand with. 
 	var hand_scene : PackedScene
 	var bone_name : String
 	var orient_to_godot : Basis
 	if left_hand:
 		hand_scene = preload("res://addons/godot-xr-tools2/hands/gltf/LeftHandHumanoid.gltf")
-		bone_name = "LeftHand"
+		bone_name = "LeftMiddleMetacarpal"
 		orient_to_godot = Basis.from_euler(Vector3(0.5 * PI, 0.5 * -PI, 0.0))
 	elif right_hand:
 		hand_scene = preload("res://addons/godot-xr-tools2/hands/gltf/RightHandHumanoid.gltf")
-		bone_name = "RightHand"
+		bone_name = "RightMiddleMetacarpal"
 		orient_to_godot = Basis.from_euler(Vector3(0.5 * PI, PI, 0.5 * PI))
 	else:
 		return
