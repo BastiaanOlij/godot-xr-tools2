@@ -45,10 +45,10 @@ radial_segments = 32
 [node name="MainStage" unique_id=1924971845 instance=ExtResource("1_spd8v")]
 script = ExtResource("2_4i4c4")
 
-[node name="WorldEnvironment" parent="." index="0"]
+[node name="WorldEnvironment" parent="." index="0" unique_id=700307530]
 environment = SubResource("Environment_8sh2w")
 
-[node name="SunLight3D" parent="." index="1"]
+[node name="SunLight3D" parent="." index="1" unique_id=1021325194]
 shadow_enabled = true
 shadow_bias = 0.01
 shadow_transmittance_bias = 0.005
@@ -91,9 +91,9 @@ forward_movement_speed = 0.0
 movement_acceleration = 0.0
 
 [node name="LeftHandAttachment" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand" index="1" unique_id=345731134]
-transform = Transform3D(0.99999994, -3.417338e-07, 1.8328423e-05, 4.0133915e-07, 0.99999845, -0.0016677812, -1.8358156e-05, 0.0016677516, 0.99999833, -0.0149999615, -1.8697472e-05, 0.067175575)
+transform = Transform3D(0.99500257, -0.0035018958, 0.09978712, -0.003500683, 0.99754673, 0.069914035, -0.09978719, -0.069914, 0.99254906, -0.02500046, 0.003554154, 0.040035933)
 script = ExtResource("5_4i4c4")
-bone_name = "LeftHand"
+bone_name = "LeftMiddleMetacarpal"
 
 [node name="XRT2Pickup" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2LeftCollisionHand/LeftHandAttachment" index="0" unique_id=1189634809]
 transform = Transform3D(1, -1.42109e-14, 0, 0, 1, 0, 0, 0, 1, 0.02, 0, -0.08)
@@ -122,9 +122,9 @@ rotation_speed = 0.0
 strafe_movement_speed = 2.5
 
 [node name="RightHandAttachment" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2RightCollisionHand" index="1" unique_id=1910468099]
-transform = Transform3D(0.99999994, 3.417346e-07, -1.8372135e-05, -4.0141205e-07, 0.99999845, -0.0016677375, 1.8401866e-05, 0.0016677079, 0.99999833, 0.0149999615, -1.8697472e-05, 0.067175575)
+transform = Transform3D(0.99500257, 0.0035019002, -0.09978717, 0.003500686, 0.99754673, 0.06991408, 0.099787235, -0.06991404, 0.99254906, 0.02500046, 0.003554154, 0.040035933)
 script = ExtResource("5_4i4c4")
-bone_name = "RightHand"
+bone_name = "RightMiddleMetacarpal"
 metadata/_custom_type_script = "uid://xrt2eecske1"
 
 [node name="XRT2Pickup" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/XRT2RightCollisionHand/RightHandAttachment" index="0" unique_id=1254830859]
