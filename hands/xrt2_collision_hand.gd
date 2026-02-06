@@ -67,6 +67,11 @@ enum CollisionHandMode {
 	COLLIDE
 }
 
+## Finger joint
+class FingerJoint:
+	var body : XRT2CollisionFinger
+	var collision : CollisionShape3D
+	var joint : Joint3D
 
 # How much displacement is required for the hand to start orienting to a surface
 const ORIENT_DISPLACEMENT := 0.05
@@ -177,9 +182,9 @@ const ORIENT_DISPLACEMENT := 0.05
 		if _palm_collision_shape:
 			_palm_collision_shape.debug_color = debug_color
 
-		for bone in _digit_collision_shapes:
-			if _digit_collision_shapes[bone]:
-				_digit_collision_shapes[bone].debug_color = debug_color
+		for bone in _finger_joints:
+			if _finger_joints[bone].collision:
+				_finger_joints[bone].collision.debug_color = debug_color
 #endregion
 
 ## Target-override class
@@ -200,6 +205,8 @@ class TargetOverride:
 		offset = o
 
 #region Private Variables
+@onready var _hand_digit_shape : CapsuleShape3D = preload("res://addons/godot-xr-tools2/hands/xrt2_hand_digit.shape")
+
 # Trackers used
 var _hand_tracker : XRHandTracker
 var _hand_skeleton : Skeleton3D
@@ -225,7 +232,7 @@ var _ghost_mesh : Node3D
 # Skeleton collisions
 var _hand_tracking_parent : XRNode3D
 var _palm_collision_shape : CollisionShape3D
-var _digit_collision_shapes : Dictionary[String, CollisionShape3D]
+var _finger_joints : Dictionary[String, FingerJoint]
 #endregion
 
 
@@ -639,6 +646,33 @@ func _process(_delta):
 	if Engine.is_editor_hint():
 		return
 
+	# Our physics should have run, copy our bones to our skeleton:
+	if _hand_skeleton:
+		var bone_transforms : Dictionary[int, Transform3D]
+		var inv_bone_transforms : Dictionary[int, Transform3D]
+		var inv_global_transform = global_transform.inverse()
+
+		# Gather transforms
+		for bone_name in _finger_joints:
+			var bone_id = _hand_skeleton.find_bone(bone_name)
+			if bone_id >= 0:
+				var bone_transform : Transform3D = inv_global_transform * _finger_joints[bone_name].body.global_transform
+				bone_transforms[bone_id] = bone_transform
+				inv_bone_transforms[bone_id] = bone_transform.inverse()
+
+		# Convert to local and apply
+		for bone_id in bone_transforms:
+			var parent_id = _hand_skeleton.get_bone_parent(bone_id)
+			var bone_transform : Transform3D = bone_transforms[bone_id]
+
+			if parent_id >= 0:
+				if inv_bone_transforms.has(parent_id):
+					bone_transform = inv_bone_transforms[parent_id] * bone_transform
+				else:
+					bone_transform = _hand_skeleton.get_bone_global_pose(parent_id).inverse() * bone_transform
+
+			_hand_skeleton.set_bone_pose(bone_id, bone_transform)
+
 	# Our hand should now be positioned so we can do our ghost logic.
 	if _ghost_mesh:
 		_ghost_mesh.visible = false
@@ -847,11 +881,72 @@ func _update_hand_meshes():
 #region Private Collision Functions
 # Remove all our digit collisions
 func _clear_digit_collisions() -> void:
-	for digit : String in _digit_collision_shapes:
-		var collision_node = _digit_collision_shapes[digit]
-		remove_child(collision_node)
-		collision_node.queue_free()
-	_digit_collision_shapes.clear()
+	for digit : String in _finger_joints:
+		var finger_joint : FingerJoint = _finger_joints[digit]
+		if finger_joint.joint:
+			remove_child(finger_joint.joint)
+			finger_joint.joint.queue_free()
+
+		if finger_joint.body:
+			# This will also destroy our collision shape
+			remove_child(finger_joint.body)
+			finger_joint.body.queue_free()
+			
+	_finger_joints.clear()
+
+func _create_finger_joint(parent_body : PhysicsBody3D, bone_name : String, offset : Transform3D, bone_transform : Transform3D, shape : Shape3D) -> FingerJoint:
+	var finger_joint : FingerJoint = FingerJoint.new()
+
+	finger_joint.collision = CollisionShape3D.new()
+	finger_joint.collision.name = bone_name + "Col"
+	finger_joint.collision.shape = shape
+	finger_joint.collision.transform = offset
+	finger_joint.collision.debug_color = debug_color
+
+	finger_joint.body = XRT2CollisionFinger.new()
+	finger_joint.body.name = bone_name + "Body"
+	finger_joint.body.mass = 0.001
+	finger_joint.body.transform = bone_transform
+	finger_joint.body.parent_body = parent_body
+
+	var joint : Generic6DOFJoint3D = Generic6DOFJoint3D.new()
+
+	# joint.set_param_x(Generic6DOFJoint3D.PARAM_LINEAR_LOWER_LIMIT, -0.01)
+	# joint.set_param_x(Generic6DOFJoint3D.PARAM_LINEAR_UPPER_LIMIT, 0.01)
+	# joint.set_param_y(Generic6DOFJoint3D.PARAM_LINEAR_LOWER_LIMIT, -0.01)
+	# joint.set_param_y(Generic6DOFJoint3D.PARAM_LINEAR_UPPER_LIMIT, 0.01)
+	# joint.set_param_z(Generic6DOFJoint3D.PARAM_LINEAR_LOWER_LIMIT, -0.01)
+	# joint.set_param_z(Generic6DOFJoint3D.PARAM_LINEAR_UPPER_LIMIT, 0.01)
+
+	joint.set_param_x(Generic6DOFJoint3D.PARAM_ANGULAR_LOWER_LIMIT, -PI)
+	joint.set_param_x(Generic6DOFJoint3D.PARAM_ANGULAR_UPPER_LIMIT, PI)
+	joint.set_param_y(Generic6DOFJoint3D.PARAM_ANGULAR_LOWER_LIMIT, -PI)
+	joint.set_param_y(Generic6DOFJoint3D.PARAM_ANGULAR_UPPER_LIMIT, PI)
+	joint.set_param_z(Generic6DOFJoint3D.PARAM_ANGULAR_LOWER_LIMIT, -PI)
+	joint.set_param_z(Generic6DOFJoint3D.PARAM_ANGULAR_UPPER_LIMIT, PI)
+
+	joint.name = bone_name + "Joint"
+	joint.transform = bone_transform
+
+	finger_joint.body.add_child(finger_joint.collision, false, Node.INTERNAL_MODE_BACK)
+	add_child(finger_joint.body, false, Node.INTERNAL_MODE_BACK)
+	finger_joint.body.top_level = true
+
+	add_child(joint, false, Node.INTERNAL_MODE_BACK)
+	joint.node_a = parent_body.get_path()
+	joint.node_b = finger_joint.body.get_path()
+	finger_joint.joint = joint
+
+	# For testing
+	var sphere : SphereMesh = SphereMesh.new()
+	sphere.radius = 0.005
+	sphere.height = 0.01
+	var instance : MeshInstance3D = MeshInstance3D.new()
+	instance.mesh = sphere
+	joint.add_child(instance, false, Node.INTERNAL_MODE_BACK)
+
+	return finger_joint
+
 #endregion
 
 
@@ -865,38 +960,56 @@ func _on_skeleton_updated() -> void:
 	var bone_count = _ghost_skeleton.get_bone_count()
 	for i in bone_count:
 		var bone_transform : Transform3D = _ghost_skeleton.get_bone_global_pose(i)
-		var collision_node : CollisionShape3D
-		var offset : Transform3D
-		offset.origin = Vector3(0.0, 0.015, 0.0) # move to side of object
+		var finger_joint : FingerJoint
 
+		var parent_bone = _ghost_skeleton.get_bone_parent(i)
 		var bone_name = _ghost_skeleton.get_bone_name(i)
-		if bone_name == ("LeftHand" if hand == 0 else "RightHand"):
+		# if bone_name == ("LeftHand" if hand == 0 else "RightHand"):
+		if parent_bone == -1:
+			var offset : Transform3D = Transform3D()
 			offset.origin = Vector3(0.0, 0.025, 0.0) # move to side of object
-			collision_node = _palm_collision_shape
-		elif bone_name.contains("Proximal") or bone_name.contains("Intermediate") or \
-			bone_name.contains("Distal"):
-			if _digit_collision_shapes.has(bone_name):
-				collision_node = _digit_collision_shapes[bone_name]
+			_palm_collision_shape.transform = bone_transform * offset
+
+			#if _finger_joints.has(bone_name):
+				#finger_joint = _finger_joints[bone_name]
+			#else:
+				#var shape : SphereShape3D = SphereShape3D.new()
+				#shape.radius = 0.01
+				#shape.margin = 0.01
+
+				#finger_joint = _create_finger_joint(self, bone_name, Transform3D(), bone_transform, shape)
+				#_finger_joints[bone_name] = finger_joint
+
+		elif not bone_name.contains("Tip"):
+			if _finger_joints.has(bone_name):
+				finger_joint = _finger_joints[bone_name]
+				if parent_bone == 0 and (finger_joint.joint.position - bone_transform.origin).length() > 0.005:
+					var was_transform : Transform3D = finger_joint.body.transform
+					finger_joint.joint.transform = bone_transform
+					finger_joint.body.transform = global_transform * bone_transform
+					finger_joint.joint.node_b = NodePath()
+					finger_joint.joint.node_b = finger_joint.body.get_path()
+
+					finger_joint.body.transform = was_transform
 			else:
-				collision_node = CollisionShape3D.new()
-				collision_node.name = bone_name + "Col"
-				collision_node.shape = \
-					preload("res://addons/godot-xr-tools2/hands/xrt2_hand_digit.shape")
-				collision_node.debug_color = debug_color
-				add_child(collision_node, false, Node.INTERNAL_MODE_BACK)
-				_digit_collision_shapes[bone_name] = collision_node
+				var offset : Transform3D
+				offset.origin = Vector3(0.0, 0.015, 0.0) # move to side of object
 
-		if collision_node:
-			# TODO it would require a far more complex approach,
-			# but being able to check if our collision shapes
-			# can move to their new locations would be interesting.
+				var parent_body : RigidBody3D = self
+				var parent_bone_name = _ghost_skeleton.get_bone_name(parent_bone)
+				if _finger_joints.has(parent_bone_name):
+					parent_body = _finger_joints[parent_bone_name].body
 
-			# For now just copy our transform to our collision shape
-			collision_node.transform = bone_transform * offset
+				finger_joint = _create_finger_joint(parent_body, bone_name, offset, bone_transform, _hand_digit_shape)
+				_finger_joints[bone_name] = finger_joint
 
-		# And copy our bone transform to our hand skeleton.
-		var bone_pose : Transform3D = _ghost_skeleton.get_bone_pose(i)
-		_hand_skeleton.set_bone_pose(i, bone_pose)
+		if finger_joint:
+			# Store this so we can apply forces in physics
+			finger_joint.body.target_transform = bone_transform
+		else:
+			# Just copy the local transform
+			bone_transform = _ghost_skeleton.get_bone_pose(i)
+			_hand_skeleton.set_bone_pose(i, bone_transform)
 
 	skeleton_updated.emit()
 
