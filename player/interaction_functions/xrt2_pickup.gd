@@ -300,10 +300,12 @@ func pickup_object(which : PhysicsBody3D):
 	# Note, we're already handled our exclusive logic, can ignore that here.
 	_grab_point = _get_closest_grabpoint(_picked_up, global_position)
 
-	# Figure out our grab position
-	var grab_transform : Transform3D 
+	# Figure out our grab position and finger poses
+	var grab_transform: Transform3D 
+	var finger_poses: XRT2FingerPoses
 	if _grab_point:
 		grab_transform = _grab_point.get_hand_transform(global_position)
+		finger_poses = _grab_point.finger_poses
 	else:
 		grab_transform = _get_default_hand_transform(_picked_up, global_position)
 	var local_grab_transform: Transform3D = _picked_up.global_transform.inverse() * grab_transform
@@ -317,7 +319,8 @@ func pickup_object(which : PhysicsBody3D):
 		# Apply target override
 		_xr_collision_hand.add_target_override(_picked_up, 1, _grab_offset)
 
-		# TODO set pose overrule based on what we've picked up (if applicable)
+		# Set finger poses based on what we've picked up (if applicable)
+		_xr_collision_hand.finger_poses = finger_poses
 
 		# TODO: We should add a nicer solution in xr collision hand for this!
 		if _xr_collision_hand._hand_mesh:
@@ -372,6 +375,7 @@ func drop_held_object( \
 		_xr_collision_hand.remove_collision_exception_with(_picked_up)
 
 		_xr_collision_hand.remove_target_override(_picked_up)
+		_xr_collision_hand.finger_poses = null
 
 		# TODO: should be something on our collision hand
 		if _xr_collision_hand._hand_mesh:
