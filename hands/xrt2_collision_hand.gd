@@ -97,6 +97,15 @@ const ORIENT_DISPLACEMENT := 0.05
 		if is_inside_tree() and not Engine.is_editor_hint():
 			_update_hand_motion_range()
 
+
+## Set finger poses
+@export var finger_poses: XRT2FingerPoses:
+	set(value):
+		finger_poses = value
+		if _finger_pose_modifier:
+			_finger_pose_modifier.finger_poses = finger_poses
+
+
 ## Fallback settings used if hand tracking isn't available.
 @export_subgroup("Fallback", "fallback")
 
@@ -199,33 +208,37 @@ class TargetOverride:
 		priority = p
 		offset = o
 
+
 #region Private Variables
 # Trackers used
-var _hand_tracker : XRHandTracker
-var _hand_skeleton : Skeleton3D
-var _ghost_skeleton : Skeleton3D
-var _controller_tracker : XRControllerTracker
-var _pickup : XRT2Pickup
-var _parent_body : CollisionObject3D
-var _was_parent_basis : Basis
+var _hand_tracker: XRHandTracker
+var _hand_skeleton: Skeleton3D
+var _ghost_skeleton: Skeleton3D
+var _controller_tracker: XRControllerTracker
+var _pickup: XRT2Pickup
+var _parent_body: CollisionObject3D
+var _was_parent_basis: Basis
 
 # Sorted stack of TargetOverride
-var _target_overrides : Array[TargetOverride]
+var _target_overrides: Array[TargetOverride]
 
 # Current target override
-var _target_override : Node3D
+var _target_override: Node3D
 
 # Current target offset
-var _target_offset : Transform3D
+var _target_offset: Transform3D
 
 # Hand meshes
-var _hand_mesh : Node3D
-var _ghost_mesh : Node3D
+var _hand_mesh: Node3D
+var _ghost_mesh: Node3D
 
 # Skeleton collisions
-var _hand_tracking_parent : XRNode3D
-var _palm_collision_shape : CollisionShape3D
-var _digit_collision_shapes : Dictionary[String, CollisionShape3D]
+var _hand_tracking_parent: XRNode3D
+var _palm_collision_shape: CollisionShape3D
+var _digit_collision_shapes: Dictionary[String, CollisionShape3D]
+
+# Finger pose modifier
+var _finger_pose_modifier: XRT2FingerPosesModifier3D
 #endregion
 
 
@@ -752,14 +765,17 @@ func _add_hand_modifiers(p_hand_mesh : Node3D) -> void:
 	skeleton_node.add_child(hand_tracking_modifier)
 
 	# Add fallback modifier
-	var hand_fallback_modifier : XRT2HandFallbackModifier3D= XRT2HandFallbackModifier3D.new()
+	var hand_fallback_modifier: XRT2HandFallbackModifier3D = XRT2HandFallbackModifier3D.new()
 	hand_fallback_modifier.trigger_action = trigger_action
 	hand_fallback_modifier.trigger_curl = trigger_curl
 	hand_fallback_modifier.grip_action = grip_action
 	hand_fallback_modifier.grip_curl = grip_curl
 	skeleton_node.add_child(hand_fallback_modifier)
 
-	# TODO add pose override modifier
+	# Add finger poses modifier
+	_finger_pose_modifier = XRT2FingerPosesModifier3D.new()
+	_finger_pose_modifier.finger_poses = finger_poses
+	skeleton_node.add_child(_finger_pose_modifier)
 
 # Find the mesh_instance node child
 func _get_mesh_instance_node(p_node : Node) -> MeshInstance3D:
@@ -786,6 +802,9 @@ func _update_hand_material(p_node : Node, p_material : Material, p_cast_shadows 
 func _update_hand_meshes():
 	# Clean up old hand meshes
 	_clear_digit_collisions()
+
+	if _finger_pose_modifier:
+		_finger_pose_modifier = null
 
 	if _hand_skeleton:
 		_hand_skeleton = null

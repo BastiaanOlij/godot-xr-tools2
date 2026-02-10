@@ -63,6 +63,14 @@ extends Node3D
 ## Highlight behavior if this grab point is closest.
 @export_enum("Highlight", "Only if not picked up", "Disabled") var highlight_mode : int = 0
 
+## Manage finger poses
+@export var finger_poses: XRT2FingerPoses:
+	set(value):
+		finger_poses = value
+
+		if _finger_pose_modifier:
+			_finger_pose_modifier.finger_poses = finger_poses
+
 ## Visualise our hand
 ## For editor only
 @export var show_hand : bool = false:
@@ -75,7 +83,8 @@ extends Node3D
 
 
 #region Private variables
-var _hand_mesh : Node3D
+var _hand_mesh: Node3D
+var _finger_pose_modifier: XRT2FingerPosesModifier3D
 #endregion
 
 #region Public functions
@@ -110,6 +119,7 @@ func _update_show_hand():
 		remove_child(_hand_mesh)
 		_hand_mesh.queue_free()
 		_hand_mesh = null
+		_finger_pose_modifier = null
 
 	if not show_hand:
 		return
@@ -140,6 +150,10 @@ func _update_show_hand():
 			var bone_transform : Transform3D = skeleton.get_bone_global_pose(bone_idx)
 			var bone_offset : Transform3D = Transform3D(orient_to_godot, Vector3())
 			_hand_mesh.transform = (bone_transform * bone_offset).inverse()
+
+		_finger_pose_modifier = XRT2FingerPosesModifier3D.new()
+		_finger_pose_modifier.finger_poses = finger_poses
+		skeleton.add_child(_finger_pose_modifier)
 
 
 func _ready():
