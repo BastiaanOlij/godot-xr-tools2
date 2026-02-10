@@ -1,39 +1,42 @@
-[gd_scene load_steps=4 format=3 uid="uid://xrt2qimm3dy"]
+[gd_scene format=3 uid="uid://xrt2qimm3dy"]
 
 [ext_resource type="Script" uid="uid://xrt2w8u06yy" path="res://addons/godot-xr-tools2/player/components/xrt2_locomotion_handler.gd" id="1_5vwnv"]
 [ext_resource type="Script" uid="uid://xrt2244vo8p" path="res://addons/godot-xr-tools2/player/components/xrt2_physical_movement_handler.gd" id="1_thxug"]
 [ext_resource type="Script" uid="uid://xrt2tdnvsb2" path="res://addons/godot-xr-tools2/player/movement_providers/xrt2_raycast_body.gd" id="2_vkyom"]
+[ext_resource type="Script" uid="uid://xrt2ebmt58c" path="res://addons/godot-xr-tools2/hands/xrt2_collision_hand.gd" id="4_tec0s"]
 
-[node name="XRT2CharacterBody3D" type="CharacterBody3D"]
+[node name="XRT2CharacterBody3D" type="CharacterBody3D" unique_id=795871005]
 
-[node name="XRT2LocomotionHandler" type="Node3D" parent="."]
+[node name="XRT2LocomotionHandler" type="Node3D" parent="." unique_id=1784650286]
 script = ExtResource("1_5vwnv")
 metadata/_custom_type_script = "uid://xrt2w8u06yy"
 
-[node name="XRT2RaycastBody" type="Node3D" parent="."]
+[node name="XRT2RaycastBody" type="Node3D" parent="." unique_id=577890577]
 script = ExtResource("2_vkyom")
 metadata/_custom_type_script = "uid://xrt2tdnvsb2"
 
-[node name="XROrigin3D" type="XROrigin3D" parent="."]
+[node name="XROrigin3D" type="XROrigin3D" parent="." unique_id=1272081866]
 
-[node name="XRT2PhysicalMovementHandler" type="Node3D" parent="XROrigin3D"]
+[node name="XRT2PhysicalMovementHandler" type="Node3D" parent="XROrigin3D" unique_id=2059939210]
 script = ExtResource("1_thxug")
 metadata/_custom_type_script = "uid://xrt2244vo8p"
 
-[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
+[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D" unique_id=1350035131]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -0.1)
 cull_mask = 1048571
 
-[node name="OpenXRVisibilityMask" type="OpenXRVisibilityMask" parent="XROrigin3D/XRCamera3D"]
+[node name="OpenXRVisibilityMask" type="OpenXRVisibilityMask" parent="XROrigin3D/XRCamera3D" unique_id=338075429]
 layers = 2
 
-[node name="LeftHand" type="XRController3D" parent="XROrigin3D"]
+[node name="LeftCollisionHand" type="RigidBody3D" parent="XROrigin3D" unique_id=360497191]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, -0.5)
-tracker = &"left_hand"
-pose = &"grip"
-show_when_tracked = true
+script = ExtResource("4_tec0s")
+grip_action = "grab"
+metadata/_custom_type_script = "uid://xrt2ebmt58c"
 
-[node name="RightHand" type="XRController3D" parent="XROrigin3D"]
+[node name="RightCollisionHand" type="RigidBody3D" parent="XROrigin3D" unique_id=709012286]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1, -0.5)
-tracker = &"right_hand"
-pose = &"grip"
+script = ExtResource("4_tec0s")
+hand = 1
+grip_action = "grab"
+metadata/_custom_type_script = "uid://xrt2ebmt58c"

@@ -27,12 +27,12 @@
 extends XROrigin3D
 class_name XRT2StaticPlayerRig
 
+## @deprecated
 ## This player rig is meant for simulation games such as driving games
 ## or flight simulation.
 ## It is designed on the assumption this node is placed where the players
-## head should be by default.
-##
-## Note: this will probably be redone at some point in time.
+## head should be by default.[br]
+## [b]Warning[/b]: this will probably be redone at some point in time.
 
 ## Maximum distance the players head can be from the origin point before we fade to black.
 @export var max_head_distance : float = 0.5

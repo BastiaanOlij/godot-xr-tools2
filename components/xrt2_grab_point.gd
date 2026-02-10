@@ -63,19 +63,64 @@ extends Node3D
 ## Highlight behavior if this grab point is closest.
 @export_enum("Highlight", "Only if not picked up", "Disabled") var highlight_mode : int = 0
 
-## Visualise our hand
-## For editor only
+## Manage finger poses
+@export var finger_poses: XRT2FingerPoses:
+	set(value):
+		finger_poses = value
+		notify_property_list_changed()
+
+		if _finger_pose_modifier:
+			_finger_pose_modifier.finger_poses = finger_poses
+			_finger_pose_modifier.test_trigger = test_trigger
+			_finger_pose_modifier.test_grip = test_grip
+
+## Set open finger poses
+## Set these for adjusting finger position
+## based on trigger input (index finger only)
+## and/or grip input (little, ring and middle fingers)
+@export var open_finger_poses: XRT2FingerPoses:
+	set(value):
+		open_finger_poses = value
+		notify_property_list_changed()
+
+		if _finger_pose_modifier:
+			_finger_pose_modifier.open_finger_poses = open_finger_poses
+			_finger_pose_modifier.test_trigger = test_trigger
+			_finger_pose_modifier.test_grip = test_grip
+
+## Visualise our hand.
+## For editor only.
 @export var show_hand : bool = false:
 	set(value):
 		show_hand = value
+		notify_property_list_changed()
 
 		if is_inside_tree():
 			_update_show_hand()
+
+## Test trigger value.
+## For editor only.
+@export_range(0.0, 1.0, 0.01) var test_trigger: float = 1.0:
+	set(value):
+		test_trigger = value
+		if _finger_pose_modifier:
+			_finger_pose_modifier.test_trigger = test_trigger
+
+
+## Test grip value.
+## For editor only.
+@export_range(0.0, 1.0, 0.01) var test_grip: float = 1.0:
+	set(value):
+		test_grip = value
+		if _finger_pose_modifier:
+			_finger_pose_modifier.test_grip = test_grip
+
 #endregion
 
 
 #region Private variables
-var _hand_mesh : Node3D
+var _hand_mesh: Node3D
+var _finger_pose_modifier: XRT2FingerPosesModifier3D
 #endregion
 
 #region Public functions
@@ -110,6 +155,7 @@ func _update_show_hand():
 		remove_child(_hand_mesh)
 		_hand_mesh.queue_free()
 		_hand_mesh = null
+		_finger_pose_modifier = null
 
 	if not show_hand:
 		return
@@ -141,6 +187,13 @@ func _update_show_hand():
 			var bone_offset : Transform3D = Transform3D(orient_to_godot, Vector3())
 			_hand_mesh.transform = (bone_transform * bone_offset).inverse()
 
+		_finger_pose_modifier = XRT2FingerPosesModifier3D.new()
+		_finger_pose_modifier.finger_poses = finger_poses
+		_finger_pose_modifier.open_finger_poses = open_finger_poses
+		_finger_pose_modifier.test_trigger = test_trigger
+		_finger_pose_modifier.test_grip = test_grip
+		skeleton.add_child(_finger_pose_modifier)
+
 
 func _ready():
 	_update_show_hand()
@@ -156,4 +209,13 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 	# Return warnings
 	return warnings
+
+
+# Adjust properties as needed
+func _validate_property(property):
+	if property.name in [ "test_trigger", "test_grip" ]:
+		if not finger_poses or not open_finger_poses or not show_hand:
+			property.usage = PROPERTY_USAGE_NONE
+		else:
+			property.usage = PROPERTY_USAGE_EDITOR
 #endregion

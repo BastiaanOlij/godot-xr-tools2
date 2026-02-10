@@ -28,6 +28,7 @@
 class_name XRT2StageBase
 extends Node3D
 
+#region Signals
 ## This signal is used to request the staging transition to the main-menu
 ## scene. Developers should use [method exit_to_main_menu] rather than
 ## emitting this signal directly.
@@ -45,21 +46,20 @@ signal request_load_scene(p_scene_path, user_data)
 ##
 ## The [param user_data] parameter is passed through staging to the new scenes.
 signal request_reset_scene(user_data)
+#endregion
 
+#region Private variables
+# XR Origin related to our scene
+var _origin: XROrigin3D
 
-## Player origin used in this stage
-@export var player_origin : XROrigin3D:
-	set(value):
-		player_origin = value
-		if is_inside_tree():
-			_get_xr_camera()
-
+# XR Camera related to our scene
 var _camera : XRCamera3D
+#endregion
 
 # TODO update documentation for entry points, there are differences with how 
 # this worked in XR Tools 2 around centering the player
 
-
+#region Public functions
 ## Make our origin and camera the current entries
 func make_current():
 	# Make our camera current
@@ -67,29 +67,8 @@ func make_current():
 		_camera.current = true
 
 	# Make our origin current
-	if player_origin:
-		player_origin.current = true
-
-
-func _get_xr_camera():
-	if player_origin:
-		for child in player_origin.get_children():
-			if child is XRCamera3D:
-				_camera = child
-				return
-		push_error("Missing XRCamera3D in stage.")
-
-
-# Verifies our staging has a valid configuration.
-func _get_configuration_warnings() -> PackedStringArray:
-	var warnings := PackedStringArray()
-
-	# Report player origin not specified
-	if not player_origin:
-		warnings.append("No player origin has been selected")
-
-	# Return warnings
-	return warnings
+	if _origin:
+		_origin.current = true
 
 
 ## This is called after the scene is loaded and added to our scene tree
@@ -134,8 +113,10 @@ func load_scene(p_scene_path : String, user_data = null) -> void:
 ## Call this to reset the current scene
 func reset_scene(user_data = null) -> void:
 	request_reset_scene.emit(user_data)
+#endregion
 
-
+#region Private functions
+# Find our XROrigin3D node
 func _find_xr_origin(node : Node3D) -> XROrigin3D:
 	for child in node.get_children():
 		if child is XROrigin3D:
@@ -150,14 +131,45 @@ func _find_xr_origin(node : Node3D) -> XROrigin3D:
 	return null
 
 
+func _find_xr_camera(origin: XROrigin3D) -> XRCamera3D:
+	if origin:
+		for child in origin.get_children():
+			if child is XRCamera3D:
+				return child
+
+	# Could not find it
+	return null
+
+
+# Verifies our staging has a valid configuration.
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+
+	# Report origin not found
+	var origin: XROrigin3D = _find_xr_origin(self)
+	if not origin:
+		warnings.append("This scene must have an XROrigin3D node")
+	else:
+		# Report origin not found
+		if not _find_xr_camera(origin):
+			warnings.append("This scene must have an XRCamera3D node")
+
+	# Return warnings
+	return warnings
+
+
 func _ready() -> void:
 	# Do not run if in the editor
 	if Engine.is_editor_hint():
 		return
 
-	if not player_origin:
-		# Lets find it...
-		player_origin = _find_xr_origin(self)
+	# Find our origi.
+	_origin = _find_xr_origin(self)
+	if not _origin:
+		push_error("Missing XROrigin3D in stage.")
+	else:
+		_camera = _find_xr_camera(_origin)
 
-	if player_origin:
-		_get_xr_camera()
+	if not _camera:
+		push_error("Missing XRCamera3D in stage.")
+#endregion
