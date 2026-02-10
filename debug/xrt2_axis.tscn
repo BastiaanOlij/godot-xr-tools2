@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://xrt252f1jo2"]
 
-[ext_resource type="Script" uid="uid://xrt2em8pwic" path="res://addons/godot-xr-tools2/debug/axis.gd" id="1_8umds"]
-[ext_resource type="PackedScene" uid="uid://xrt21y5e026" path="res://addons/godot-xr-tools2/debug/vector.tscn" id="1_axhod"]
+[ext_resource type="Script" uid="uid://xrt2em8pwic" path="res://addons/godot-xr-tools2/debug/xrt2_axis.gd" id="1_8umds"]
+[ext_resource type="PackedScene" uid="uid://xrt21y5e026" path="res://addons/godot-xr-tools2/debug/xrt2_vector.tscn" id="1_axhod"]
 
 [node name="Axis" type="Node3D"]
 script = ExtResource("1_8umds")

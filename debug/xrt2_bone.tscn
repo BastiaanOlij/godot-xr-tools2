@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://xrt2vbt4mlq"]
+
+[sub_resource type="Shader" id="Shader_iwxc7"]
+code = "shader_type spatial;
+render_mode depth_test_disabled, shadows_disabled, unshaded;
+
+varying vec3 org_normal;
+
+void vertex() {
+	org_normal = NORMAL;
+	if (VERTEX.y > 0.0) {
+		VERTEX.x = 0.0;
+		VERTEX.z = 0.0;
+	}
+}
+
+void fragment() {
+	if (org_normal.y < -0.5) {
+		discard;
+	} else if (org_normal.z > 0.5) {
+		ALBEDO = vec3(0.0, 0.0, 1.0);
+	} else if (org_normal.z < -0.5) {
+		ALBEDO = vec3(0.0, 0.0, 0.25);
+	} else if (org_normal.x > 0.5) {
+		ALBEDO = vec3(1.0, 0.0, 0.0);
+	} else {
+		ALBEDO = vec3(0.25, 0.0, 0.0);
+	}
+	ALPHA = 0.9;
+}
+
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xys4s"]
+render_priority = 0
+shader = SubResource("Shader_iwxc7")
+
+[sub_resource type="PrismMesh" id="PrismMesh_iwxc7"]
+material = SubResource("ShaderMaterial_xys4s")
+size = Vector3(0.25, 0.25, 0.25)
+
+[sub_resource type="PrismMesh" id="PrismMesh_xys4s"]
+material = SubResource("ShaderMaterial_xys4s")
+size = Vector3(0.25, 0.75, 0.25)
+
+[node name="Bone" type="Node3D" unique_id=1974812107]
+
+[node name="Top" type="MeshInstance3D" parent="." unique_id=186657830]
+transform = Transform3D(1, 0, 0, 0, -1, -8.742278e-08, 0, -8.742278e-08, 1, 0, 0.125, 0)
+mesh = SubResource("PrismMesh_iwxc7")
+
+[node name="Bottom" type="MeshInstance3D" parent="." unique_id=1637618184]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.625, 0)
+mesh = SubResource("PrismMesh_xys4s")
