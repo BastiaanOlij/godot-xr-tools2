@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://dm2d7si17m8vd"]
+[gd_scene format=3 uid="uid://dm2d7si17m8vd"]
 
 [ext_resource type="PackedScene" uid="uid://dvvlw0k32b8wq" path="res://components/floor.tscn" id="1_c36xp"]
 [ext_resource type="PackedScene" uid="uid://d0px0pvdr03o" path="res://components/static_box.tscn" id="2_s2yy1"]
@@ -32,306 +32,306 @@ buffer = PackedFloat32Array(0.5628576, 0, -1.4100657, -14.533596, 0, 1.5182536, 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_dhxdq"]
 friction = 0.1
 
-[node name="World" type="Node3D"]
+[node name="World" type="Node3D" unique_id=1181138856]
 
-[node name="Floor" parent="." instance=ExtResource("1_c36xp")]
+[node name="Floor" parent="." unique_id=1640049433 instance=ExtResource("1_c36xp")]
 
-[node name="Walls" type="Node3D" parent="."]
+[node name="Walls" type="Node3D" parent="." unique_id=2044635465]
 
-[node name="Wall01" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall01" parent="Walls" unique_id=1921789615 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(0.494003, 0, -0.86946, 0, 1, 0, 0.86946, 0, 0.494003, -2.00183, 0, -4.52584)
 size = Vector3(0.1, 2, 2)
 
-[node name="Wall02" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall02" parent="Walls" unique_id=981394173 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-0.7743041, 0, -0.632814, 0, 1, 0, 0.632814, 0, -0.7743041, 3.73808, 0, -2.65948)
 size = Vector3(0.1, 2.2, 2)
 color = Color(0.69357204, 0.538853, 0.30530423, 1)
 
-[node name="10cm" type="Label3D" parent="Walls/Wall02"]
+[node name="10cm" type="Label3D" parent="Walls/Wall02" unique_id=1456015214]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.1, 0)
 pixel_size = 0.002
 text = "0.1m"
 
-[node name="20cm" type="Label3D" parent="Walls/Wall02"]
+[node name="20cm" type="Label3D" parent="Walls/Wall02" unique_id=2069941091]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.2, 0)
 pixel_size = 0.002
 text = "0.2m"
 
-[node name="30cm" type="Label3D" parent="Walls/Wall02"]
+[node name="30cm" type="Label3D" parent="Walls/Wall02" unique_id=994391392]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.3, 0)
 pixel_size = 0.002
 text = "0.3m"
 
-[node name="40cm" type="Label3D" parent="Walls/Wall02"]
+[node name="40cm" type="Label3D" parent="Walls/Wall02" unique_id=1846164118]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.4, 0)
 pixel_size = 0.002
 text = "0.4m"
 
-[node name="50cm" type="Label3D" parent="Walls/Wall02"]
+[node name="50cm" type="Label3D" parent="Walls/Wall02" unique_id=1984605952]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.5, 0)
 pixel_size = 0.002
 text = "0.5m"
 
-[node name="60cm" type="Label3D" parent="Walls/Wall02"]
+[node name="60cm" type="Label3D" parent="Walls/Wall02" unique_id=1022052809]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.6, 0)
 pixel_size = 0.002
 text = "0.6m"
 
-[node name="70cm" type="Label3D" parent="Walls/Wall02"]
+[node name="70cm" type="Label3D" parent="Walls/Wall02" unique_id=2105560457]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.7, 0)
 pixel_size = 0.002
 text = "0.7m"
 
-[node name="80cm" type="Label3D" parent="Walls/Wall02"]
+[node name="80cm" type="Label3D" parent="Walls/Wall02" unique_id=1382706790]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.8, 0)
 pixel_size = 0.002
 text = "0.8m"
 
-[node name="90cm" type="Label3D" parent="Walls/Wall02"]
+[node name="90cm" type="Label3D" parent="Walls/Wall02" unique_id=1062746493]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 0.9, 0)
 pixel_size = 0.002
 text = "0.9m"
 
-[node name="100cm" type="Label3D" parent="Walls/Wall02"]
+[node name="100cm" type="Label3D" parent="Walls/Wall02" unique_id=1964819535]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1, 0)
 pixel_size = 0.002
 text = "1.0m"
 
-[node name="110cm" type="Label3D" parent="Walls/Wall02"]
+[node name="110cm" type="Label3D" parent="Walls/Wall02" unique_id=1063109533]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.1, 0)
 pixel_size = 0.002
 text = "1.1m"
 
-[node name="120cm" type="Label3D" parent="Walls/Wall02"]
+[node name="120cm" type="Label3D" parent="Walls/Wall02" unique_id=1144950406]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.2, 0)
 pixel_size = 0.002
 text = "1.2m"
 
-[node name="130cm" type="Label3D" parent="Walls/Wall02"]
+[node name="130cm" type="Label3D" parent="Walls/Wall02" unique_id=1188000544]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.3, 0)
 pixel_size = 0.002
 text = "1.3m"
 
-[node name="140cm" type="Label3D" parent="Walls/Wall02"]
+[node name="140cm" type="Label3D" parent="Walls/Wall02" unique_id=1018656298]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.4, 0)
 pixel_size = 0.002
 text = "1.4m"
 
-[node name="150cm" type="Label3D" parent="Walls/Wall02"]
+[node name="150cm" type="Label3D" parent="Walls/Wall02" unique_id=1143075040]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.5, 0)
 pixel_size = 0.002
 text = "1.5m"
 
-[node name="160cm" type="Label3D" parent="Walls/Wall02"]
+[node name="160cm" type="Label3D" parent="Walls/Wall02" unique_id=410119164]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.6, 0)
 pixel_size = 0.002
 text = "1.6m"
 
-[node name="170cm" type="Label3D" parent="Walls/Wall02"]
+[node name="170cm" type="Label3D" parent="Walls/Wall02" unique_id=287595712]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.7, 0)
 pixel_size = 0.002
 text = "1.7m"
 
-[node name="180cm" type="Label3D" parent="Walls/Wall02"]
+[node name="180cm" type="Label3D" parent="Walls/Wall02" unique_id=2046213299]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.8, 0)
 pixel_size = 0.002
 text = "1.8m"
 
-[node name="190cm" type="Label3D" parent="Walls/Wall02"]
+[node name="190cm" type="Label3D" parent="Walls/Wall02" unique_id=1156073218]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 1.9, 0)
 pixel_size = 0.002
 text = "1.9m"
 
-[node name="200cm" type="Label3D" parent="Walls/Wall02"]
+[node name="200cm" type="Label3D" parent="Walls/Wall02" unique_id=9614464]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06, 2, 0)
 pixel_size = 0.002
 text = "2.0m"
 
-[node name="Wall03" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall03" parent="Walls" unique_id=1134299353 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-4.371137e-08, 0, 0.9999996, 0, 1, 0, -0.9999996, 0, -4.371137e-08, 2.0000002, 0, 4.999999)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall07" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall07" parent="Walls" unique_id=1620998628 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-4.371137e-08, 0, 0.9999996, 0, 1, 0, -0.9999996, 0, -4.371137e-08, 5.999998, 0, 4.9999986)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall08" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall08" parent="Walls" unique_id=249549048 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-0.9999996, 0, -8.742274e-08, 0, 1, 0, 8.742274e-08, 0, -0.9999996, 9.999996, 0, 1.9999995)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall27" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall27" parent="Walls" unique_id=38822277 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-0.9999996, 0, -8.742274e-08, 0, 1, 0, 8.742274e-08, 0, -0.9999996, 9.999996, 0, 5.999998)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall28" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall28" parent="Walls" unique_id=817201100 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-4.371137e-08, 0, 0.9999996, 0, 1, 0, -0.9999996, 0, -4.371137e-08, 7.999997, 0, 7.999997)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall09" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall09" parent="Walls" unique_id=752493281 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-0.9999996, 0, -8.742274e-08, 0, 1, 0, 8.742274e-08, 0, -0.9999996, 9.999996, 0, -1.9999988)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall10" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall10" parent="Walls" unique_id=1923576689 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-0.9999996, 0, -8.742274e-08, 0, 1, 0, 8.742274e-08, 0, -0.9999996, 9.999996, 0, -5.999997)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall11" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall11" parent="Walls" unique_id=1234228930 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-0.9999996, 0, -8.742274e-08, 0, 1, 0, 8.742274e-08, 0, -0.9999996, 9.999996, 0, -9.999995)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall12" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall12" parent="Walls" unique_id=1499475873 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(1.3113412e-07, 0, -0.9999996, 0, 1, 0, 0.9999996, 0, 1.3113412e-07, 9.999996, 0, -13.999993)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall14" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall14" parent="Walls" unique_id=1217155220 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(1.3113412e-07, 0, -0.9999996, 0, 1, 0, 0.9999996, 0, 1.3113412e-07, 5.999998, 0, -13.999992)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall15" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall15" parent="Walls" unique_id=293523218 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(1.3113412e-07, 0, -0.9999996, 0, 1, 0, 0.9999996, 0, 1.3113412e-07, 1.9999998, 0, -13.999991)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall16" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall16" parent="Walls" unique_id=724375286 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(1.3113412e-07, 0, -0.9999996, 0, 1, 0, 0.9999996, 0, 1.3113412e-07, -1.9999986, 0, -13.99999)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall17" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall17" parent="Walls" unique_id=1771848207 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(1.3113412e-07, 0, -0.9999996, 0, 1, 0, 0.9999996, 0, 1.3113412e-07, -5.999997, 0, -13.9999895)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall18" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall18" parent="Walls" unique_id=1196833450 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(0.9999996, 0, 1.7484548e-07, 0, 1, 0, -1.7484548e-07, 0, 0.9999996, -10.999995, 0, -13.999989)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall19" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall19" parent="Walls" unique_id=1506628436 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(1.937151e-07, 0, -0.9999995, 0, 1, 0, 0.9999995, 0, 1.937151e-07, -8.999997, 0, -15.999988)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall20" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall20" parent="Walls" unique_id=1768845140 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(0.9999996, 0, 1.7484548e-07, 0, 1, 0, -1.7484548e-07, 0, 0.9999996, -10.999995, 0, -9.99999)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall21" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall21" parent="Walls" unique_id=1631810006 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(0.9999996, 0, 1.7484548e-07, 0, 1, 0, -1.7484548e-07, 0, 0.9999996, -10.999994, 0, -5.9999924)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall22" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall22" parent="Walls" unique_id=876892254 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(0.9999996, 0, 1.7484548e-07, 0, 1, 0, -1.7484548e-07, 0, 0.9999996, -10.999993, 0, -1.999994)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall23" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall23" parent="Walls" unique_id=1785946464 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(0.9999996, 0, 1.7484548e-07, 0, 1, 0, -1.7484548e-07, 0, 0.9999996, -10.999992, 0, 2.0000043)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall26" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall26" parent="Walls" unique_id=675612361 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(0.9999996, 0, 1.7484548e-07, 0, 1, 0, -1.7484548e-07, 0, 0.9999996, -10.999991, 0, 6.000003)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall24" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall24" parent="Walls" unique_id=2089362604 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-1.6391277e-07, 0, 0.9999995, 0, 1, 0, -0.9999995, 0, -1.6391277e-07, -8.999999, 0, 7.999998)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall25" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall25" parent="Walls" unique_id=653506508 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-1.6391277e-07, 0, 0.9999995, 0, 1, 0, -0.9999995, 0, -1.6391277e-07, -5.0000014, 0, 7.999997)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall13" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall13" parent="Walls" unique_id=2137256281 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-0.9999996, 0, -8.742275e-08, 0, 1, 0, 8.742275e-08, 0, -0.9999996, 11.999995, 0, -11.999995)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall05" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall05" parent="Walls" unique_id=1151370957 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-4.371137e-08, 0, 0.9999996, 0, 1, 0, -0.9999996, 0, -4.371137e-08, -1.9999982, 0, 4.999999)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall06" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall06" parent="Walls" unique_id=800295014 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-4.371137e-08, 0, 0.9999996, 0, 1, 0, -0.9999996, 0, -4.371137e-08, -5.9999967, 0, 4.999999)
 size = Vector3(0.1, 2, 4)
 color = Color(0.2205455, 0.39421764, 0.70283246, 1)
 
-[node name="Wall04" parent="Walls" instance=ExtResource("2_s2yy1")]
+[node name="Wall04" parent="Walls" unique_id=1888405760 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(0.53519285, 0, 0.84472966, 0, 1, 0, -0.84472966, 0, 0.53519285, -4.0438614, 0, 0.5594559)
 size = Vector3(0.1, 1, 6)
 color = Color(0.9098039, 0, 0.92941177, 1)
 
-[node name="BallAndChainFixed" type="StaticBody3D" parent="."]
+[node name="BallAndChainFixed" type="StaticBody3D" parent="." unique_id=1963234235]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0346768, 1.523355, -1.7327807)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="BallAndChainFixed"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BallAndChainFixed" unique_id=303737961]
 shape = SubResource("SphereShape3D_re04o")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="BallAndChainFixed"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="BallAndChainFixed" unique_id=504092123]
 mesh = SubResource("SphereMesh_re04o")
 
-[node name="BallAndChain" parent="BallAndChainFixed" instance=ExtResource("5_re04o")]
+[node name="BallAndChain" parent="BallAndChainFixed" unique_id=593257258 instance=ExtResource("5_re04o")]
 transform = Transform3D(0.015026676, -0.9998871, 0, 0.9998871, 0.015026676, 0, 0, 0, 1, 0, -0.16, 0)
 
-[node name="PinJoint3D" type="PinJoint3D" parent="BallAndChainFixed"]
+[node name="PinJoint3D" type="PinJoint3D" parent="BallAndChainFixed" unique_id=588901669]
 node_a = NodePath("..")
 node_b = NodePath("../BallAndChain")
 
-[node name="Table" parent="." instance=ExtResource("3_cfwdu")]
+[node name="Table" parent="." unique_id=1416213509 instance=ExtResource("3_cfwdu")]
 
-[node name="Box01" parent="Table" instance=ExtResource("4_xu5kv")]
+[node name="Box01" parent="Table" unique_id=1233973179 instance=ExtResource("4_xu5kv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.70814544, 1.15, 0.23178434)
 color = Color(0.31845716, 0.6472459, 0.45833033, 1)
 
-[node name="Box02" parent="Table" instance=ExtResource("4_xu5kv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.46485636, 1.20919, 0.18593454)
+[node name="Box02" parent="Table" unique_id=218000510 instance=ExtResource("4_xu5kv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.46485636, 1.1768023, 0.18593454)
 mass = 10.0
-size = Vector3(0.2, 0.2, 0.2)
+size = Vector3(0.15, 0.15, 0.15)
 
-[node name="Box03" parent="Table" instance=ExtResource("4_xu5kv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07488975, 1.2801381, 0.15274632)
+[node name="Box03" parent="Table" unique_id=1845199912 instance=ExtResource("4_xu5kv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07488975, 1.2093202, 0.15274632)
 mass = 20.0
-size = Vector3(0.3, 0.3, 0.3)
+size = Vector3(0.2, 0.2, 0.2)
 color = Color(0.57990265, 0.58945864, 0.31561917, 1)
 
-[node name="Box04" parent="Table" instance=ExtResource("4_xu5kv")]
-transform = Transform3D(0.9997567, 0, 0.022059172, 0, 1, 0, -0.022059172, 0, 0.9997567, 0.41641495, 1.34847, 0.109362245)
+[node name="Box04" parent="Table" unique_id=1066586118 instance=ExtResource("4_xu5kv")]
+transform = Transform3D(0.9997567, 0, 0.022059172, 0, 1, 0, -0.022059172, 0, 0.9997567, 0.41641495, 1.2223271, 0.109362245)
 mass = 50.0
-size = Vector3(0.4, 0.4, 0.4)
+size = Vector3(0.25, 0.25, 0.25)
 color = Color(0.20507804, 0.6172268, 0.78655386, 1)
 
-[node name="Stairs" parent="." instance=ExtResource("5_s2yy1")]
+[node name="Stairs" parent="." unique_id=1413836190 instance=ExtResource("5_s2yy1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 1)
 
-[node name="Ramps" parent="." instance=ExtResource("6_dhxdq")]
+[node name="Ramps" parent="." unique_id=613512241 instance=ExtResource("6_dhxdq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -12.611528)
 
-[node name="Clouds" type="Node3D" parent="."]
+[node name="Clouds" type="Node3D" parent="." unique_id=589196877]
 
-[node name="Clouds01" type="MultiMeshInstance3D" parent="Clouds"]
+[node name="Clouds01" type="MultiMeshInstance3D" parent="Clouds" unique_id=1539234913]
 multimesh = SubResource("MultiMesh_re04o")
 
-[node name="Clouds02" type="MultiMeshInstance3D" parent="Clouds"]
+[node name="Clouds02" type="MultiMeshInstance3D" parent="Clouds" unique_id=1243032670]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 0)
 multimesh = SubResource("MultiMesh_hmdkj")
 
-[node name="SlipperyFloor" parent="." instance=ExtResource("2_s2yy1")]
+[node name="SlipperyFloor" parent="." unique_id=2034676723 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 4.723036, 0, -13.667241)
 physics_material_override = SubResource("PhysicsMaterial_dhxdq")
 size = Vector3(4, 4, 0.01)

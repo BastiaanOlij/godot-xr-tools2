@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://u6nldwj0320i" path="res://assets/main/splash.png" id="3_51pj4"]
 [ext_resource type="PackedScene" uid="uid://xrt27oxtswc" path="res://addons/godot-xr-tools2/spectator/xrt2_stabilized_camera.tscn" id="5_v5hs0"]
 
-[node name="Construct" type="Node2D" unique_id=65284563]
+[node name="Spectator" type="Node2D" unique_id=65284563]
 script = ExtResource("2_8sb5x")
 
 [node name="LoadingImage" type="TextureRect" parent="." unique_id=1978528374]
