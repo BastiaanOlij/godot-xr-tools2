@@ -17,8 +17,12 @@ func _update_size():
 	$CollisionShape3D.shape.size = size
 	$MeshInstance3D.mesh.size = size
 	$Label3D.position.z = size.z * 0.5 + 0.002
-	$RightGrabPoint.position.x = size.x * 0.5 + 0.025
-	$LeftGrabPoint.position.x = -(size.x * 0.5 + 0.025)
+	$RightGrabPoint.position.x = size.x * 0.5 + 0.035
+	$RightGrabPoint.position.y = size.y * 0.5 - 0.04
+	$RightGrabPoint.position.z = -size.z * 0.5 + 0.11
+	$LeftGrabPoint.position.x = -(size.x * 0.5 + 0.035)
+	$LeftGrabPoint.position.y = size.y * 0.5 - 0.04
+	$LeftGrabPoint.position.z = -size.z * 0.5 + 0.11
 
 
 func _update_color():
