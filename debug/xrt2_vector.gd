@@ -39,6 +39,13 @@ extends Node3D
 		if is_inside_tree():
 			_on_layers_changed()
 
+func place_vector(at: Vector3, direction: Vector3):
+	if abs(Vector3.UP.dot(at)) < 0.9:
+		transform = Transform3D(Basis.looking_at(direction, Vector3.UP, true), at)
+	else:
+		transform = Transform3D(Basis.looking_at(direction, Vector3.RIGHT, true), at)
+
+
 func _on_color_changed():
 	var material : StandardMaterial3D = $Stem.material_override
 	material.albedo_color = color

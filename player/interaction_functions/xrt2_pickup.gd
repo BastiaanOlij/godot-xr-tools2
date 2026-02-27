@@ -24,7 +24,6 @@
 # SOFTWARE.
 #-------------------------------------------------------------------------------
 
-
 @tool
 class_name XRT2Pickup
 extends Node3D
@@ -59,34 +58,32 @@ enum PickedUpByMode {
 
 # Class for storing our highlight overrule data
 class HighlightedBody extends RefCounted:
-	var original_materials : Dictionary[MeshInstance3D, Material]
-	var pickups : Array[XRT2Pickup]
+	var original_materials: Dictionary[MeshInstance3D, Material]
+	var pickups: Array[XRT2Pickup]
 
-# Class for storing closest info
-class ClosestObject extends RefCounted:
-	var body : PhysicsBody3D
-	var grab_point : XRT2GrabPoint
+# Class for storing object info for grabbing
+class GrabObject extends RefCounted:
+	var body: PhysicsBody3D
+	var grab_point: XRT2GrabPoint
+	var collision_point: Vector3
+	var collision_normal: Vector3
 
 # Array of all current pickup handlers
-static var _pickup_handlers : Array[XRT2Pickup]
+static var _pickup_handlers: Array[XRT2Pickup]
 
 # We only want one hand to highlight
-static var _highlighted_bodies : Dictionary[Node3D, HighlightedBody]
+static var _highlighted_bodies: Dictionary[Node3D, HighlightedBody]
 
 #region Export variables
 ## If ticked we monitor for things we can pick up
 @export var enabled: bool = true:
 	set(value):
 		enabled = value
-		if is_inside_tree():
-			_update_enabled()
 
 ## We only pick up items present in these physics layers
 @export_flags_3d_physics var collision_mask: int = 1:
 	set(value):
 		collision_mask = value
-		if is_inside_tree():
-			_update_collision_mask()
 
 ## How far from our pickup function we check if there are items to pick up.
 @export var detection_radius: float = 0.3:
@@ -96,12 +93,9 @@ static var _highlighted_bodies : Dictionary[Node3D, HighlightedBody]
 			_update_detection_radius()
 
 ## Offset our detection area
-@export var detection_offset: Vector3 = Vector3(0.0, 0.0, -0.08):
+@export var detection_offset: Vector3 = Vector3(0.0, 0.0, -0.06):
 	set(value):
 		detection_offset = value
-
-		if _detection_area:
-			_detection_area.position = detection_offset
 
 		if _editor_mesh_instance:
 			_editor_mesh_instance.position = detection_offset
@@ -130,10 +124,10 @@ var _xr_collision_hand: XRT2CollisionHand
 var _xr_player_object: CollisionObject3D
 var _was_player_basis: Basis
 
-# Child objects for our detection area
-var _detection_area: Area3D
-var _collision_shape: CollisionShape3D
-var _collision_sphere: SphereShape3D
+# Object detection
+var _detection_shape: SphereShape3D
+var _detection_query: PhysicsShapeQueryParameters3D
+var _detection_exclude : Array[RID]
 
 # Visualisation in the editor
 var _editor_sphere: SphereMesh
@@ -152,7 +146,7 @@ var _was_xr_pressed: bool = false
 var _updating_transform: bool = false
 
 # What is currently our closest object
-var _closest_object: ClosestObject
+var _closest_object: GrabObject
 
 # What are we holding and by which grab point
 var _picked_up: PhysicsBody3D
@@ -258,7 +252,7 @@ func get_controller_target() -> Transform3D:
 
 
 ## Pick up this object
-func pickup_object(which : PhysicsBody3D):
+func pickup_object(object : GrabObject):
 	# Get our current tracker position
 	var target : Transform3D
 	if _xr_collision_hand:
@@ -270,9 +264,9 @@ func pickup_object(which : PhysicsBody3D):
 		return
 
 	# No longer show highlighted
-	_remove_highlight(which)
+	_remove_highlight(object.body)
 
-	var other = picked_up_by(which)
+	var other = picked_up_by(object.body)
 	if other:
 		_is_primary = false
 		other._two_hand_delay = 0.0
@@ -287,15 +281,15 @@ func pickup_object(which : PhysicsBody3D):
 	# Make sure our body doesn't collide with things we've picked up
 	if _is_primary and _xr_player_object:
 		# TODO should create a collision exception manager to ensure we don't undo this too quickly
-		which.add_collision_exception_with(_xr_player_object)
-		_xr_player_object.add_collision_exception_with(which)
+		object.body.add_collision_exception_with(_xr_player_object)
+		_xr_player_object.add_collision_exception_with(object.body)
 
 	# Remember state
-	_picked_up = which
+	_picked_up = object.body
 
-	if which is RigidBody3D or which is PhysicalBone3D:
+	if object.body is RigidBody3D or object.body is PhysicalBone3D:
 		# Get some behaviour characteristics
-		var rigid_body_behaviour: XRT2RigidBodyBehaviour = XRT2RigidBodyBehaviour.get_behaviour_node(which)
+		var rigid_body_behaviour: XRT2RigidBodyBehaviour = XRT2RigidBodyBehaviour.get_behaviour_node(object.body)
 		if rigid_body_behaviour:
 			_pivot_on_primary = rigid_body_behaviour.pivot_on_primary
 		else:
@@ -324,7 +318,8 @@ func pickup_object(which : PhysicsBody3D):
 		finger_poses = _grab_point.finger_poses
 		open_finger_poses = _grab_point.open_finger_poses
 	else:
-		grab_transform = _get_default_hand_transform(_picked_up, global_position)
+		grab_transform = _get_hand_transform_from_surface(object.collision_point, object.collision_normal)
+		# grab_transform = _get_default_hand_transform(_picked_up, global_position)
 	var local_grab_transform: Transform3D = _picked_up.global_transform.inverse() * grab_transform
 
 	# Calculate the offset between our controller position, and the object we picked up.
@@ -430,26 +425,8 @@ func drop_held_object( \
 
 
 #region Private export variable update functions
-# Update our enabled status
-func _update_enabled():
-	if _collision_sphere:
-		_collision_shape.disabled = !enabled
-	if _detection_area:
-		_detection_area.monitoring = enabled
-
-	# Q: Do we drop anything we're holding when disabled?
-
-
-# Update our collision mask
-func _update_collision_mask():
-	if _detection_area:
-		_detection_area.collision_mask = collision_mask
-
-
 # Update our detection radius
 func _update_detection_radius():
-	if _collision_sphere:
-		_collision_sphere.radius = detection_radius
 	if _editor_mesh_instance:
 		# Just scale it, prevents having to recreate mesh
 		_editor_mesh_instance.scale = Vector3(detection_radius, detection_radius, detection_radius)
@@ -478,9 +455,29 @@ func _validate_property(property: Dictionary) -> void:
 		property.usage = PROPERTY_USAGE_NONE
 
 
+# Exclude any collision children related to this node
+func _exclude_collision_children(parent: Node3D):
+	for child in parent.get_children():
+		if child is CollisionObject3D:
+			_detection_exclude.push_back(child.get_rid())
+
+		_exclude_collision_children(child)
+
+
 # Called when node enters the scene tree
 func _enter_tree():
+	_detection_exclude.clear()
+
+	# Exclude any collision parents of our node
+	var parent = get_parent()
+	while parent:
+		if parent is CollisionObject3D:
+			_detection_exclude.push_back(parent.get_rid())
+		parent = parent.get_parent()
+
 	_xr_origin = XRT2Helper.get_xr_origin(self)
+	_exclude_collision_children(_xr_origin)
+
 	_xr_collision_hand = XRT2CollisionHand.get_xr_collision_hand(self)
 	if _xr_collision_hand:
 		_xr_player_object = _xr_collision_hand.get_collision_parent()
@@ -517,6 +514,12 @@ func _ready():
 		_editor_mesh_instance.position = detection_offset
 		add_child(_editor_mesh_instance, false, Node.INTERNAL_MODE_BACK)
 
+		# For now visualize our center, but this should be replaced by a gizmo!!
+		var center_mesh_instance = MeshInstance3D.new()
+		center_mesh_instance.mesh = _editor_sphere
+		_editor_mesh_instance.add_child(center_mesh_instance)
+		center_mesh_instance.scale = Vector3(0.1, 0.1, 0.1)
+
 		_update_detection_radius()
 		return
 
@@ -525,26 +528,20 @@ func _ready():
 	# Add this to our list of active pickup handlers
 	_pickup_handlers.push_back(self)
 
-	# Create our collision shape
-	_collision_sphere = SphereShape3D.new()
+	# Create our detection shape
+	_detection_shape = SphereShape3D.new()
 
-	# Create our collision object
-	_collision_shape = CollisionShape3D.new()
-	_collision_shape.shape = _collision_sphere
+	# Create our detection query
+	_detection_query = PhysicsShapeQueryParameters3D.new()
+	_detection_query.shape = _detection_shape
 
-	# Create our area detection node
-	_detection_area = Area3D.new()
-	_detection_area.add_child(_collision_shape, false, Node.INTERNAL_MODE_FRONT)
-	_detection_area.position = detection_offset
-	add_child(_detection_area, false, Node.INTERNAL_MODE_BACK)
-
-	_update_enabled()
-	_update_collision_mask()
 	_update_detection_radius()
 
 
 # Called when node exits the scene tree
 func _exit_tree():
+	_detection_exclude.clear()
+
 	if not Engine.is_editor_hint():
 		if _closest_object and is_instance_valid(_closest_object.body):
 			_remove_highlight(_closest_object.body)
@@ -616,11 +613,11 @@ func _process(_delta):
 
 		drop_held_object(linear_velocity, angular_velocity)
 	elif not was_grab and _is_grab and _closest_object and is_instance_valid(_closest_object.body):
-		pickup_object(_closest_object.body)
+		pickup_object(_closest_object)
 		return
 
 	# Update closest object
-	var was_closest_object : ClosestObject = _closest_object
+	var was_closest_object : GrabObject = _closest_object
 	_closest_object = _get_closest()
 
 	if was_closest_object and _closest_object and was_closest_object.body == _closest_object.body:
@@ -781,12 +778,28 @@ func _get_closest_grabpoint(body : PhysicsBody3D, hand_position : Vector3) -> XR
 	return closest_grab_point
 
 
+func _get_hand_transform_from_surface(point: Vector3, normal: Vector3) -> Transform3D:
+	var t : Transform3D
+
+	# Invert the normal if we're dealing with our left hand
+	if _is_left_hand():
+		normal = -normal
+
+	t.basis.x = normal.normalized()
+	t.basis.z = t.basis.x.cross(global_basis.y).normalized()
+	t.basis.y = t.basis.z.cross(t.basis.x).normalized()
+	t.origin = point
+
+	# We need an offset as our collision point should be at our palm...
+	t = t * Transform3D(Basis(), -detection_offset)
+
+	return t
+
+
 # Returns a transform for hand positioning using our default logic.
 # Used when there are no grab points.
 func _get_default_hand_transform(body : PhysicsBody3D, hand_position : Vector3) -> Transform3D:
 	var state : PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
-
-	# TODO: Change this to shape cast using our area collision shape
 
 	var params : PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
 	params.from = hand_position
@@ -811,64 +824,56 @@ func _get_default_hand_transform(body : PhysicsBody3D, hand_position : Vector3) 
 		return t
 
 
-func _get_closest() -> ClosestObject:
-	if not _detection_area.monitoring:
+func _get_closest() -> GrabObject:
+	if not enabled:
 		return null
 
-	var overlapping_bodies = _detection_area.get_overlapping_bodies()
-	var closest : ClosestObject
-	var closest_dist : float = 9999999.99
+	if not _detection_shape:
+		return null
 
-	for body : Node3D in overlapping_bodies:
-		if body.is_ancestor_of(self):
-			# Ignore any of our parents
-			continue
-		elif _xr_origin.is_ancestor_of(body):
-			# Ignore any children of our origin
-			continue
-		elif body is RigidBody3D and not body.freeze:
-			# Always include rigidbodies unless frozen
-			# TODO see if we can treat frozen bodies like grabing a static body
-			pass
-		elif body is PhysicalBone3D and _xr_collision_hand:
-			# We support picking up PhysicalBone3D if we're using collision hands
-			pass
-		elif body is StaticBody3D and _xr_collision_hand:
-			# TODO implement a system for selectively including these
-			# (or maybe switch on animatable body)
-			pass
-		else:
-			# Skip anything else
-			continue
+	if not _detection_query:
+		return null
 
-		var by : XRT2Pickup = picked_up_by(body)
-		if by:
-			# Check if it's already been picked up by an exclusive grab
-			var on_grab_point = by.get_picked_up_grab_point()
-			if on_grab_point and on_grab_point.exclusive:
-				# Can't pick this up
-				continue
+	var state : PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
 
-		# Do we have a grab point?
-		var new_dist : float = 9999999.99
-		var grab_point = _get_closest_grabpoint(body, global_position)
-		if grab_point:
-			if by and grab_point.exclusive:
-				# Two handed not possible
-				continue
+	_detection_shape.radius = detection_radius
+	_detection_query.collision_mask = collision_mask
+	_detection_query.exclude = _detection_exclude
+	_detection_query.transform = global_transform * Transform3D(Basis(), detection_offset)
+	
+	var result: Dictionary = state.get_rest_info(_detection_query)
+	if not result or result.is_empty():
+		return null
 
-			new_dist = (global_position - grab_point.get_hand_transform(global_position).origin).length_squared()
-		else:
-			# TODO should do our raycast to see if there is nothing between us and the object we're picking up
-			
-			new_dist = (global_position - body.global_position).length_squared()
+	var hand_normal = -global_basis.x if _is_left_hand() else global_basis.x
+	if hand_normal.dot(result.normal) < 0.0:
+		return null
 
-		# See if this is our closest object
-		if new_dist < closest_dist:
-			closest = ClosestObject.new()
-			closest.body = body
-			closest.grab_point = grab_point
-			closest_dist = new_dist
+	var collider: PhysicsBody3D = instance_from_id(result.collider_id)
+	if not collider:
+		return null
+
+	# Check if already picked up
+	var by : XRT2Pickup = picked_up_by(collider)
+	if by:
+		# Check if it's already been picked up by an exclusive grab
+		var on_grab_point = by.get_picked_up_grab_point()
+		if on_grab_point and on_grab_point.exclusive:
+			# Can't pick this up
+			return null
+
+	# Get our grab point (if any)
+	var grab_point = _get_closest_grabpoint(collider, global_position)
+	if grab_point:
+		if by and grab_point.exclusive:
+			# Two handed not possible
+			return null
+
+	var closest: GrabObject = GrabObject.new()
+	closest.body = collider
+	closest.grab_point = grab_point
+	closest.collision_point = result.point
+	closest.collision_normal = result.normal
 
 	return closest
 
