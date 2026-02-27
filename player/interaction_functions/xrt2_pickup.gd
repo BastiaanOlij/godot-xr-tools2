@@ -40,8 +40,6 @@ extends Node3D
 #   The idea is to also be able to grab marked StaticBodies but we then keep
 #   our hand attached to the static body and work with a movement provider
 #   to allow allow body movement.
-# - We no longer have logic on our [RigidBody3D] so we need a static
-#   interface to easily find out by what the [RigidBody3D] is held
 
 #region Signals
 
@@ -114,6 +112,13 @@ static var _highlighted_bodies : Dictionary[Node3D, HighlightedBody]
 ## If false we need to continously hold our grab button, if true we toggle
 ## Note: with keyboard entry toggle is enforced
 @export var grab_toggle: bool = false
+
+## When the second hand lets go of an object, how long do we delay our "snap"
+@export_range(0.0, 2.0, 0.01) var two_hand_delay = 0.5
+
+## When an object is let go by one hand, but still held by another
+## this factor is applied to soften our let go action.
+@export_range(0.01, 1.00, 0.01) var let_go_factor = 0.3
 #endregion
 
 
@@ -153,6 +158,8 @@ var _closest_object: ClosestObject
 var _picked_up: PhysicsBody3D
 var _grab_point: XRT2GrabPoint
 var _grab_offset: Transform3D
+var _pivot_on_primary: bool = false
+var _two_hand_delay: float = 0.0
 
 # If true, we are the primary hand holding this object (for 2 handed)
 var _is_primary: bool = false
@@ -265,10 +272,13 @@ func pickup_object(which : PhysicsBody3D):
 	# No longer show highlighted
 	_remove_highlight(which)
 
-	if picked_up_by(which):
+	var other = picked_up_by(which)
+	if other:
 		_is_primary = false
+		other._two_hand_delay = 0.0
 	else :
 		_is_primary = true
+		_two_hand_delay = 0.0
 
 	# In case we need it, initialise our was player basis at pickup.
 	if _xr_player_object:
@@ -282,6 +292,14 @@ func pickup_object(which : PhysicsBody3D):
 
 	# Remember state
 	_picked_up = which
+
+	if which is RigidBody3D or which is PhysicalBone3D:
+		# Get some behaviour characteristics
+		var rigid_body_behaviour: XRT2RigidBodyBehaviour = XRT2RigidBodyBehaviour.get_behaviour_node(which)
+		if rigid_body_behaviour:
+			_pivot_on_primary = rigid_body_behaviour.pivot_on_primary
+		else:
+			_pivot_on_primary = false
 
 	# TODO: the way we now make this work for xr_collision_hand can also
 	# be applied for a xr_controller.
@@ -390,11 +408,13 @@ func drop_held_object( \
 	_grab_point = null
 	_grab_offset = Transform3D()
 	_is_primary = false
+	_pivot_on_primary = false
 
 	var other = picked_up_by(was_picked_up)
 	if other:
 		# If it isn't already primary, this is now our primary
 		other._is_primary = true
+		other._two_hand_delay = two_hand_delay
 	elif _xr_player_object:
 		# TODO: Delay this until we're not colliding!
 		was_picked_up.remove_collision_exception_with(_xr_player_object)
@@ -640,8 +660,8 @@ func _physics_process(delta):
 	if _picked_up.has_method("_xr_custom_pickup_handler"):
 		_picked_up._xr_custom_pickup_handler(self, global_target)
 	elif _picked_up is RigidBody3D or _picked_up is PhysicalBone3D:
-		# TODO: obtain this somehow from our picked up object (decoration?)
-		var pivot_on_primary: bool = true
+		var primary_factor: float = 1.0 if _two_hand_delay == 0.0 else let_go_factor
+		_two_hand_delay = max(0.0, _two_hand_delay - delta)
 
 		var parent_linear_velocity: Vector3 = Vector3()
 		var parent_angular_velocity: Vector3 = Vector3()
@@ -682,18 +702,25 @@ func _physics_process(delta):
 				var angle: float = acos(start_vector.dot(dest_vector))
 
 				global_target.basis = Basis(cross, angle)
-				if pivot_on_primary:
+
+				# Now calculate how much our tracked hands are rotated along our destination vector
+				var primary_angle = XRT2Helper.angle_in_plane(dest_vector, global_target.basis * _grab_offset.basis.y, controller_target.basis.y)
+				var secondary_angle = XRT2Helper.angle_in_plane(dest_vector, global_target.basis * other_grab_offset.basis.y, other_controller_target.basis.y)
+
+				global_target.basis = Basis(dest_vector, (primary_angle + secondary_angle) * 0.5) * global_target.basis
+
+				if _pivot_on_primary:
 					# If we're pivoting on primary, adjust our target position accordingly.
 					global_target.origin = controller_target.origin - (global_target.basis * _grab_offset.origin)
 
 			# Apply angular motion to picked up object.
 			# We always do this on primary only!
 			XRT2Helper.apply_torque_to_target(
-				delta, _picked_up, global_target.basis, 1.0,
+				delta, _picked_up, global_target.basis, primary_factor,
 				parent_angular_velocity, parent_global_basis
 			)
 
-		if not pivot_on_primary:
+		if not _pivot_on_primary:
 			# If we're holding this with multiple hands, we apply proportionally.
 			var proportion: float = 1.0 / picked_up_count(_picked_up)
 
@@ -703,7 +730,7 @@ func _physics_process(delta):
 			)
 		elif _is_primary:
 			# Apply linear motion to picked up object.
-			XRT2Helper.apply_force_to_target(delta, _picked_up, global_target.origin, 1.0,
+			XRT2Helper.apply_force_to_target(delta, _picked_up, global_target.origin, primary_factor,
 				parent_linear_velocity, parent_angular_velocity, parent_global_position
 			)
 	elif _picked_up is StaticBody3D:
