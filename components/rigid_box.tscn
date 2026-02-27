@@ -3,7 +3,8 @@
 [ext_resource type="Shader" uid="uid://hy6wp5qwpmjk" path="res://materials_and_shaders/textured.gdshader" id="1_k2m5r"]
 [ext_resource type="Script" uid="uid://ba6wewfa3a1cg" path="res://components/rigid_box.gd" id="1_ve6ct"]
 [ext_resource type="Texture2D" uid="uid://ds8hppgpq3pod" path="res://assets/main/pattern.png" id="2_cqel8"]
-[ext_resource type="Script" uid="uid://xrt2jog5h0j" path="res://addons/godot-xr-tools2/components/xrt2_grab_point.gd" id="3_h7r30"]
+[ext_resource type="Script" uid="uid://xrt2ljdl5rd" path="res://addons/godot-xr-tools2/components/decorators/xrt2_rigid_body_behaviour.gd" id="2_noshu"]
+[ext_resource type="Script" uid="uid://xrt2jog5h0j" path="res://addons/godot-xr-tools2/components/decorators/xrt2_grab_point.gd" id="3_h7r30"]
 [ext_resource type="Resource" uid="uid://b1ahvycegofbi" path="res://components/box_finger_poses.tres" id="5_0mpbp"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hxxno"]
@@ -30,6 +31,10 @@ size = Vector3(0.1, 0.1, 0.1)
 [node name="Box" type="RigidBody3D" unique_id=2133351570]
 script = ExtResource("1_ve6ct")
 
+[node name="XRT2RigidBodyBehaviour" type="Node" parent="." unique_id=2009456604]
+script = ExtResource("2_noshu")
+metadata/_custom_type_script = "uid://xrt2ljdl5rd"
+
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1084887047]
 shape = SubResource("BoxShape3D_hxxno")
 
@@ -40,12 +45,14 @@ mesh = SubResource("BoxMesh_yjhaw")
 [node name="RightGrabPoint" type="Node3D" parent="." unique_id=1923406402]
 transform = Transform3D(0.9924039, 0.08682408, 0.087155744, -0.09512389, 0.9908173, 0.096086755, -0.078012764, -0.10364746, 0.99154997, 0.085, 0.010000001, 0.06)
 script = ExtResource("3_h7r30")
+enabled = false
 left_hand = false
 finger_poses = ExtResource("5_0mpbp")
 
 [node name="LeftGrabPoint" type="Node3D" parent="." unique_id=583737289]
 transform = Transform3D(0.9930659, -0.07925686, -0.08682408, 0.086824074, 0.9924039, 0.08715574, 0.079256855, -0.09408981, 0.9924039, -0.085, 0.010000001, 0.06)
 script = ExtResource("3_h7r30")
+enabled = false
 right_hand = false
 finger_poses = ExtResource("5_0mpbp")
 

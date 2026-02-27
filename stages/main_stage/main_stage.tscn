@@ -86,7 +86,7 @@ movement_acceleration = 0.0
 transform = Transform3D(0.99500257, -0.0035018958, 0.09978712, -0.003500683, 0.99754673, 0.069914035, -0.09978719, -0.069914, 0.99254906, -0.02500046, 0.003554154, 0.040035933)
 script = ExtResource("4_l0n08")
 detection_radius = 0.1
-detection_offset = Vector3(0.03, 0, -0.08)
+detection_offset = Vector3(0.03, 0, -0.06)
 
 [node name="IndexTipAttachment" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" parent_id_path=PackedInt32Array(1387237929, 360497191) index="2" unique_id=1677449161]
 transform = Transform3D(0.91954595, -0.014892519, -0.39270008, -0.03211107, 0.99309224, -0.11285275, 0.39166808, 0.11638334, 0.9127157, -0.026100121, 0.042943064, -0.13161416)
@@ -104,7 +104,7 @@ strafe_movement_speed = 2.5
 transform = Transform3D(0.99500257, 0.0035019002, -0.09978717, 0.003500686, 0.99754673, 0.06991408, 0.099787235, -0.06991404, 0.99254906, 0.02500046, 0.003554154, 0.040035933)
 script = ExtResource("4_l0n08")
 detection_radius = 0.1
-detection_offset = Vector3(-0.03, 0, -0.08)
+detection_offset = Vector3(-0.03, 0, -0.06)
 
 [node name="XRT2Log" parent="XRT2CharacterBody3D" index="3" unique_id=2103358672 instance=ExtResource("11_4i4c4")]
 transform = Transform3D(0.9854406, 0, 0.17002034, 0, 1, 0, -0.17002034, 0, 0.9854406, -0.19793722, 1.5116211, -1.2153747)
