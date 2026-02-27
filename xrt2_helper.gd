@@ -100,6 +100,22 @@ static func get_collision_object(p_node : Node3D) -> CollisionObject3D:
 ################################################################################
 # Helper functions for our physics
 
+## Calculate the angle between two vector within the plane of another vector
+static func angle_in_plane(p_plane_vector: Vector3, p_a: Vector3, p_b: Vector3) -> float:
+	# Take the cross product with our plane vector
+	var a: Vector3 = p_plane_vector.cross(p_a).normalized()
+	var b: Vector3 = p_plane_vector.cross(p_b).normalized()
+
+	# Now calculate the angle
+	var angle = acos(a.dot(b))
+
+	# Check alignment with plane vector
+	var cross: Vector3 = a.cross(b).normalized()
+	if cross.dot(p_plane_vector) < 0.0:
+		angle = -angle
+
+	return angle
+
 ## Calculate the axis-angle rotation between two orientations.
 static func rotation_to_axis_angle(start_orientation : Basis, end_orientation : Basis) -> Vector3:
 	var delta_basis : Basis = end_orientation * start_orientation.inverse()

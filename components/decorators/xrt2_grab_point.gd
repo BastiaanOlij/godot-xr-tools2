@@ -24,7 +24,6 @@
 # SOFTWARE.
 #-------------------------------------------------------------------------------
 
-
 @tool
 class_name XRT2GrabPoint
 extends Node3D
