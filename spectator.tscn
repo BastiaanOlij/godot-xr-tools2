@@ -28,7 +28,7 @@ popup/item_1/text = "Stablilized Camera"
 popup/item_1/id = 1
 
 [node name="Xrt2SpectatorCamera" parent="." unique_id=717676012 instance=ExtResource("2_hkn0h")]
-transform = Transform3D(-0.772577, 0.196973, -0.603594, 0.00228937, 0.951519, 0.307582, 0.634916, 0.236249, -0.735573, -0.993, 2.0438, -1.355278)
+transform = Transform3D(-0.772577, 0.013742587, -0.63477176, 0.0022893846, 0.99981976, 0.018859178, 0.63491595, 0.013116851, -0.7724695, -0.58694303, 1.4365196, -2.462911)
 
 [node name="Xrt2StabilizedCamera" parent="." unique_id=787561721 instance=ExtResource("5_v5hs0")]
 

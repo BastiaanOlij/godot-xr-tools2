@@ -6,8 +6,10 @@
 [ext_resource type="PackedScene" uid="uid://djjdpt6vpdljg" path="res://components/rigid_box.tscn" id="4_xu5kv"]
 [ext_resource type="PackedScene" uid="uid://dli41g6lolyef" path="res://props/ball_and_chain/ball_and_chain.tscn" id="5_re04o"]
 [ext_resource type="PackedScene" uid="uid://bpw8fh2d8fo4m" path="res://components/stairs.tscn" id="5_s2yy1"]
+[ext_resource type="Script" uid="uid://xrt2jog5h0j" path="res://addons/godot-xr-tools2/components/decorators/xrt2_grab_point.gd" id="6_27ely"]
 [ext_resource type="PackedScene" uid="uid://c4tgb1fvpccgb" path="res://components/ramps.tscn" id="6_dhxdq"]
 [ext_resource type="ArrayMesh" uid="uid://2iuv58i1suq2" path="res://assets/low-poly-clouds-pack-1/meshes/Cloud_1_Icosphere_044.res" id="6_xu5kv"]
+[ext_resource type="Resource" uid="uid://b1ahvycegofbi" path="res://components/box_finger_poses.tres" id="7_0mmyo"]
 [ext_resource type="ArrayMesh" uid="uid://de02agai7haih" path="res://assets/low-poly-clouds-pack-1/meshes/Cloud_2_Icosphere_043.res" id="7_dhxdq"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_re04o"]
@@ -16,6 +18,17 @@ radius = 0.01
 [sub_resource type="SphereMesh" id="SphereMesh_re04o"]
 radius = 0.01
 height = 0.02
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_xe0wv"]
+size = Vector3(0.2, 0.2, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_j1sp4"]
+transparency = 1
+albedo_color = Color(0, 0.5058824, 0.5058824, 0.4509804)
+
+[sub_resource type="BoxMesh" id="BoxMesh_8mqay"]
+material = SubResource("StandardMaterial3D_j1sp4")
+size = Vector3(0.2, 0.2, 0.2)
 
 [sub_resource type="MultiMesh" id="MultiMesh_re04o"]
 transform_format = 1
@@ -311,10 +324,35 @@ size = Vector3(0.2, 0.2, 0.2)
 color = Color(0.57990265, 0.58945864, 0.31561917, 1)
 
 [node name="Box04" parent="Table" unique_id=1066586118 instance=ExtResource("4_xu5kv")]
-transform = Transform3D(0.9997567, 0, 0.022059172, 0, 1, 0, -0.022059172, 0, 0.9997567, 0.41641495, 1.2223271, 0.109362245)
+transform = Transform3D(0.9997567, 0, 0.022059172, 0, 1, 0, -0.022059172, 0, 0.9997567, 0.40760654, 1.2223271, -0.28984928)
 mass = 50.0
 size = Vector3(0.25, 0.25, 0.25)
 color = Color(0.20507804, 0.6172268, 0.78655386, 1)
+
+[node name="Test" type="RigidBody3D" parent="Table" unique_id=1039235317]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45693105, 1.2134975, 0.30739772)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Table/Test" unique_id=983238227]
+shape = SubResource("BoxShape3D_xe0wv")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Table/Test" unique_id=932850860]
+mesh = SubResource("BoxMesh_8mqay")
+
+[node name="LeftGrabPoint" type="Node3D" parent="Table/Test" unique_id=1811487180]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.0025416687, 0.055870533, 0.12585759)
+script = ExtResource("6_27ely")
+right_hand = false
+finger_poses = ExtResource("7_0mmyo")
+show_hand = true
+metadata/_custom_type_script = "uid://xrt2jog5h0j"
+
+[node name="RightGrabPoint" type="Node3D" parent="Table/Test" unique_id=1000392240]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13008094, 0.05615008, 0.008329272)
+script = ExtResource("6_27ely")
+left_hand = false
+finger_poses = ExtResource("7_0mmyo")
+show_hand = true
+metadata/_custom_type_script = "uid://xrt2jog5h0j"
 
 [node name="Stairs" parent="." unique_id=1413836190 instance=ExtResource("5_s2yy1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 1)

@@ -1,9 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://dli41g6lolyef"]
+[gd_scene format=3 uid="uid://dli41g6lolyef"]
 
 [ext_resource type="Material" uid="uid://csrmou74coiid" path="res://props/ball_and_chain/ball_and_chain_material.tres" id="1_r34nt"]
 [ext_resource type="PackedScene" uid="uid://bupahxln4i5pf" path="res://props/ball_and_chain/chain_link.tscn" id="2_htpog"]
 [ext_resource type="PackedScene" uid="uid://dqexn22mo1ngx" path="res://props/ball_and_chain/ball.tscn" id="3_jnubn"]
-[ext_resource type="Script" uid="uid://xrt2jog5h0j" path="res://addons/godot-xr-tools2/components/xrt2_grab_point.gd" id="4_htpog"]
+[ext_resource type="Script" uid="uid://xrt2jog5h0j" path="res://addons/godot-xr-tools2/components/decorators/xrt2_grab_point.gd" id="4_htpog"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_qw1p0"]
 margin = 0.01
