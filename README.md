@@ -13,8 +13,8 @@
 This repository contains a number of support files and support scenes that can be used together with the various AR and VR interfaces for the Godot game engine.
 
 ![GitHub forks](https://img.shields.io/github/forks/BastiaanOlij/godot-xr-tools2)
-![GitHub stars](https://img.shields.io/github/stars/BastiaanOlij/godot-xr-tools2)
-![GitHub contributors](https://img.shields.io/github/contributors/BastiaanOlij/godot-xr-tools2)
+![GitHub stars](https://img.shields.io/github/stars/BastiaanOlij/godot-xr-tools2?style=social)
+![GitHub contributors](https://img.shields.io/github/contributors/BastiaanOlij/godot-xr-tools2?style=flat)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 ## Versions
