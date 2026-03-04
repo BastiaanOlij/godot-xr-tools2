@@ -14,7 +14,7 @@ This repository contains a number of support files and support scenes that can b
 
 ![GitHub forks](https://img.shields.io/github/forks/BastiaanOlij/godot-xr-tools2)
 ![GitHub stars](https://img.shields.io/github/stars/BastiaanOlij/godot-xr-tools2?style=social)
-![GitHub contributors](https://img.shields.io/github/contributors/BastiaanOlij/godot-xr-tools2?style=flat)
+![contributors](https://badgen.net/github/contributors/BastiaanOlij/godot-xr-tools2)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 ## Versions
