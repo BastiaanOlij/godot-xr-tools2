@@ -155,6 +155,10 @@ var _grab_offset: Transform3D
 var _pivot_on_primary: bool = false
 var _two_hand_delay: float = 0.0
 
+# Static object manipulation
+# Should make this setable at some point
+var _static_velocity_lerp_factor: float = 10.0
+
 # If true, we are the primary hand holding this object (for 2 handed)
 var _is_primary: bool = false
 
@@ -278,16 +282,16 @@ func pickup_object(object : GrabObject):
 	if _xr_player_object:
 		_was_player_basis = _xr_player_object.basis
 
-	# Make sure our body doesn't collide with things we've picked up
-	if _is_primary and _xr_player_object:
-		# TODO should create a collision exception manager to ensure we don't undo this too quickly
-		object.body.add_collision_exception_with(_xr_player_object)
-		_xr_player_object.add_collision_exception_with(object.body)
-
 	# Remember state
 	_picked_up = object.body
 
 	if object.body is RigidBody3D or object.body is PhysicalBone3D:
+		# Make sure our body doesn't collide with things we've picked up
+		if _is_primary and _xr_player_object:
+			# TODO should create a collision exception manager to ensure we don't undo this too quickly
+			object.body.add_collision_exception_with(_xr_player_object)
+			_xr_player_object.add_collision_exception_with(object.body)
+
 		# Get some behaviour characteristics
 		var rigid_body_behaviour: XRT2RigidBodyBehaviour = XRT2RigidBodyBehaviour.get_behaviour_node(object.body)
 		if rigid_body_behaviour:
@@ -411,9 +415,10 @@ func drop_held_object( \
 		other._is_primary = true
 		other._two_hand_delay = two_hand_delay
 	elif _xr_player_object:
-		# TODO: Delay this until we're not colliding!
-		was_picked_up.remove_collision_exception_with(_xr_player_object)
-		_xr_player_object.remove_collision_exception_with(was_picked_up)
+		if was_picked_up is RigidBody3D or was_picked_up is PhysicalBone3D:
+			# TODO: Delay this until we're not colliding!
+			was_picked_up.remove_collision_exception_with(_xr_player_object)
+			_xr_player_object.remove_collision_exception_with(was_picked_up)
 
 		if was_picked_up.has_method("dropped"):
 			was_picked_up.dropped(self)
@@ -730,9 +735,50 @@ func _physics_process(delta):
 			XRT2Helper.apply_force_to_target(delta, _picked_up, global_target.origin, primary_factor,
 				parent_linear_velocity, parent_angular_velocity, parent_global_position
 			)
-	elif _picked_up is StaticBody3D:
-		# TODO: If static body, apply forces to player!
-		pass
+	elif _picked_up is StaticBody3D and _xr_player_object:
+		if _is_primary:
+			# Adjust linear velocity based on our primary hand
+			var start_position: Vector3 = controller_target.origin
+			var dest_position: Vector3 = _picked_up.global_transform * _grab_offset.origin
+
+			var other: XRT2Pickup = picked_up_by(_picked_up, PickedUpByMode.SECONDARY)
+			if other:
+				var other_grab_offset: Transform3D = other.get_grab_offset()
+				var other_grab_origin: Vector3 = _picked_up.global_transform * other_grab_offset.origin
+				var other_controller_target: Transform3D = other.get_controller_target()
+
+				# If two handed grab and we are primary, rotate player
+				var start_vector = (other_controller_target.origin - start_position).normalized()
+				var dest_vector = (other_grab_origin - dest_position).normalized()
+				var cross: Vector3 = start_vector.cross(dest_vector).normalized()
+				var angle: float = acos(start_vector.dot(dest_vector))
+
+				if cross.length() > 0.0 and abs(angle) > 0.0:
+					if _xr_player_object is RigidBody3D:
+						# TODO: Apply torque to player object
+						var rot: Quaternion = Quaternion(cross, angle)
+						var required_angular_velocity: Vector3 = rot.get_axis().normalized() * rot.get_angle() / delta
+
+						pass
+					elif _xr_player_object is CharacterBody3D:
+						# We don't have an angular velocity here so I guess we'll just apply it...
+						_xr_player_object.global_basis = Basis(cross, angle * delta * _static_velocity_lerp_factor) * _xr_player_object.global_basis
+
+				# And update for two handed linear velocity
+				start_position = (start_position + other_controller_target.origin) * 0.5
+				dest_position = (dest_position + other_grab_origin) * 0.5
+
+			# Now adjust linear velocity
+			var required_linear_velocity: Vector3 = (dest_position - start_position) / delta
+
+			# TODO: We'll likely want a maximum here, or rely on our let go logic?
+
+			if _xr_player_object is RigidBody3D:
+				# TODO: Apply forces to player object
+				pass
+			elif _xr_player_object is CharacterBody3D:
+				# Adjust linear velocity of player object
+				_xr_player_object.velocity = lerp(_xr_player_object.velocity, required_linear_velocity, delta * _static_velocity_lerp_factor)
 
 #endregion
 
