@@ -50,6 +50,12 @@ extends Node3D
 
 ## Effects how quickly we stop if we're on a floor and have no additional input
 @export_range(0.01, 0.90, 0.01) var drag_factor = 0.1
+
+## Align our body with gravity?
+@export var align_body_with_gravity: bool = true
+
+## Rotation factor to apply when trying to align body with gravity
+@export var upright_factor: float = 10.0
 #endregion
 
 #region Private variables
@@ -185,6 +191,21 @@ func _physics_process(delta) -> void:
 	if not _character_body:
 		set_process(false)
 		return
+
+	var body_state: PhysicsDirectBodyState3D = PhysicsServer3D.body_get_direct_state(_character_body.get_rid())
+	var up = -body_state.total_gravity.normalized()
+
+	# Q: set _character_body.up_vector to up? Seems like a good choice?
+
+	# Align body with gravity
+	if align_body_with_gravity:
+		var body_up: Vector3 = _character_body.global_basis.y
+		var cross: Vector3 = body_up.cross(up).normalized()
+		var angle: float = acos(body_up.dot(up))
+
+		if cross.length() > 0.0 and abs(angle) > 0.0:
+			# We don't have an angular velocity here so I guess we'll just apply it...
+			_character_body.global_basis = Basis(cross, angle * delta * upright_factor) * _character_body.global_basis
 
 	# Apply floor friction
 	var floor_friction : float = get_floor_friction()

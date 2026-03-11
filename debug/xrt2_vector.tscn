@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://xrt21y5e026"]
+[gd_scene format=3 uid="uid://xrt21y5e026"]
 
 [ext_resource type="Script" uid="uid://xrt27krhimi" path="res://addons/godot-xr-tools2/debug/xrt2_vector.gd" id="1_dofip"]
 
@@ -22,16 +22,16 @@ radial_segments = 16
 rings = 0
 cap_top = false
 
-[node name="Vector" type="Node3D"]
+[node name="Vector" type="Node3D" unique_id=68917488]
 script = ExtResource("1_dofip")
 
-[node name="Stem" type="MeshInstance3D" parent="."]
+[node name="Stem" type="MeshInstance3D" parent="." unique_id=1156501169]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0.05)
 material_override = SubResource("StandardMaterial3D_dofip")
 cast_shadow = 0
 mesh = SubResource("CylinderMesh_j8k8m")
 
-[node name="Head" type="MeshInstance3D" parent="."]
+[node name="Head" type="MeshInstance3D" parent="." unique_id=905516734]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0.11)
 material_override = SubResource("StandardMaterial3D_dofip")
 cast_shadow = 0
