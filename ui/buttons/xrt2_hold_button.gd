@@ -1,5 +1,6 @@
+#-------------------------------------------------------------------------------
 # xrt2_hold_button.gd
-#
+#-------------------------------------------------------------------------------
 # MIT License
 #
 # Copyright (c) 2024-present Bastiaan Olij, Malcolm A Nixon and contributors
@@ -21,6 +22,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#-------------------------------------------------------------------------------
 
 @tool
 class_name XRT2HoldButton
@@ -38,7 +40,8 @@ signal pressed
 		if is_inside_tree():
 			_update_enabled()
 
-## Action in action map and/or input map that triggers
+## Action in action map and/or input map that triggers[br]
+## [b]Note:[b] supports both bool and float actionmap inputs.
 @export var activate_action : String = "trigger_click"
 
 ## Duration action must be pressed
@@ -120,9 +123,15 @@ func _process(delta) -> void:
 		# We check all trackers
 		var controllers = XRServer.get_trackers(XRServer.TRACKER_CONTROLLER)
 		for tracker_name in controllers:
-			var tracker : XRPositionalTracker = controllers[tracker_name]
-			if tracker.get_input(activate_action):
-				button_pressed = true
+			var tracker: XRPositionalTracker = controllers[tracker_name]
+			var input: Variant = tracker.get_input(activate_action)
+			match typeof(input):
+				TYPE_BOOL:
+					if input:
+						button_pressed = true
+				TYPE_FLOAT:
+					if input > 0.5:
+						button_pressed = true
 
 	if button_pressed:
 		_set_time_held(time_held + delta)

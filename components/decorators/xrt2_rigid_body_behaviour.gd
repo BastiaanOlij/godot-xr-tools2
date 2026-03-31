@@ -39,6 +39,11 @@ extends Node
 ## the positioning.
 @export var pivot_on_primary: bool = false
 
+## If [code]true[/code] and this object is picked up,
+## we apply the same logic as static body,
+## e.g. we move the player, not the static body.
+@export var grab_as_static_body: bool = false
+
 static func get_behaviour_node(p_for: Node3D) -> XRT2RigidBodyBehaviour:
 	if p_for is RigidBody3D or p_for is PhysicalBone3D:
 		for child in p_for.get_children():

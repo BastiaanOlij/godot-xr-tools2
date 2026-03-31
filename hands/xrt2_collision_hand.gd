@@ -254,6 +254,7 @@ var _target_offset: Transform3D
 # Hand meshes
 var _hand_mesh: Node3D
 var _ghost_mesh: Node3D
+var _tween: Tween
 
 # Skeleton collisions
 var _hand_tracking_parent: XRNode3D
@@ -392,6 +393,36 @@ func get_input(action_name) -> Variant:
 		return _controller_tracker.get_input(action_name)
 
 	return null
+
+
+## This will tween our hand from the given location to our current location.
+## We do so by adjusting the hand mesh position, not the location of our root node.
+func tween_hand_from_location(global_from: Transform3D, duration: float = 0.1) -> void:
+	if _hand_mesh:
+		# Now position our hand mesh where our hand was
+		_hand_mesh.global_transform = global_from
+
+		# And tween our hand mesh,
+		# this should animate our hand moving to where we've grabbed it
+		# while at the same time we pull our grabbed object to where our
+		# hand is tracking 
+		if _tween:
+			_tween.kill()
+
+		_tween = _hand_mesh.create_tween()
+
+		# Now tween
+		_tween.tween_property(_hand_mesh, "transform", Transform3D(), duration)
+
+
+## Reset our tween that animates our hand position
+func reset_tween() -> void:
+	if _tween:
+		_tween.kill()
+		_tween = null
+
+	if _hand_mesh:
+		_hand_mesh.transform = Transform3D()
 
 
 ## Trigger a haptic pulse on this controller
