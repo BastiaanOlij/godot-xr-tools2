@@ -1,5 +1,6 @@
+#-------------------------------------------------------------------------------
 # xrt2_loading_screen.gd
-#
+#-------------------------------------------------------------------------------
 # MIT License
 #
 # Copyright (c) 2024-present Bastiaan Olij, Malcolm A Nixon and contributors
@@ -21,6 +22,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#-------------------------------------------------------------------------------
 
 @tool
 class_name XRT2LoadingScreen
@@ -29,90 +31,94 @@ extends Node3D
 ## User pressed the continue
 signal continue_pressed
 
-# Node helpers
-@onready var _splash_screen : MeshInstance3D = $SplashScreen
-@onready var _spinning_logo : MeshInstance3D = $SpinningLogo
-# @onready var _progress_bar : Node3D = $ProgressBar
-@onready var _press_to_continue : Label3D = $PressToContinue
-@onready var _button_icon : MeshInstance3D = $PressToContinue/ButtonIcon
-@onready var _hold_button : XRT2HoldButton = $PressToContinue/HoldButton
-
-# Materials
-var _splash_screen_material : ShaderMaterial
-var _spinning_logo_material : ShaderMaterial
-var _button_icon_material : ShaderMaterial
-
 ## Enabled the follow camera
-@export var follow_camera_enabled : bool = false:
+@export var follow_camera_enabled: bool = false:
 	set(value):
 		follow_camera_enabled = value
 
 ## The camera the screen will follow
-@export var follow_camera : XRCamera3D:
+@export var follow_camera: XRCamera3D:
 	set(value):
 		follow_camera = value
 
 ## Curve for following the camera
-@export var follow_speed : Curve
+@export var follow_speed: Curve
 
 ## Splash screen texture
-@export var splash_screen : Texture2D:
+@export var splash_screen: Texture2D:
 	set(value):
 		splash_screen = value
 		if is_inside_tree():
 			_update_splash_screen()
 
 ## Splash screen texture
-@export var spinning_logo : Texture2D:
+@export var spinning_logo: Texture2D:
 	set(value):
 		spinning_logo = value
 		if is_inside_tree():
 			_update_spinning_logo()
 
 ## Progress bar
-@export_range(0.0, 1.0, 0.01) var progress : float = 0.5:
+@export_range(0.0, 1.0, 0.01) var progress: float = 0.5:
 	set(value):
 		progress = value
 		if is_inside_tree():
 			_update_progress_bar()
 
 ## If true, the contine message is shown, if false the progress bar is visible.
-@export var enable_press_to_continue : bool = false:
+@export var enable_press_to_continue: bool = false:
 	set(value):
 		enable_press_to_continue = value
 		if is_inside_tree():
 			_update_press_to_continue()
 
 ## Text to display
-@export var press_to_continue_text : String = "Hold trigger to continue":
+@export var press_to_continue_text: String = "Hold trigger to continue":
 	set(value):
 		press_to_continue_text = value
 		if is_inside_tree():
 			_update_press_to_continue_text()
 
 ## Set an image to show as an icon before our press to continue text.
-@export var button_icon : Texture2D:
+@export var button_icon: Texture2D:
 	set(value):
 		button_icon = value
 		if is_inside_tree():
 			_update_button_icon()
 
-@export var activate_action : String = "trigger_click":
+## Action in action map and/or input map that triggers[br]
+## [b]Note:[b] supports both bool and float action map inputs.
+@export var activate_action: String = "trigger_click":
 	set(value):
 		activate_action = value
 		if is_inside_tree():
 			_update_activate_action()
+
+# Node helpers
+@onready var _splash_screen: MeshInstance3D = $SplashScreen
+@onready var _spinning_logo: MeshInstance3D = $SpinningLogo
+# @onready var _progress_bar: Node3D = $ProgressBar
+@onready var _press_to_continue: Label3D = $PressToContinue
+@onready var _button_icon: MeshInstance3D = $PressToContinue/ButtonIcon
+@onready var _hold_button: XRT2HoldButton = $PressToContinue/HoldButton
+
+# Materials
+var _splash_screen_material: ShaderMaterial
+var _spinning_logo_material: ShaderMaterial
+var _button_icon_material: ShaderMaterial
 
 const SPIN_SPEED = 2.0
 var spinning_logo_angle = 0.0
 
 
 func _update_splash_screen() -> void:
+	_splash_screen.visible = is_instance_valid(splash_screen)
 	if _splash_screen_material:
 		_splash_screen_material.set_shader_parameter("texture_albedo", splash_screen)
 
 
 func _update_spinning_logo() -> void:
+	_spinning_logo.visible = is_instance_valid(spinning_logo) and !enable_press_to_continue
 	if _spinning_logo_material:
 		_spinning_logo_material.set_shader_parameter("texture_albedo", spinning_logo)
 
@@ -124,14 +130,13 @@ func _update_progress_bar() -> void:
 
 func _update_press_to_continue() -> void:
 	# _progress_bar.visible = !enable_press_to_continue
-	_spinning_logo.visible = !enable_press_to_continue
+	_spinning_logo.visible = is_instance_valid(spinning_logo) and !enable_press_to_continue
 	_press_to_continue.visible = enable_press_to_continue
 	_hold_button.enabled = enable_press_to_continue
 
 
 func _update_press_to_continue_text() -> void:
 	_press_to_continue.text = press_to_continue_text
-	pass
 
 
 func _update_button_icon() -> void:

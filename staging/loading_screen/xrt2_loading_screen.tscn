@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://xrt20000004"]
+[gd_scene format=3 uid="uid://xrt20000004"]
 
 [ext_resource type="Script" uid="uid://xrt2pj0dr4j" path="res://addons/godot-xr-tools2/staging/loading_screen/xrt2_loading_screen.gd" id="1_ugti3"]
 [ext_resource type="PackedScene" uid="uid://xrt20000011" path="res://addons/godot-xr-tools2/ui/buttons/xrt2_hold_button.tscn" id="2_m02j3"]
@@ -55,22 +55,22 @@ shader_parameter/uv_offset = Vector2(0, 0)
 resource_local_to_scene = true
 size = Vector2(1.5, 1.5)
 
-[node name="LoadingScreen" type="Node3D"]
+[node name="LoadingScreen" type="Node3D" unique_id=77278886]
 script = ExtResource("1_ugti3")
 follow_speed = SubResource("Curve_ve03c")
 spinning_logo = ExtResource("2_y53v2")
 
-[node name="SplashScreen" type="MeshInstance3D" parent="."]
+[node name="SplashScreen" type="MeshInstance3D" parent="." unique_id=2054802191]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -100)
 material_override = SubResource("ShaderMaterial_juqya")
 mesh = SubResource("QuadMesh_d472w")
 
-[node name="SpinningLogo" type="MeshInstance3D" parent="."]
-transform = Transform3D(-0.19611, 0, 0.980582, 0, 1, 0, -0.980582, 0, -0.19611, 6, -3, -10)
+[node name="SpinningLogo" type="MeshInstance3D" parent="." unique_id=965629097]
+transform = Transform3D(0.94212246, 0, -0.3352694, 0, 1, 0, 0.3352694, 0, 0.94212246, 6, -3, -10)
 material_override = SubResource("ShaderMaterial_ycls2")
 mesh = SubResource("QuadMesh_rkvh4")
 
-[node name="PressToContinue" type="Label3D" parent="."]
+[node name="PressToContinue" type="Label3D" parent="." unique_id=637533399]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3, -10)
 visible = false
 pixel_size = 0.025
@@ -78,13 +78,13 @@ text = "Hold trigger to continue"
 autowrap_mode = 2
 width = 400.0
 
-[node name="ButtonIcon" type="MeshInstance3D" parent="PressToContinue"]
+[node name="ButtonIcon" type="MeshInstance3D" parent="PressToContinue" unique_id=962242635]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, 0)
 visible = false
 material_override = SubResource("ShaderMaterial_jgetr")
 mesh = SubResource("QuadMesh_6lr7l")
 
-[node name="HoldButton" parent="PressToContinue" instance=ExtResource("2_m02j3")]
+[node name="HoldButton" parent="PressToContinue" unique_id=665796439 instance=ExtResource("2_m02j3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 0)
 hold_time = 0.5
 color = Color(0, 0.717647, 1, 1)
