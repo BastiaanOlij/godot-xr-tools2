@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://duyv2y1dvh4l7"]
+
+[resource]
+resource_name = "RedHold"
+cull_mode = 2
+albedo_color = Color(0.9064027, 0.03308619, 0.011176543, 1)
+roughness = 0.5

@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://ce531wqexy0gl"]
+
+[resource]
+resource_name = "PurpleHold"
+cull_mode = 2
+albedo_color = Color(0.645746, 0.076117896, 0.90658844, 1)
+roughness = 0.5
