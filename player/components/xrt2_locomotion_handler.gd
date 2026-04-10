@@ -41,15 +41,15 @@ extends Node3D
 @export_group("Collisions", "collision_")
 
 ## Lets the player push rigid bodies
-@export var collision_push_rigid_bodies : bool = true
+@export var collision_push_rigid_bodies: bool = true
 
 ## If push_rigid_bodies is enabled, provides a strength factor for the impulse
-@export var collision_push_strength_factor : float = 1.0
+@export var collision_push_strength_factor: float = 1.0
 
 @export_group("Physics")
 
 ## Effects how quickly we stop if we're on a floor and have no additional input
-@export_range(0.01, 0.90, 0.01) var drag_factor = 0.1
+@export_range(0.01, 0.90, 0.01) var drag_factor: float = 0.1
 
 ## Align our body with gravity?
 @export var align_body_with_gravity: bool = true
@@ -60,36 +60,48 @@ extends Node3D
 
 #region Private variables
 # Character body node
-var _character_body : CharacterBody3D
+var _character_body: CharacterBody3D
 
 # Callbacks for on floor checks
-var _on_floor_callbacks : Array[Callable]
+var _on_floor_callbacks: Array[Callable]
 
 # Callbacks for getting floor friction
-var _floor_friction_callbacks : Array[Callable]
+var _floor_friction_callbacks: Array[Callable]
 #endregion
 
 #region Public functions
+## Returns the locomotion handler for this character body (null if none)
+static func get_locomotion_handler(for_character_body: CharacterBody3D) -> XRT2LocomotionHandler:
+	var locomotion_handle: XRT2LocomotionHandler
+
+	var handlers: Array[Node] = for_character_body.find_children("*", "XRT2LocomotionHandler", false)
+	if not handlers.is_empty():
+		# There should be only 1!
+		return handlers[0]
+
+	return null
+
+
 ## Register an on floor callback
-func register_on_floor_callback(callback : Callable):
+func register_on_floor_callback(callback: Callable) -> void:
 	if not _on_floor_callbacks.has(callback):
 		_on_floor_callbacks.push_back(callback)
 
 
 ## Unregister an on floor callback
-func unregister_on_floor_callback(callback : Callable):
+func unregister_on_floor_callback(callback: Callable) -> void:
 	if _on_floor_callbacks.has(callback):
 		_on_floor_callbacks.erase(callback)
 
 
 ## Register an floor friction callback
-func register_floor_friction_callback(callback : Callable):
+func register_floor_friction_callback(callback: Callable) -> void:
 	if not _floor_friction_callbacks.has(callback):
 		_floor_friction_callbacks.push_back(callback)
 
 
 ## Unregister an floor friction callback
-func unregister_floor_friction_callback(callback : Callable):
+func unregister_floor_friction_callback(callback: Callable) -> void:
 	if _floor_friction_callbacks.has(callback):
 		_floor_friction_callbacks.erase(callback)
 
@@ -109,8 +121,8 @@ func is_on_floor() -> bool:
 
 ## Returns our floor friction
 func get_floor_friction() -> float:
-	var has_floor_friction : bool = false
-	var total_floor_friction : float = 0.0
+	var has_floor_friction: bool = false
+	var total_floor_friction: float = 0.0
 
 	# It's likely we only have one callback but...
 	for callback in _floor_friction_callbacks:
@@ -147,7 +159,7 @@ func _push_rigid_bodies() -> void:
 			var obj = with.get_collider()
 
 			if obj is RigidBody3D:
-				var rb : RigidBody3D = obj
+				var rb: RigidBody3D = obj
 
 				# Get our relative impact velocity
 				var impact_velocity = _character_body.velocity - rb.linear_velocity

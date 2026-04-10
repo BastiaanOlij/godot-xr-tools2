@@ -116,9 +116,6 @@ extends Resource
 		little_enabled = value
 		notify_property_list_changed()
 
-## Mode for posing of the pinky ("On grip" animates based on grip input)
-@export_enum("Disabled", "Pose", "On grip") var little_mode: int = 0
-
 ## Spread for our little finger
 @export_range(-20.0, 20.0, 1.0, "radians_as_degrees") var little_spread: float = 0.0
 
