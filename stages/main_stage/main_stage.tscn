@@ -8,7 +8,6 @@
 [ext_resource type="Script" uid="uid://xrt2ebknph2" path="res://addons/godot-xr-tools2/player/movement_providers/xrt2_direct_movement.gd" id="3_7f0s7"]
 [ext_resource type="Script" uid="uid://xrt23qrb4js" path="res://addons/godot-xr-tools2/player/interaction_functions/xrt2_pickup.gd" id="4_l0n08"]
 [ext_resource type="Script" uid="uid://xrt2eecske1" path="res://addons/godot-xr-tools2/hands/xrt2_hand_attachment.gd" id="5_4i4c4"]
-[ext_resource type="PackedScene" uid="uid://xrt21y5e026" path="res://addons/godot-xr-tools2/debug/xrt2_vector.tscn" id="8_6d2rb"]
 [ext_resource type="PackedScene" uid="uid://xrt2ef8ojbk" path="res://addons/godot-xr-tools2/debug/xrt2_log.tscn" id="11_4i4c4"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ie47k"]
@@ -106,16 +105,6 @@ transform = Transform3D(0.99500257, 0.0035019002, -0.09978717, 0.003500686, 0.99
 script = ExtResource("4_l0n08")
 detection_radius = 0.1
 detection_offset = Vector3(-0.03, 0, -0.06)
-
-[node name="VectorA" parent="XRT2CharacterBody3D/XROrigin3D/RightCollisionHand/XRT2Pickup" index="0" unique_id=358645801 instance=ExtResource("8_6d2rb")]
-transform = Transform3D(0.99500257, 0.0035019002, -0.09978717, 0.003500686, 0.99754673, 0.06991408, 0.099787235, -0.06991404, 0.99254906, 0.52500045, 1.0035541, -0.45996407)
-top_level = true
-color = Color(0.943947, 0.6101231, 0.45235908, 1)
-
-[node name="VectorB" parent="XRT2CharacterBody3D/XROrigin3D/RightCollisionHand/XRT2Pickup" index="1" unique_id=68917488 instance=ExtResource("8_6d2rb")]
-transform = Transform3D(0.99500257, 0.0035019002, -0.09978717, 0.003500686, 0.99754673, 0.06991408, 0.099787235, -0.06991404, 0.99254906, 0.52500045, 1.0035541, -0.45996407)
-top_level = true
-color = Color(0.18317223, 0.45750153, 0.5845314, 1)
 
 [node name="XRT2Log" parent="XRT2CharacterBody3D" index="3" unique_id=2103358672 instance=ExtResource("11_4i4c4")]
 transform = Transform3D(0.9854406, 0, 0.17002034, 0, 1, 0, -0.17002034, 0, 0.9854406, -0.19793722, 1.5116211, -1.2153747)

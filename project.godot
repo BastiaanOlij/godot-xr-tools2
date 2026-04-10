@@ -64,6 +64,8 @@ trigger_click={
 3d_render/layer_1="Default"
 3d_render/layer_2="HMD only"
 3d_render/layer_3="Spectator only"
+3d_physics/layer_1="Default"
+3d_physics/layer_2="Can't pickup"
 
 [physics]
 

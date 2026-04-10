@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://dvvlw0k32b8wq"]
+[gd_scene format=3 uid="uid://dvvlw0k32b8wq"]
 
 [ext_resource type="Texture2D" uid="uid://ds8hppgpq3pod" path="res://assets/main/pattern.png" id="1_ml584"]
 
@@ -46,12 +46,12 @@ shader_parameter/uv1_offset = Vector3(0, 0, 0)
 [sub_resource type="PlaneMesh" id="PlaneMesh_3t8ge"]
 size = Vector2(100, 100)
 
-[node name="Floor" type="StaticBody3D"]
+[node name="Floor" type="StaticBody3D" unique_id=54768458]
+collision_layer = 2
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1140618938]
 shape = SubResource("WorldBoundaryShape3D_of381")
-debug_color = Color(0, 0.6, 0.7, 0.42)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1848300543]
 material_override = SubResource("ShaderMaterial_beopk")
 mesh = SubResource("PlaneMesh_3t8ge")

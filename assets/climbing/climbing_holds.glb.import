@@ -1,0 +1,117 @@
+[remap]
+
+importer="scene"
+importer_version=1
+type="PackedScene"
+uid="uid://3pd8dm1y5kcs"
+path="res://.godot/imported/climbing_holds.glb-122592351fcb6478b75fde01c340fa01.scn"
+
+[deps]
+
+source_file="res://assets/climbing/climbing_holds.glb"
+dest_files=["res://.godot/imported/climbing_holds.glb-122592351fcb6478b75fde01c340fa01.scn"]
+
+[params]
+
+nodes/root_type=""
+nodes/root_name=""
+nodes/root_script=null
+nodes/apply_root_scale=true
+nodes/root_scale=0.15
+nodes/import_as_skeleton_bones=false
+nodes/use_name_suffixes=true
+nodes/use_node_type_suffixes=true
+meshes/ensure_tangents=true
+meshes/generate_lods=true
+meshes/create_shadow_meshes=true
+meshes/light_baking=1
+meshes/lightmap_texel_size=0.2
+meshes/force_disable_compression=false
+skins/use_named_skins=true
+animation/import=true
+animation/fps=30
+animation/trimming=false
+animation/remove_immutable_tracks=true
+animation/import_rest_as_RESET=false
+import_script/path=""
+materials/extract=0
+materials/extract_format=0
+materials/extract_path=""
+_subresources={
+"materials": {
+"GreenHold": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://assets/climbing/materials/GreenHold.tres",
+"use_external/path": "uid://ccivec3l8xrj7"
+},
+"MetalScrew": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://assets/climbing/materials/MetalScrew.tres",
+"use_external/path": "uid://frcbtmki3lnn"
+},
+"PurpleHold": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://assets/climbing/materials/PurpleHold.tres",
+"use_external/path": "uid://ce531wqexy0gl"
+},
+"RedHold": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://assets/climbing/materials/RedHold.tres",
+"use_external/path": "uid://duyv2y1dvh4l7"
+},
+"YellowHold": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://assets/climbing/materials/YellowHold.tres",
+"use_external/path": "uid://dr2kjhe3symj0"
+}
+},
+"meshes": {
+"climbing_holds_Sphere": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/climbing/mesh/climbing_holds_screw.tres",
+"save_to_file/path": "uid://cm6qpwacwbntw"
+},
+"climbing_holds_rock": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/climbing/mesh/climbing_holds_rock.res",
+"save_to_file/path": "uid://slip8g0616y3"
+},
+"climbing_holds_rock_001": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/climbing/mesh/climbing_holds_rock_001.res",
+"save_to_file/path": "uid://sgr1soh6jh0y"
+},
+"climbing_holds_rock_002": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/climbing/mesh/climbing_holds_rock_002.res",
+"save_to_file/path": "uid://ds1k76eeqfstr"
+},
+"climbing_holds_rock_003": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/climbing/mesh/climbing_holds_rock_003.res",
+"save_to_file/path": "uid://dmldmy2hjvu4y"
+}
+}
+}
+gltf/naming_version=2
+gltf/embedded_image_handling=1

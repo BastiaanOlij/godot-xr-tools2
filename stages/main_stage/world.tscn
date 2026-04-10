@@ -2,22 +2,18 @@
 
 [ext_resource type="PackedScene" uid="uid://dvvlw0k32b8wq" path="res://components/floor.tscn" id="1_c36xp"]
 [ext_resource type="PackedScene" uid="uid://d0px0pvdr03o" path="res://components/static_box.tscn" id="2_s2yy1"]
+[ext_resource type="PackedScene" uid="uid://3wtrtlg65e2a" path="res://components/climbing_hold_yellow.tscn" id="3_27ely"]
 [ext_resource type="PackedScene" uid="uid://2tngyui13f4v" path="res://components/table.tscn" id="3_cfwdu"]
+[ext_resource type="PackedScene" uid="uid://d4r1db8w75e7" path="res://components/climbing_hold_red.tscn" id="4_j1sp4"]
 [ext_resource type="PackedScene" uid="uid://djjdpt6vpdljg" path="res://components/rigid_box.tscn" id="4_xu5kv"]
-[ext_resource type="PackedScene" uid="uid://dli41g6lolyef" path="res://props/ball_and_chain/ball_and_chain.tscn" id="5_re04o"]
+[ext_resource type="PackedScene" uid="uid://cunilmctlx4pw" path="res://components/climbing_hold_purple.tscn" id="5_8mqay"]
 [ext_resource type="PackedScene" uid="uid://bpw8fh2d8fo4m" path="res://components/stairs.tscn" id="5_s2yy1"]
 [ext_resource type="Script" uid="uid://xrt2jog5h0j" path="res://addons/godot-xr-tools2/components/decorators/xrt2_grab_point.gd" id="6_27ely"]
 [ext_resource type="PackedScene" uid="uid://c4tgb1fvpccgb" path="res://components/ramps.tscn" id="6_dhxdq"]
+[ext_resource type="PackedScene" uid="uid://cdsp0awdqvwc7" path="res://components/climbing_hold_green.tscn" id="6_uelbq"]
 [ext_resource type="ArrayMesh" uid="uid://2iuv58i1suq2" path="res://assets/low-poly-clouds-pack-1/meshes/Cloud_1_Icosphere_044.res" id="6_xu5kv"]
 [ext_resource type="Resource" uid="uid://b1ahvycegofbi" path="res://components/box_finger_poses.tres" id="7_0mmyo"]
 [ext_resource type="ArrayMesh" uid="uid://de02agai7haih" path="res://assets/low-poly-clouds-pack-1/meshes/Cloud_2_Icosphere_043.res" id="7_dhxdq"]
-
-[sub_resource type="SphereShape3D" id="SphereShape3D_re04o"]
-radius = 0.01
-
-[sub_resource type="SphereMesh" id="SphereMesh_re04o"]
-radius = 0.01
-height = 0.02
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_xe0wv"]
 size = Vector3(0.2, 0.2, 0.2)
@@ -160,6 +156,18 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.06
 pixel_size = 0.002
 text = "2.0m"
 
+[node name="ClimbingHoldYellow01" parent="Walls/Wall02" unique_id=473279995 instance=ExtResource("3_27ely")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.051504135, 0.94580543, 0.6358204)
+
+[node name="ClimbingHoldRed01" parent="Walls/Wall02" unique_id=12822958 instance=ExtResource("4_j1sp4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.051504113, 1.2534356, 0.23722868)
+
+[node name="ClimbingHoldPurple01" parent="Walls/Wall02" unique_id=259104814 instance=ExtResource("5_8mqay")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.051504612, 1.5929859, 0.74163413)
+
+[node name="ClimbingHoldGreen01" parent="Walls/Wall02" unique_id=1889490741 instance=ExtResource("6_uelbq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.051504582, 1.9252667, 0.28374922)
+
 [node name="Wall03" parent="Walls" unique_id=1134299353 instance=ExtResource("2_s2yy1")]
 transform = Transform3D(-4.371137e-08, 0, 0.9999996, 0, 1, 0, -0.9999996, 0, -4.371137e-08, 2.0000002, 0, 4.999999)
 size = Vector3(0.1, 2, 4)
@@ -290,22 +298,6 @@ transform = Transform3D(0.53519285, 0, 0.84472966, 0, 1, 0, -0.84472966, 0, 0.53
 size = Vector3(0.1, 1, 6)
 color = Color(0.9098039, 0, 0.92941177, 1)
 
-[node name="BallAndChainFixed" type="StaticBody3D" parent="." unique_id=1963234235]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0346768, 1.523355, -1.7327807)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="BallAndChainFixed" unique_id=303737961]
-shape = SubResource("SphereShape3D_re04o")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="BallAndChainFixed" unique_id=504092123]
-mesh = SubResource("SphereMesh_re04o")
-
-[node name="BallAndChain" parent="BallAndChainFixed" unique_id=593257258 instance=ExtResource("5_re04o")]
-transform = Transform3D(0.015026676, -0.9998871, 0, 0.9998871, 0.015026676, 0, 0, 0, 1, 0, -0.16, 0)
-
-[node name="PinJoint3D" type="PinJoint3D" parent="BallAndChainFixed" unique_id=588901669]
-node_a = NodePath("..")
-node_b = NodePath("../BallAndChain")
-
 [node name="Table" parent="." unique_id=1416213509 instance=ExtResource("3_cfwdu")]
 
 [node name="Box01" parent="Table" unique_id=1233973179 instance=ExtResource("4_xu5kv")]
@@ -320,6 +312,7 @@ size = Vector3(0.15, 0.15, 0.15)
 [node name="Box03" parent="Table" unique_id=1845199912 instance=ExtResource("4_xu5kv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07488975, 1.2093202, 0.15274632)
 mass = 20.0
+freeze = true
 size = Vector3(0.2, 0.2, 0.2)
 color = Color(0.57990265, 0.58945864, 0.31561917, 1)
 

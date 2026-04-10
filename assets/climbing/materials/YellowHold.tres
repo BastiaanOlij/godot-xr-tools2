@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dr2kjhe3symj0"]
+
+[resource]
+resource_name = "YellowHold"
+cull_mode = 2
+albedo_color = Color(0.7870597, 0.9065055, 0, 1)
+roughness = 0.5
