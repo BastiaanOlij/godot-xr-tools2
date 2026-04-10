@@ -173,17 +173,26 @@ static func get_pickup(parent : Node3D) -> XRT2Pickup:
 	return null
 
 ## Find which pickup handler has picked up this object
-static func picked_up_by(what: PhysicsBody3D, mode: PickedUpByMode = PickedUpByMode.ANY) -> XRT2Pickup:
+static func picked_up_by(what: PhysicsBody3D = null, mode: PickedUpByMode = PickedUpByMode.ANY, exclude: Array[XRT2Pickup] = []) -> XRT2Pickup:
 	var by : XRT2Pickup
 	for pickup : XRT2Pickup in _pickup_handlers:
-		if pickup._picked_up == what:
-			by = pickup
+		if pickup in exclude:
+			# In our exclude list? Skip.
+			continue
+		elif what and pickup._picked_up != what:
+			# Hasn't picked up this object? Skip.
+			continue
+		elif not what and not pickup.has_picked_up():
+			# Any object but we haven't picked anything up? Skip.
+			continue
 
-			# If this is our primary, return that
-			if pickup._is_primary and mode != PickedUpByMode.SECONDARY:
-				return by
-			elif not pickup._is_primary and mode == PickedUpByMode.SECONDARY:
-				return by
+		by = pickup
+
+		# If this is our primary, return that
+		if pickup._is_primary and mode != PickedUpByMode.SECONDARY:
+			return by
+		elif not pickup._is_primary and mode == PickedUpByMode.SECONDARY:
+			return by
 
 	if mode == PickedUpByMode.ANY:
 		# If we found one, it will be our secondary hand
@@ -300,14 +309,13 @@ func pickup_object(object : GrabObject):
 		else:
 			_pivot_on_primary = false
 			_grab_as_static_body = false
+
+		# If object is frozen, always treat like a static body.
+		if object.body.freeze:
+			_grab_as_static_body = true
 	elif object.body is StaticBody3D:
 		_pivot_on_primary = false
 		_grab_as_static_body = true
-
-	# TODO: the way we now make this work for xr_collision_hand can also
-	# be applied for a xr_controller.
-	# We just don't have the target override logic, but we can send a signal
-	# that the user can implement.
 
 	if _xr_collision_hand:
 		# Make a collision exception between hand and picked up object
@@ -638,6 +646,7 @@ func _physics_process(delta):
 	if Engine.is_editor_hint():
 		return
 
+	# Nothing picked up, no need to run this
 	if not _picked_up:
 		return
 
@@ -654,8 +663,30 @@ func _physics_process(delta):
 	if not _grab_as_static_body and (_picked_up is RigidBody3D or _picked_up is PhysicalBone3D):
 		_handle_picked_up_dynamic(delta, controller_target, global_target)
 	elif _grab_as_static_body and _xr_player_object:
-		_handle_picked_up_static(delta, controller_target, global_target)
+		if not XRT2LocomotionHandler.get_locomotion_handler(_xr_player_object):
+			_handle_picked_up_static(delta, controller_target, global_target)
 
+
+# Called when locomotion is handeld by a locomotion handler
+func _process_locomotion(delta: float) -> void:
+	if not _picked_up:
+		# Not picked up, no need to run this.
+		return
+	elif not _xr_player_object:
+		# No player object to run our logic on, no need to run this.
+		return
+	elif _picked_up.has_method("_xr_custom_pickup_handler"):
+		# Has a custom handler, no need to run this.
+		return
+	elif not _grab_as_static_body:
+		# Hasn't picked up a static body, no need to run this.
+		return
+
+	var controller_target: Transform3D = get_controller_target()
+	if controller_target == Transform3D():
+		return
+
+	_handle_picked_up_static(delta, controller_target, controller_target * _grab_offset.inverse())
 #endregion
 
 
@@ -854,9 +885,12 @@ func _handle_picked_up_dynamic(delta: float, controller_target: Transform3D, glo
 # Handle moving a picked up static object (StaticBody3D/AnimatableBody3D) 
 # In this scenario, we want to rotate/move our player
 func _handle_picked_up_static(delta: float, controller_target: Transform3D, global_target: Transform3D) -> void:
-	# Ignore on secondary hand, we'll handle all our logic on our primary including 2 handed.
-	if not _is_primary:
+	# Find any other pickup handler that has picked up something (should be our other hand).
+	var other: XRT2Pickup = picked_up_by(null, PickedUpByMode.ANY, [ self ])
+	if other and not _is_left_hand():
+		# If both hands are holding something, we only process the left hand.
 		return
+
 	var target_basis: Basis = Basis()
 	var lerp_factor: float = delta / _static_velocity_lerp_duration
 
@@ -864,12 +898,12 @@ func _handle_picked_up_static(delta: float, controller_target: Transform3D, glob
 	var start_position: Vector3 = controller_target.origin
 	var dest_position: Vector3 = _picked_up.global_transform * _grab_offset.origin
 
-	var other: XRT2Pickup = picked_up_by(_picked_up, PickedUpByMode.SECONDARY)
 	if other:
 		# Q: Should we use original orientation here too?
 
+		var other_picked_up: PhysicsBody3D = other.get_picked_up()
 		var other_grab_offset: Transform3D = other.get_grab_offset()
-		var other_grab_origin: Vector3 = _picked_up.global_transform * other_grab_offset.origin
+		var other_grab_origin: Vector3 = other_picked_up.global_transform * other_grab_offset.origin
 		var other_controller_target: Transform3D = other.get_controller_target()
 
 		# We rotate our player in reverse
@@ -883,7 +917,7 @@ func _handle_picked_up_static(delta: float, controller_target: Transform3D, glob
 
 		# Now calculate how much our tracked hands are rotated along our destination vector
 		var primary_angle = XRT2Helper.angle_in_plane(dest_vector, controller_target.basis.y, target_basis * _picked_up.global_basis * _grab_offset.basis.y)
-		var secondary_angle = XRT2Helper.angle_in_plane(dest_vector, other_controller_target.basis.y, target_basis * _picked_up.global_basis * other_grab_offset.basis.y)
+		var secondary_angle = XRT2Helper.angle_in_plane(dest_vector, other_controller_target.basis.y, target_basis * other_picked_up.global_basis * other_grab_offset.basis.y)
 
 		target_basis = Basis(dest_vector, (primary_angle + secondary_angle) * 0.5 * lerp_factor) * target_basis * _xr_player_object.global_basis
 
@@ -906,7 +940,8 @@ func _handle_picked_up_static(delta: float, controller_target: Transform3D, glob
 		# Apply forces to player object
 		XRT2Helper.apply_force_to_target(delta, _xr_player_object, _xr_player_object.global_position + (dest_position - start_position))
 	elif _xr_player_object is CharacterBody3D:
-		# We don't have an angular velocity here so I guess we'll just apply it...
+		# We don't have an angular velocity here, nor collision detection so we're just going to rotate around the local y-axis
+		target_basis = target_basis.looking_at(target_basis.z - target_basis.z.project(_xr_player_object.global_basis.y), _xr_player_object.global_basis.y, true)
 		_xr_player_object.global_basis = target_basis
 
 		# And adjust linear velocity of player object
