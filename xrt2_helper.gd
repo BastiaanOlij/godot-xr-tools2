@@ -205,9 +205,161 @@ static func apply_torque_to_target(
 
 
 ################################################################################
-## Note, older PD related code below is unused but kept for reference
+# Helper functions to track collision exceptions.
+# Note: We should only ever have a few collision exceptions in play
+# at any given time, so looping an array is fine.
+
+class CollisionExceptionPair:
+	var bodyA: PhysicsBody3D
+	var bodyB: PhysicsBody3D
+	var count: int
+	var registered: bool
+
+static var _collision_exception_pairs: Array[CollisionExceptionPair]
+static var _collision_check_timer: Timer
+static var _collision_check_wait_time: float = 0.1
+
+
+## Set how often we check collisions for our released collision exceptions.
+static func set_collision_check_update_rate(times_per_second: float):
+	if times_per_second <= 0.0:
+		return
+
+	_collision_check_wait_time = 1.0 / times_per_second
+	if _collision_check_timer:
+		_collision_check_timer.wait_time = _collision_check_wait_time
+
+
+# Check our collision exception array for a physics body pair
+static func _find_collision_exception_pair(bodyA: PhysicsBody3D, bodyB: PhysicsBody3D, add_if_missing: bool = true) -> CollisionExceptionPair:
+	for cep in _collision_exception_pairs:
+		if cep.bodyA == bodyA and cep.bodyB == bodyB:
+			return cep
+
+		if cep.bodyA == bodyB and cep.bodyB == bodyA:
+			return cep
+
+	if add_if_missing:
+		var cep: CollisionExceptionPair = CollisionExceptionPair.new()
+		cep.bodyA = bodyA
+		cep.bodyB = bodyB
+		cep.count = 0
+		cep.registered = false
+		_collision_exception_pairs.push_back(cep)
+		return cep
+	else:
+		return null
+
+
+# Our timer function to check if we can remove collision exceptions.
+static func _on_collision_check_timer():
+	# We loop a copy so we can modify the original
+	var pairs: Array[CollisionExceptionPair] = _collision_exception_pairs
+
+	for cep in pairs:
+		if not is_instance_valid(cep.bodyA) or not is_instance_valid(cep.bodyB):
+			# No longer valid, probably because our scene was unloaded.
+			# Collision exceptions are no longer active so just erase.
+			_collision_exception_pairs.erase(cep)
+		elif cep.count == 0:
+			# Check if bodyA and bodyB are no longer colliding and if so,
+			# remove collisions and free.
+			var is_colliding: bool = false
+			var body_state: PhysicsDirectBodyState3D = PhysicsServer3D.body_get_direct_state(cep.bodyA.get_rid())
+			var space_state: PhysicsDirectSpaceState3D = body_state.get_space_state()
+			var query: PhysicsShapeQueryParameters3D = PhysicsShapeQueryParameters3D.new()
+
+			# Temporarily set a unique layer for bodyB,
+			# so we're only checking collisions with bodyB.
+			# We user layer 32 assuming nobody uses that :)
+			var was_bodyB_layer = cep.bodyB.collision_layer
+			cep.bodyB.collision_layer = 1 << 31
+
+			# Setup our query 
+			query.collision_mask = 1 << 31
+
+			# Check for collisions
+			for owner_id in cep.bodyA.get_shape_owners():
+				query.transform = cep.bodyA.global_transform * cep.bodyA.shape_owner_get_transform(owner_id)
+
+				for shape_id in cep.bodyA.shape_owner_get_shape_count(owner_id):
+					var shape: Shape3D = cep.bodyA.shape_owner_get_shape(owner_id, shape_id)
+					query.shape = shape
+
+					var info: PackedVector3Array = space_state.collide_shape(query, 1)
+					if not info.is_empty():
+						is_colliding = true
+						break
+
+				if is_colliding:
+					break
+
+			# Reset our bodyB layer to what it was.
+			cep.bodyB.collision_layer = was_bodyB_layer
+
+			# If we are no longer colliding, time to free.
+			if not is_colliding:
+				cep.bodyA.remove_collision_exception_with(cep.bodyB)
+				cep.bodyB.remove_collision_exception_with(cep.bodyA)
+				_collision_exception_pairs.erase(cep)
+
+	# If we have nothing left to check, don't need to keep our timer running.
+	if _collision_check_timer and _collision_exception_pairs.is_empty():
+		_collision_check_timer.stop()
+
+## Add a collision exception between these two physics bodies.
+## If a collision exception was already created, we refcount this.
+static func add_collision_exception(bodyA: PhysicsBody3D, bodyB: PhysicsBody3D):
+	var cep: CollisionExceptionPair = _find_collision_exception_pair(bodyA, bodyB)
+
+	# If new entry we add our collision exceptions
+	if not cep.registered:
+		bodyA.add_collision_exception_with(bodyB)
+		bodyB.add_collision_exception_with(bodyA)
+		cep.registered = true
+
+	cep.count = cep.count + 1
+
+	# First time? Create our collision timer on our root.
+	if not _collision_check_timer:
+		var scene_tree: SceneTree = bodyA.get_tree()
+		var root: Node = scene_tree.get_root()
+
+		_collision_check_timer = Timer.new()
+		_collision_check_timer.name = "CollisionCheckTimer"
+		_collision_check_timer.wait_time = _collision_check_wait_time
+		root.add_child(_collision_check_timer)
+
+		_collision_check_timer.timeout.connect(_on_collision_check_timer)
+
+	# And start our timer.
+	if _collision_check_timer and _collision_check_timer.is_stopped():
+		_collision_check_timer.start()
+
+
+## Remove a collision exception between these two physics bodies.
+## The collision exception is only removed if we've called this for
+## each time [add_collision_exception] was called AND the two
+## bodies no longer collide.
+static func remove_collision_exception(bodyA: PhysicsBody3D, bodyB: PhysicsBody3D):
+	var cep: CollisionExceptionPair = _find_collision_exception_pair(bodyA, bodyB, false)
+	if not cep:
+		return
+
+	if cep.count == 0:
+		push_warning("Called remove_collision_exception without matching add_collision_exception")
+		return
+
+	cep.count = cep.count - 1
+	# Note: Once this hits 0, it will be freed in our timer when
+	# we no longer collide.
+
+
+################################################################################
+# Note, older PD related code below is unused but kept for reference
 
 ## Apply a linear force to a RigidBody based on a target location
+## @deprecated old PID based physics code
 static func apply_linear_force(
 		delta : float,
 		apply_to: RigidBody3D,
@@ -256,6 +408,7 @@ static func apply_linear_force(
 
 
 ## Apply a torque force to a RigidBody based on a target orientation
+## @deprecated old PID based physics code
 static func apply_torque(
 		delta : float,
 		apply_to: RigidBody3D,
