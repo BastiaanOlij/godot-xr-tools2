@@ -296,10 +296,7 @@ func pickup_object(object : GrabObject):
 
 	if object.body is RigidBody3D or object.body is PhysicalBone3D:
 		# Make sure our body doesn't collide with things we've picked up
-		if _is_primary and _xr_player_object:
-			# TODO should create a collision exception manager to ensure we don't undo this too quickly
-			object.body.add_collision_exception_with(_xr_player_object)
-			_xr_player_object.add_collision_exception_with(object.body)
+		XRT2Helper.add_collision_exception(_xr_player_object, object.body)
 
 		# Get some behaviour characteristics
 		var rigid_body_behaviour: XRT2RigidBodyBehaviour = XRT2RigidBodyBehaviour.get_behaviour_node(object.body)
@@ -319,8 +316,7 @@ func pickup_object(object : GrabObject):
 
 	if _xr_collision_hand:
 		# Make a collision exception between hand and picked up object
-		_picked_up.add_collision_exception_with(_xr_collision_hand)
-		_xr_collision_hand.add_collision_exception_with(_picked_up)
+		XRT2Helper.add_collision_exception(_xr_collision_hand, _picked_up)
 
 	# Find our grab point (if any).
 	# Note, we're already handled our exclusive logic, can ignore that here.
@@ -381,9 +377,7 @@ func drop_held_object( \
 
 	# Process letting go
 	if _xr_collision_hand:
-		# TODO: Delay this until we're not colliding!
-		_picked_up.remove_collision_exception_with(_xr_collision_hand)
-		_xr_collision_hand.remove_collision_exception_with(_picked_up)
+		XRT2Helper.remove_collision_exception(_xr_collision_hand, _picked_up)
 
 		_xr_collision_hand.remove_target_override(_picked_up)
 		_xr_collision_hand.finger_poses = null
@@ -403,20 +397,17 @@ func drop_held_object( \
 	_pivot_on_primary = false
 	_grab_as_static_body = false
 
+	if _xr_player_object and (was_picked_up is RigidBody3D or was_picked_up is PhysicalBone3D):
+		XRT2Helper.remove_collision_exception(_xr_player_object, was_picked_up)
+
 	var other = picked_up_by(was_picked_up)
 	if other:
 		# If it isn't already primary, this is now our primary
 		other._is_primary = true
 		other._two_hand_delay = two_hand_delay
 		other._picked_up_to_org_target = was_picked_up.global_transform.inverse() * other.get_controller_target()
-	elif _xr_player_object:
-		if was_picked_up is RigidBody3D or was_picked_up is PhysicalBone3D:
-			# TODO: Delay this until we're not colliding!
-			was_picked_up.remove_collision_exception_with(_xr_player_object)
-			_xr_player_object.remove_collision_exception_with(was_picked_up)
-
-		if was_picked_up.has_method("dropped"):
-			was_picked_up.dropped(self)
+	elif _xr_player_object and was_picked_up.has_method("dropped"):
+		was_picked_up.dropped(self)
 
 	# Send out a signal to let those wanting to know that we dropped something
 	dropped.emit(self, was_picked_up)
