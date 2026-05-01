@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://d4r1db8w75e7"]
 
-[ext_resource type="ArrayMesh" uid="uid://fbq50k5n8oka" path="res://assets/climbing/mesh/climbing_holds_rock_001.res" id="1_vqye1"]
-[ext_resource type="ArrayMesh" uid="uid://bwtgq5074wq07" path="res://assets/climbing/mesh/climbing_holds_screw.tres" id="2_l2jbu"]
+[ext_resource type="ArrayMesh" uid="uid://sgr1soh6jh0y" path="res://assets/climbing/mesh/climbing_holds_rock_001.res" id="1_vqye1"]
+[ext_resource type="ArrayMesh" uid="uid://cm6qpwacwbntw" path="res://assets/climbing/mesh/climbing_holds_screw.tres" id="2_l2jbu"]
 [ext_resource type="Script" uid="uid://xrt2jog5h0j" path="res://addons/godot-xr-tools2/components/decorators/xrt2_grab_point.gd" id="3_2x2j5"]
 [ext_resource type="Resource" uid="uid://bglrxdt5fkwdu" path="res://components/climbing_hold_pose.tres" id="4_bampv"]
 

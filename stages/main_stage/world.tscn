@@ -312,7 +312,6 @@ size = Vector3(0.15, 0.15, 0.15)
 [node name="Box03" parent="Table" unique_id=1845199912 instance=ExtResource("4_xu5kv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07488975, 1.2093202, 0.15274632)
 mass = 20.0
-freeze = true
 size = Vector3(0.2, 0.2, 0.2)
 color = Color(0.57990265, 0.58945864, 0.31561917, 1)
 
