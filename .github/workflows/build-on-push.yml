@@ -8,6 +8,8 @@ jobs:
   build:
     name: Assembling artifacts
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Enables creating/updating releases and tags
 
     steps:
       # Check out into demo/godot-xr-tools2
@@ -29,10 +31,10 @@ jobs:
       # Remove folders we don't want to include in the releases
       - name: Cleanup
         run: |
-          rm -rf demo/godot-xr-tools/.git
-          rm -rf demo/godot-xr-tools/.github
-          rm -rf plugin/godot-xr-tools/.git
-          rm -rf plugin/godot-xr-tools/.github
+          rm -rf demo/godot-xr-tools2/.git
+          rm -rf demo/godot-xr-tools2/.github
+          rm -rf plugin/godot-xr-tools2/.git
+          rm -rf plugin/godot-xr-tools2/.github
 
       # Upload plugin
       - name: Create XR tools v2 library artifact
@@ -60,7 +62,7 @@ jobs:
           zip -qq -r ../godot-xr-tools2-demo.zip godot-xr-tools2
           cd ..
 
-          # For tagged builds create the release
+      # For tagged builds create the release
       - name: Create and upload asset
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         uses: ncipollo/release-action@v1
