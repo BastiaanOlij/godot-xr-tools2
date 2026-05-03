@@ -242,6 +242,11 @@ func get_grab_offset() -> Transform3D:
 	return _grab_offset
 
 
+## Return our collision hand (if applicable)
+func get_xr_collision_hand() -> XRT2CollisionHand:
+	return _xr_collision_hand
+
+
 ## Return our controller target for this hand.
 func get_controller_target() -> Transform3D:
 	var target: Transform3D
@@ -357,7 +362,7 @@ func pickup_object(object : GrabObject):
 	picked_up.emit(self, _picked_up)
 
 	# Let object know that we picked it up
-	if _is_primary and _picked_up.has_method("picked_up"):
+	if _picked_up.has_method("picked_up"):
 		_picked_up.picked_up(self)
 
 
@@ -406,7 +411,8 @@ func drop_held_object( \
 		other._is_primary = true
 		other._two_hand_delay = two_hand_delay
 		other._picked_up_to_org_target = was_picked_up.global_transform.inverse() * other.get_controller_target()
-	elif _xr_player_object and was_picked_up.has_method("dropped"):
+
+	if was_picked_up.has_method("dropped"):
 		was_picked_up.dropped(self)
 
 	# Send out a signal to let those wanting to know that we dropped something

@@ -38,10 +38,10 @@ var entries: PackedStringArray
 
 ## Get entries from our log.
 ## If clear is [code]true[/code] we clear our buffer.
-func get_entries(clear: bool = false) -> PackedStringArray:
+func get_entries(clear: bool = true) -> PackedStringArray:
 	# Make a copy to return
 	mutex.lock()
-	var ret: PackedStringArray = entries
+	var ret: PackedStringArray = entries.duplicate()
 	if clear:
 		entries.clear()
 	mutex.unlock()
