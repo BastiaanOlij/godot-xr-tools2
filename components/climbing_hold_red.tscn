@@ -37,5 +37,4 @@ script = ExtResource("3_2x2j5")
 left_hand = false
 exclusive = true
 finger_poses = ExtResource("4_bampv")
-show_hand = true
 metadata/_custom_type_script = "uid://xrt2jog5h0j"

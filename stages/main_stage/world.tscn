@@ -13,7 +13,10 @@
 [ext_resource type="PackedScene" uid="uid://cdsp0awdqvwc7" path="res://components/climbing_hold_green.tscn" id="6_uelbq"]
 [ext_resource type="ArrayMesh" uid="uid://2iuv58i1suq2" path="res://assets/low-poly-clouds-pack-1/meshes/Cloud_1_Icosphere_044.res" id="6_xu5kv"]
 [ext_resource type="Resource" uid="uid://b1ahvycegofbi" path="res://components/box_finger_poses.tres" id="7_0mmyo"]
+[ext_resource type="PackedScene" uid="uid://ce28s2x0jlug7" path="res://components/railing.tscn" id="7_8mqay"]
 [ext_resource type="ArrayMesh" uid="uid://de02agai7haih" path="res://assets/low-poly-clouds-pack-1/meshes/Cloud_2_Icosphere_043.res" id="7_dhxdq"]
+[ext_resource type="PackedScene" uid="uid://bdy7yi08b7b44" path="res://components/rung.tscn" id="8_uelbq"]
+[ext_resource type="PackedScene" uid="uid://dmgrvnq7g1how" path="res://components/door.tscn" id="17_ss0mf"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_xe0wv"]
 size = Vector3(0.2, 0.2, 0.2)
@@ -298,6 +301,38 @@ transform = Transform3D(0.53519285, 0, 0.84472966, 0, 1, 0, -0.84472966, 0, 0.53
 size = Vector3(0.1, 1, 6)
 color = Color(0.9098039, 0, 0.92941177, 1)
 
+[node name="Platform01" parent="Walls" unique_id=1750394934 instance=ExtResource("2_s2yy1")]
+transform = Transform3D(0.99999976, 0, 0, 0, -4.371139e-08, 0.99999976, 0, -1, -4.3711378e-08, 1.9999993, 1.9999998, -5)
+size = Vector3(2, 2, 0.1)
+color = Color(0.9098039, 0, 0.92941177, 1)
+
+[node name="Railing01" parent="Walls/Platform01" unique_id=1548576977 instance=ExtResource("7_8mqay")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0, 0)
+
+[node name="Railing02" parent="Walls/Platform01" unique_id=865080290 instance=ExtResource("7_8mqay")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0, 0)
+
+[node name="Rung01" parent="Walls/Platform01" unique_id=1132095924 instance=ExtResource("8_uelbq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="Rung02" parent="Walls/Platform01" unique_id=1895735925 instance=ExtResource("8_uelbq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -0.3)
+
+[node name="Rung03" parent="Walls/Platform01" unique_id=1002796673 instance=ExtResource("8_uelbq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -0.6)
+
+[node name="Rung04" parent="Walls/Platform01" unique_id=1475257464 instance=ExtResource("8_uelbq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -0.9)
+
+[node name="Rung05" parent="Walls/Platform01" unique_id=1853487150 instance=ExtResource("8_uelbq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -1.2)
+
+[node name="Rung06" parent="Walls/Platform01" unique_id=644414579 instance=ExtResource("8_uelbq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -1.5)
+
+[node name="Rung07" parent="Walls/Platform01" unique_id=525913365 instance=ExtResource("8_uelbq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -1.8)
+
 [node name="Table" parent="." unique_id=1416213509 instance=ExtResource("3_cfwdu")]
 
 [node name="Box01" parent="Table" unique_id=1233973179 instance=ExtResource("4_xu5kv")]
@@ -331,7 +366,7 @@ shape = SubResource("BoxShape3D_xe0wv")
 mesh = SubResource("BoxMesh_8mqay")
 
 [node name="LeftGrabPoint" type="Node3D" parent="Table/Test" unique_id=1811487180]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.0025416687, 0.055870533, 0.12585759)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.014562495, 0.055870533, 0.12585759)
 script = ExtResource("6_27ely")
 right_hand = false
 finger_poses = ExtResource("7_0mmyo")
@@ -339,7 +374,7 @@ show_hand = true
 metadata/_custom_type_script = "uid://xrt2jog5h0j"
 
 [node name="RightGrabPoint" type="Node3D" parent="Table/Test" unique_id=1000392240]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13008094, 0.05615008, 0.008329272)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13008094, 0.05615008, 0.014306426)
 script = ExtResource("6_27ely")
 left_hand = false
 finger_poses = ExtResource("7_0mmyo")
@@ -366,3 +401,6 @@ transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 4.72
 physics_material_override = SubResource("PhysicsMaterial_dhxdq")
 size = Vector3(4, 4, 0.01)
 color = Color(0.4825061, 0.6763734, 0.9588645, 1)
+
+[node name="Door" parent="." unique_id=1926341240 instance=ExtResource("17_ss0mf")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.3539724, 0, -1.2468029)

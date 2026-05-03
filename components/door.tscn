@@ -1,0 +1,205 @@
+[gd_scene format=3 uid="uid://dmgrvnq7g1how"]
+
+[ext_resource type="Shader" uid="uid://hy6wp5qwpmjk" path="res://materials_and_shaders/textured.gdshader" id="1_58skw"]
+[ext_resource type="Texture2D" uid="uid://ds8hppgpq3pod" path="res://assets/main/pattern.png" id="2_i24i1"]
+[ext_resource type="Script" uid="uid://bh2q7oi3dudxl" path="res://components/door_handle.gd" id="2_vgedk"]
+[ext_resource type="Script" uid="uid://xrt2jog5h0j" path="res://addons/godot-xr-tools2/components/decorators/xrt2_grab_point.gd" id="3_0ux2l"]
+[ext_resource type="Script" uid="uid://xrt22k41jo6" path="res://addons/godot-xr-tools2/hands/poses/xrt2_finger_poses.gd" id="4_nqay4"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_58skw"]
+size = Vector3(0.1, 2.1, 0.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_i24i1"]
+size = Vector3(1, 0.1, 0.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_naxlo"]
+size = Vector3(0.2, 0.03, 0.03)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ujdsv"]
+top_radius = 0.01
+bottom_radius = 0.01
+height = 0.03
+
+[sub_resource type="BoxMesh" id="BoxMesh_bewm7"]
+size = Vector3(0.2, 0.03, 0.03)
+
+[sub_resource type="Resource" id="Resource_sx6w7"]
+script = ExtResource("4_nqay4")
+thumb_enabled = true
+thumb_spread = 0.2617993877991494
+thumb_metacarpal_curl = 0.017453292519943295
+thumb_proximal_curl = 0.8203047484373349
+thumb_distal_curl = 1.5707963267948966
+index_enabled = true
+index_proximal_curl = 1.1693705988362009
+middle_enabled = true
+middle_proximal_curl = 1.117010721276371
+middle_distal_curl = 1.1344640137963142
+ring_enabled = true
+ring_proximal_curl = 0.9075712110370514
+ring_distal_curl = 1.0821041362364843
+little_enabled = true
+metadata/_custom_type_script = "uid://xrt22k41jo6"
+
+[sub_resource type="Resource" id="Resource_55b6a"]
+script = ExtResource("4_nqay4")
+thumb_enabled = true
+thumb_spread = 0.2617993877991494
+thumb_metacarpal_curl = 0.017453292519943295
+thumb_proximal_curl = 0.8203047484373349
+thumb_distal_curl = 1.5707963267948966
+index_enabled = true
+index_proximal_curl = 1.1693705988362009
+middle_enabled = true
+middle_proximal_curl = 1.117010721276371
+middle_distal_curl = 1.1344640137963142
+ring_enabled = true
+ring_proximal_curl = 0.9075712110370514
+ring_distal_curl = 1.0821041362364843
+little_enabled = true
+metadata/_custom_type_script = "uid://xrt22k41jo6"
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vgedk"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_0ux2l"]
+radius = 0.01
+height = 0.02
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_eany1"]
+render_priority = 0
+shader = ExtResource("1_58skw")
+shader_parameter/albedo = Color(0.83799356, 0.44355276, 0.18207249, 1)
+shader_parameter/texture_albedo = ExtResource("2_i24i1")
+shader_parameter/roughness = 1.0
+shader_parameter/specular = 0.5
+shader_parameter/metallic = 0.0
+shader_parameter/uv1_scale = Vector3(1, 3, 1)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_mpqow"]
+material = SubResource("ShaderMaterial_eany1")
+size = Vector3(1, 2, 0.05)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_eany1"]
+size = Vector3(1, 2, 0.05)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lg60e"]
+render_priority = 0
+shader = ExtResource("1_58skw")
+shader_parameter/albedo = Color(0.71515626, 0.50250345, 0.16212532, 1)
+shader_parameter/texture_albedo = ExtResource("2_i24i1")
+shader_parameter/roughness = 1.0
+shader_parameter/specular = 0.5
+shader_parameter/metallic = 0.0
+shader_parameter/uv1_scale = Vector3(1, 3, 1)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_jd813"]
+material = SubResource("ShaderMaterial_lg60e")
+size = Vector3(0.1, 2.1, 0.1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4foyb"]
+render_priority = 0
+shader = ExtResource("1_58skw")
+shader_parameter/albedo = Color(0.71515626, 0.50250345, 0.16212532, 1)
+shader_parameter/texture_albedo = ExtResource("2_i24i1")
+shader_parameter/roughness = 1.0
+shader_parameter/specular = 0.5
+shader_parameter/metallic = 0.0
+shader_parameter/uv1_scale = Vector3(2, 1, 1)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_58skw"]
+material = SubResource("ShaderMaterial_4foyb")
+size = Vector3(1, 0.1, 0.1)
+
+[node name="Door" type="Node3D" unique_id=1926341240]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=144773774]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 1, 0)
+collision_layer = 2
+
+[node name="ColFrame01" type="CollisionShape3D" parent="StaticBody3D" unique_id=391754775]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1, 0.05, 0)
+shape = SubResource("BoxShape3D_58skw")
+
+[node name="ColFrame02" type="CollisionShape3D" parent="StaticBody3D" unique_id=441770326]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.049999952, 0)
+shape = SubResource("BoxShape3D_58skw")
+
+[node name="ColFrameTop" type="CollisionShape3D" parent="StaticBody3D" unique_id=947226326]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.55, 1.05, 0)
+shape = SubResource("BoxShape3D_i24i1")
+
+[node name="HingeJoint3D" type="HingeJoint3D" parent="." unique_id=510985469]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0.5, 1, -0.03)
+node_a = NodePath("../StaticBody3D")
+node_b = NodePath("../DoorBody3D")
+angular_limit/enable = true
+angular_limit/lower = 0.0
+
+[node name="DoorBody3D" type="RigidBody3D" parent="." unique_id=195309319]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1, 0)
+collision_layer = 2
+collision_mask = 3
+freeze = true
+angular_damp = 0.4
+
+[node name="DoorHandle" type="AnimatableBody3D" parent="DoorBody3D" unique_id=988849223]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.3, 0.07)
+sync_to_physics = false
+script = ExtResource("2_vgedk")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DoorBody3D/DoorHandle" unique_id=96902058]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.09, 0, 0)
+shape = SubResource("BoxShape3D_naxlo")
+
+[node name="Mesh01" type="MeshInstance3D" parent="DoorBody3D/DoorHandle" unique_id=1957207911]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, -0.030000001)
+mesh = SubResource("CylinderMesh_ujdsv")
+
+[node name="Mesh02" type="MeshInstance3D" parent="DoorBody3D/DoorHandle" unique_id=678750509]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.09, 0, 0)
+mesh = SubResource("BoxMesh_bewm7")
+
+[node name="LeftGrabPoint" type="Node3D" parent="DoorBody3D/DoorHandle" unique_id=879719695]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0.108608544, 0.035512447, 0.06507922)
+script = ExtResource("3_0ux2l")
+right_hand = false
+exclusive = true
+finger_poses = SubResource("Resource_sx6w7")
+metadata/_custom_type_script = "uid://xrt2jog5h0j"
+
+[node name="RightGrabPoint" type="Node3D" parent="DoorBody3D/DoorHandle" unique_id=1696193174]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0.103, 0.041, 0.065)
+script = ExtResource("3_0ux2l")
+left_hand = false
+exclusive = true
+finger_poses = SubResource("Resource_55b6a")
+metadata/_custom_type_script = "uid://xrt2jog5h0j"
+
+[node name="State" type="MeshInstance3D" parent="DoorBody3D/DoorHandle" unique_id=1838617513]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.07281724)
+material_override = SubResource("StandardMaterial3D_vgedk")
+mesh = SubResource("SphereMesh_0ux2l")
+
+[node name="Door" type="MeshInstance3D" parent="DoorBody3D" unique_id=167391707]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0)
+mesh = SubResource("BoxMesh_mpqow")
+skeleton = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DoorBody3D" unique_id=467903967]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0)
+shape = SubResource("BoxShape3D_eany1")
+
+[node name="Frame01" type="MeshInstance3D" parent="." unique_id=170137804]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.55, 1.05, 0)
+mesh = SubResource("BoxMesh_jd813")
+
+[node name="Frame02" type="MeshInstance3D" parent="." unique_id=1687764664]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 1.05, 0)
+mesh = SubResource("BoxMesh_jd813")
+
+[node name="FrameTop" type="MeshInstance3D" parent="." unique_id=681524968]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.05, 0)
+mesh = SubResource("BoxMesh_58skw")
