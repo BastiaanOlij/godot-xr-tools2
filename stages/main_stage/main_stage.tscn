@@ -56,6 +56,7 @@ directional_shadow_split_3 = 0.25
 directional_shadow_max_distance = 30.0
 
 [node name="World" parent="." index="2" unique_id=42292334 instance=ExtResource("2_m5inh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0019800663, -1.1920929e-07, -0.00029230118)
 
 [node name="XRT2CharacterBody3D" parent="." index="3" unique_id=1387237929 instance=ExtResource("3_3ltgk")]
 

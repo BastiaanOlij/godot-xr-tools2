@@ -20,7 +20,7 @@ offset_top = 10.0
 offset_right = 329.0
 offset_bottom = 63.0
 theme_override_font_sizes/font_size = 32
-selected = 0
+selected = 1
 item_count = 2
 popup/item_0/text = "Spectator Camera"
 popup/item_0/id = 0
@@ -28,7 +28,7 @@ popup/item_1/text = "Stablilized Camera"
 popup/item_1/id = 1
 
 [node name="Xrt2SpectatorCamera" parent="." unique_id=717676012 instance=ExtResource("2_hkn0h")]
-transform = Transform3D(-0.772577, 0.013742587, -0.63477176, 0.0022893846, 0.99981976, 0.018859178, 0.63491595, 0.013116851, -0.7724695, -0.58694303, 1.4365196, -2.462911)
+transform = Transform3D(-0.772577, 0.013742587, -0.63477176, 0.0022893846, 0.99981976, 0.018859178, 0.63491595, 0.013116851, -0.7724695, 1.7248286, 1.9712102, -2.462911)
 
 [node name="Xrt2StabilizedCamera" parent="." unique_id=787561721 instance=ExtResource("5_v5hs0")]
 
