@@ -58,7 +58,7 @@ func _get_locomotion_handler(character_body : CharacterBody3D) -> XRT2Locomotion
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
 
-	var character_body : CharacterBody3D = XRT2Helper.get_character_body(self)
+	var character_body : CharacterBody3D = XRT2.get_character_body(self)
 	var locomotion_handler : XRT2LocomotionHandler = _get_locomotion_handler(character_body)
 
 	if not character_body:
@@ -72,7 +72,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 # Node was added to our scene tree
 func _enter_tree():
-	_character_body = XRT2Helper.get_character_body(self)
+	_character_body = XRT2.get_character_body(self)
 	_locomotion_handler = _get_locomotion_handler(_character_body)
 
 

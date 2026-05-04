@@ -694,18 +694,18 @@ func _physics_process(delta):
 
 			# Calculate our parents angular velocity.
 			# Our characterbody also includes our physical movement and we would double account for this.
-			parent_angular_velocity = XRT2Helper.rotation_to_axis_angle(_was_parent_basis, parent_transform.basis) / delta
+			parent_angular_velocity = XRT2.rotation_to_axis_angle(_was_parent_basis, parent_transform.basis) / delta
 
 	# TODO: If physics runs at a higher update rate than we get tracking,
 	# we should adjust our proportional value accordingly.
 
 	# Apply linear motion to hands.
-	XRT2Helper.apply_force_to_target(delta, self, target.origin,
+	XRT2.apply_force_to_target(delta, self, target.origin,
 		1.0, parent_linear_velocity, parent_angular_velocity, parent_global_position
 	)
 
 	# Apply angular motion to hands.
-	XRT2Helper.apply_torque_to_target(
+	XRT2.apply_torque_to_target(
 		delta, self, target.basis, 1.0, parent_angular_velocity, parent_global_basis
 	)
 

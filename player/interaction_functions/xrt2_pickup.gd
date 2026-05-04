@@ -301,7 +301,7 @@ func pickup_object(object : GrabObject):
 
 	if object.body is RigidBody3D or object.body is PhysicalBone3D:
 		# Make sure our body doesn't collide with things we've picked up
-		XRT2Helper.add_collision_exception(_xr_player_object, object.body)
+		XRT2.add_collision_exception(_xr_player_object, object.body)
 
 		# Get some behaviour characteristics
 		var rigid_body_behaviour: XRT2RigidBodyBehaviour = XRT2RigidBodyBehaviour.get_behaviour_node(object.body)
@@ -321,7 +321,7 @@ func pickup_object(object : GrabObject):
 
 	if _xr_collision_hand:
 		# Make a collision exception between hand and picked up object
-		XRT2Helper.add_collision_exception(_xr_collision_hand, _picked_up)
+		XRT2.add_collision_exception(_xr_collision_hand, _picked_up)
 
 	# Find our grab point (if any).
 	# Note, we're already handled our exclusive logic, can ignore that here.
@@ -382,7 +382,7 @@ func drop_held_object( \
 
 	# Process letting go
 	if _xr_collision_hand:
-		XRT2Helper.remove_collision_exception(_xr_collision_hand, _picked_up)
+		XRT2.remove_collision_exception(_xr_collision_hand, _picked_up)
 
 		_xr_collision_hand.remove_target_override(_picked_up)
 		_xr_collision_hand.finger_poses = null
@@ -403,7 +403,7 @@ func drop_held_object( \
 	_grab_as_static_body = false
 
 	if _xr_player_object and (was_picked_up is RigidBody3D or was_picked_up is PhysicalBone3D):
-		XRT2Helper.remove_collision_exception(_xr_player_object, was_picked_up)
+		XRT2.remove_collision_exception(_xr_player_object, was_picked_up)
 
 	var other = picked_up_by(was_picked_up)
 	if other:
@@ -434,7 +434,7 @@ func _update_detection_radius():
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
 
-	var xr_controller = XRT2Helper.get_xr_controller(self)
+	var xr_controller = XRT2.get_xr_controller(self)
 	var xr_collision_hand = XRT2CollisionHand.get_xr_collision_hand(self)
 
 	if not xr_controller and not xr_collision_hand:
@@ -471,7 +471,7 @@ func _enter_tree():
 			_detection_exclude.push_back(parent.get_rid())
 		parent = parent.get_parent()
 
-	_xr_origin = XRT2Helper.get_xr_origin(self)
+	_xr_origin = XRT2.get_xr_origin(self)
 	_exclude_collision_children(_xr_origin)
 
 	_xr_collision_hand = XRT2CollisionHand.get_xr_collision_hand(self)
@@ -483,9 +483,9 @@ func _enter_tree():
 		_on_skeleton_updated()
 
 	else:
-		_xr_controller = XRT2Helper.get_xr_controller(self)
+		_xr_controller = XRT2.get_xr_controller(self)
 		if _xr_controller:
-			_xr_player_object = XRT2Helper.get_collision_object(_xr_controller)
+			_xr_player_object = XRT2.get_collision_object(_xr_controller)
 
 	notify_property_list_changed()
 
@@ -822,7 +822,7 @@ func _handle_picked_up_dynamic(delta: float, controller_target: Transform3D, glo
 
 			# Calculate our parents angular velocity.
 			# Our characterbody also includes our physical movement and we would double account for this.
-			parent_angular_velocity = XRT2Helper.rotation_to_axis_angle(_was_player_basis, _xr_player_object.basis) / delta
+			parent_angular_velocity = XRT2.rotation_to_axis_angle(_was_player_basis, _xr_player_object.basis) / delta
 			_was_player_basis = _xr_player_object.basis
 
 	if _is_primary:
@@ -848,8 +848,8 @@ func _handle_picked_up_dynamic(delta: float, controller_target: Transform3D, glo
 			global_target.basis = Basis(cross, angle)
 
 			# Now calculate how much our tracked hands are rotated along our destination vector
-			var primary_angle = XRT2Helper.angle_in_plane(dest_vector, global_target.basis * _grab_offset.basis.y, controller_target.basis.y)
-			var secondary_angle = XRT2Helper.angle_in_plane(dest_vector, global_target.basis * other_grab_offset.basis.y, other_controller_target.basis.y)
+			var primary_angle = XRT2.angle_in_plane(dest_vector, global_target.basis * _grab_offset.basis.y, controller_target.basis.y)
+			var secondary_angle = XRT2.angle_in_plane(dest_vector, global_target.basis * other_grab_offset.basis.y, other_controller_target.basis.y)
 
 			global_target.basis = Basis(dest_vector, (primary_angle + secondary_angle) * 0.5) * global_target.basis
 
@@ -859,7 +859,7 @@ func _handle_picked_up_dynamic(delta: float, controller_target: Transform3D, glo
 
 		# Apply angular motion to picked up object.
 		# We always do this on primary only!
-		XRT2Helper.apply_torque_to_target(
+		XRT2.apply_torque_to_target(
 			delta, _picked_up, global_target.basis, primary_factor,
 			parent_angular_velocity, parent_global_basis
 		)
@@ -869,12 +869,12 @@ func _handle_picked_up_dynamic(delta: float, controller_target: Transform3D, glo
 		var proportion: float = 1.0 / picked_up_count(_picked_up)
 
 		# Apply linear motion to picked up object.
-		XRT2Helper.apply_force_to_target(delta, _picked_up, global_target.origin, proportion,
+		XRT2.apply_force_to_target(delta, _picked_up, global_target.origin, proportion,
 			parent_linear_velocity, parent_angular_velocity, parent_global_position
 		)
 	elif _is_primary:
 		# Apply linear motion to picked up object.
-		XRT2Helper.apply_force_to_target(delta, _picked_up, global_target.origin, primary_factor,
+		XRT2.apply_force_to_target(delta, _picked_up, global_target.origin, primary_factor,
 			parent_linear_velocity, parent_angular_velocity, parent_global_position
 		)
 
@@ -913,8 +913,8 @@ func _handle_picked_up_static(delta: float, controller_target: Transform3D, glob
 			target_basis = Basis(cross, angle * lerp_factor)
 
 		# Now calculate how much our tracked hands are rotated along our destination vector
-		var primary_angle = XRT2Helper.angle_in_plane(dest_vector, controller_target.basis.y, target_basis * _picked_up.global_basis * _grab_offset.basis.y)
-		var secondary_angle = XRT2Helper.angle_in_plane(dest_vector, other_controller_target.basis.y, target_basis * other_picked_up.global_basis * other_grab_offset.basis.y)
+		var primary_angle = XRT2.angle_in_plane(dest_vector, controller_target.basis.y, target_basis * _picked_up.global_basis * _grab_offset.basis.y)
+		var secondary_angle = XRT2.angle_in_plane(dest_vector, other_controller_target.basis.y, target_basis * other_picked_up.global_basis * other_grab_offset.basis.y)
 
 		target_basis = Basis(dest_vector, (primary_angle + secondary_angle) * 0.5 * lerp_factor) * target_basis * _xr_player_object.global_basis
 
@@ -924,7 +924,7 @@ func _handle_picked_up_static(delta: float, controller_target: Transform3D, glob
 	else:
 		# Single handed, determine rotation difference based on our rotation when we grabbed the static object
 		var dest_transform: Transform3D = _picked_up.global_transform * _picked_up_to_org_target
-		var axis_angle: Vector3 = XRT2Helper.rotation_to_axis_angle(controller_target.basis, dest_transform.basis)
+		var axis_angle: Vector3 = XRT2.rotation_to_axis_angle(controller_target.basis, dest_transform.basis)
 
 		# And apply partial rotation to our player body
 		target_basis = Basis(axis_angle.normalized(), axis_angle.length() * lerp_factor) * _xr_player_object.global_basis
@@ -932,10 +932,10 @@ func _handle_picked_up_static(delta: float, controller_target: Transform3D, glob
 	# Apply our results based on our primary hand
 	if _xr_player_object is RigidBody3D:
 		# Apply torque to player object
-		XRT2Helper.apply_torque_to_target(delta, _xr_player_object, target_basis)
+		XRT2.apply_torque_to_target(delta, _xr_player_object, target_basis)
 
 		# Apply forces to player object
-		XRT2Helper.apply_force_to_target(delta, _xr_player_object, _xr_player_object.global_position + (dest_position - start_position))
+		XRT2.apply_force_to_target(delta, _xr_player_object, _xr_player_object.global_position + (dest_position - start_position))
 	elif _xr_player_object is CharacterBody3D:
 		# We don't have an angular velocity here, nor collision detection so we're just going to rotate around the local y-axis
 		target_basis = target_basis.looking_at(target_basis.z - target_basis.z.project(_xr_player_object.global_basis.y), _xr_player_object.global_basis.y, true)

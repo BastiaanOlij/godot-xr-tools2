@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# xrt2_helper.gd
+# xrt2.gd
 #-------------------------------------------------------------------------------
 # MIT License
 #
@@ -24,14 +24,11 @@
 # SOFTWARE.
 #-------------------------------------------------------------------------------
 
-
 @tool
-class_name XRT2Helper
+class_name XRT2
 extends Node
 
-################################################################################
-# Helper functions to access key nodes
-
+#region XRT2 Node access
 ## Find the ancestor XRController3D node for a given node.
 static func get_xr_controller(p_node : Node3D) -> XRController3D:
 	var parent = p_node.get_parent()
@@ -95,11 +92,9 @@ static func get_collision_object(p_node : Node3D) -> CollisionObject3D:
 
 	# Not found
 	return null
+#endregion
 
-
-################################################################################
-# Helper functions for our physics
-
+#region XRT2 Physics helper functions
 ## Calculate the angle between two vector within the plane of another vector
 static func angle_in_plane(p_plane_vector: Vector3, p_a: Vector3, p_b: Vector3) -> float:
 	# Take the cross product with our plane vector
@@ -115,6 +110,7 @@ static func angle_in_plane(p_plane_vector: Vector3, p_a: Vector3, p_b: Vector3) 
 		angle = -angle
 
 	return angle
+
 
 ## Calculate the axis-angle rotation between two orientations.
 static func rotation_to_axis_angle(start_orientation : Basis, end_orientation : Basis) -> Vector3:
@@ -190,7 +186,7 @@ static func apply_torque_to_target(
 	var state : PhysicsDirectBodyState3D = PhysicsServer3D.body_get_direct_state(apply_to.get_rid())
 	var moment_of_inertia: Vector3 = Vector3(1.0, 1.0, 1.0) / state.inverse_inertia
 
-	var delta_axis_angle : Vector3 = XRT2Helper.rotation_to_axis_angle(apply_to.global_basis, global_target_orientation)
+	var delta_axis_angle : Vector3 = XRT2.rotation_to_axis_angle(apply_to.global_basis, global_target_orientation)
 	var velocity : Vector3 = -apply_to.angular_velocity
 	if parent_angular_velocity.length() > 0.0:
 		# Localise and add our parents angular velocity
@@ -202,17 +198,20 @@ static func apply_torque_to_target(
 
 	# Apply as our torque
 	apply_to.apply_torque(proportion * torque)
+#endregion
 
-
-################################################################################
+#region XRT2 Collision exception handler
 # Helper functions to track collision exceptions.
 # Note: We should only ever have a few collision exceptions in play
 # at any given time, so looping an array is fine.
+
+const DEFAULT_DELAY = 1.0
 
 class CollisionExceptionPair:
 	var bodyA: PhysicsBody3D
 	var bodyB: PhysicsBody3D
 	var count: int
+	var delay: float
 	var registered: bool
 
 static var _collision_exception_pairs: Array[CollisionExceptionPair]
@@ -244,6 +243,7 @@ static func _find_collision_exception_pair(bodyA: PhysicsBody3D, bodyB: PhysicsB
 		cep.bodyA = bodyA
 		cep.bodyB = bodyB
 		cep.count = 0
+		cep.delay = DEFAULT_DELAY
 		cep.registered = false
 		_collision_exception_pairs.push_back(cep)
 		return cep
@@ -262,6 +262,10 @@ static func _on_collision_check_timer():
 			# Collision exceptions are no longer active so just erase.
 			_collision_exception_pairs.erase(cep)
 		elif cep.count == 0:
+			if cep.delay > 0.0:
+				cep.delay = max(0.0, cep.delay - _collision_check_wait_time)
+				continue
+
 			# Check if bodyA and bodyB are no longer colliding and if so,
 			# remove collisions and free.
 			var is_colliding: bool = false
@@ -351,13 +355,16 @@ static func remove_collision_exception(bodyA: PhysicsBody3D, bodyB: PhysicsBody3
 		return
 
 	cep.count = cep.count - 1
-	# Note: Once this hits 0, it will be freed in our timer when
-	# we no longer collide.
 
+	if cep.count == 0:
+		# Reset our delay just in case.
+		cep.delay = DEFAULT_DELAY
 
-################################################################################
-# Note, older PD related code below is unused but kept for reference
+		# Note: Once this hits 0, it will be freed in our timer when
+		# we no longer collide.
+#endregion
 
+#region Deprecated functions
 ## Apply a linear force to a RigidBody based on a target location
 ## @deprecated old PID based physics code
 static func apply_linear_force(
@@ -420,7 +427,7 @@ static func apply_torque(
 		parent_global_orientation : Basis = Basis()
 	):
 	var adjusted_target_orientation : Basis = global_target_orientation * target_offset.inverse()
-	var delta_axis_angle : Vector3 = XRT2Helper.rotation_to_axis_angle(apply_to.global_basis, adjusted_target_orientation)
+	var delta_axis_angle : Vector3 = XRT2.rotation_to_axis_angle(apply_to.global_basis, adjusted_target_orientation)
 	var velocity : Vector3 = -apply_to.angular_velocity
 	if parent_angular_velocity.length() > 0.0:
 		# Localise and add our parents angular velocity
@@ -442,3 +449,4 @@ static func apply_torque(
 
 		# Apply as our torque
 		apply_to.apply_torque(pd)
+#endregion
