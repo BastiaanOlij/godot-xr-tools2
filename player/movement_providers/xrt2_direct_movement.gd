@@ -92,7 +92,7 @@ func _enter_tree():
 
 	_xr_collision_hand = XRT2CollisionHand.get_xr_collision_hand(self)
 	if not _xr_collision_hand:
-		_xr_controller = XRT2Helper.get_xr_controller(self)
+		_xr_controller = XRT2.get_xr_controller(self)
 
 
 # Node was removed from our scene tree
