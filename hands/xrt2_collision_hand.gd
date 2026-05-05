@@ -560,6 +560,12 @@ func _validate_property(property: Dictionary):
 	]:
 		property.usage = PROPERTY_USAGE_NONE
 
+
+# Called when we're added to our scene tree
+func _enter_tree():
+	XRT2Teleport.register_on_teleport(_on_player_teleported)
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	_palm_collision_shape = CollisionShape3D.new()
@@ -614,6 +620,11 @@ func _ready():
 
 	# Update the target
 	_update_target()
+
+
+# Called when we're removed to our scene tree
+func _exit_tree():
+	XRT2Teleport.unregister_on_teleport(_on_player_teleported)
 
 
 # Handle physics processing
@@ -984,34 +995,33 @@ func _on_skeleton_updated() -> void:
 	skeleton_updated.emit()
 
 
-# TODO: Hook this up, this is now part of our locomotion system.
-func _on_player_moved(from_transform : Transform3D, to_transform : Transform3D, is_teleport : bool):
-	if is_teleport:
-		# TODO this needs to be implemented
-		pass
-	else:
-		# Old logic, no longer applied
-		# var current_local_transform : Transform3D = from_transform.inverse() * global_transform
-		# var target_transform : Transform3D = to_transform * current_local_transform
-		# var delta_movement : Vector3 = target_transform.origin - global_transform.origin
-		pass
+# React to player teleported
+func _on_player_teleported(from_transform : Transform3D, to_transform : Transform3D):
+	var delta_transform: Transform3D = to_transform * from_transform.inverse()
+
+	# Apply our movement directly.
+	global_transform = delta_transform * global_transform
 
 
+# Button was pressed on our controller
 func _on_button_pressed(action_name: String):
 	# Just chain this.
 	button_pressed.emit(action_name)
 
 
+# Button was released on our controller
 func _on_button_released(action_name: String):
 	# Just chain this.
 	button_released.emit(action_name)
 
 
+# Float input changed on our controller
 func _on_input_float_changed(action_name: String, value: float):
 	# Just chain this.
 	input_float_changed.emit(action_name, value)
 
 
+# Vector2 input changed on our controller
 func _on_input_vector2_changed(action_name: String, vector: Vector2):
 	# Just chain this.
 	input_vector2_changed.emit(action_name, vector)

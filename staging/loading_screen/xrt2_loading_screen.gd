@@ -88,7 +88,7 @@ signal continue_pressed
 
 ## Action in action map and/or input map that triggers[br]
 ## [b]Note:[b] supports both bool and float action map inputs.
-@export var activate_action: String = "trigger_click":
+@export var activate_action: String = "trigger":
 	set(value):
 		activate_action = value
 		if is_inside_tree():

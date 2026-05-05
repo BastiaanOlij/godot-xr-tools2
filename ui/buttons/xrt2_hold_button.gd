@@ -42,7 +42,7 @@ signal pressed
 
 ## Action in action map and/or input map that triggers[br]
 ## [b]Note:[b] supports both bool and float actionmap inputs.
-@export var activate_action : String = "trigger_click"
+@export var activate_action : String = "trigger"
 
 ## Duration action must be pressed
 @export var hold_time : float = 2.0

@@ -33,20 +33,46 @@ extends Node3D
 ## This script exposes bone locations for collision hands.
 ## This has to be a child of a [XRT2CollisionHand] node.
 
-@export var bone_name : String:
+#region Export variables
+## The bone for our hand that we position this at
+@export var bone_name: String:
 	set(value):
 		bone_name = value
 		if is_inside_tree():
 			_on_skeleton_updated()
 
-var _updating : bool = false
+## Additional position offset to apply
+@export var position_offset: Vector3 = Vector3():
+	set(value):
+		position_offset = value
+		if is_inside_tree():
+			_on_skeleton_updated()
 
+## Additional rotation offset to apply
+@export var rotation_offset: Vector3 = Vector3():
+	set(value):
+		rotation_offset = value
+		if is_inside_tree():
+			_on_skeleton_updated()
+#endregion
+
+#region Private variables
+var _updating : bool = false
+var _xr_collision_hand: XRT2CollisionHand
+#endregion
+
+#region Public functions
+## Return our collision hand (if applicable)
+func get_xr_collision_hand() -> XRT2CollisionHand:
+	return _xr_collision_hand
+#endregion
+
+#region Private functions
 # Verifies if we have a valid configuration.
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
 
-	var parent = get_parent()
-	if not parent or not parent is XRT2CollisionHand:
+	if not _xr_collision_hand:
 		warnings.push_back("This node must be a child of an XRT2CollisionHand node.")
 
 	# Return warnings
@@ -63,22 +89,29 @@ func _validate_property(property):
 		else:
 			property.hint = PROPERTY_HINT_NONE
 			property.hint_string = ""
+	elif (property.name == "rotation_offset"):
+		property.hint = PROPERTY_HINT_RANGE
+		property.hint_string = "0.0,360.0,radians_as_degrees"
+	elif _xr_collision_hand and property.name in [ "position", "rotation", "scale", "rotation_edit_mode", "rotation_order", "top_level" ]:
+		property.usage = PROPERTY_USAGE_NONE
 
 
 func _enter_tree():
-	var parent = get_parent()
-	if parent and parent is XRT2CollisionHand:
-		parent.hand_mesh_changed.connect(_on_hand_mesh_changed)
-		parent.skeleton_updated.connect(_on_skeleton_updated)
+	_xr_collision_hand = XRT2CollisionHand.get_xr_collision_hand(self)
+	if _xr_collision_hand:
+		_xr_collision_hand.hand_mesh_changed.connect(_on_hand_mesh_changed)
+		_xr_collision_hand.skeleton_updated.connect(_on_skeleton_updated)
 
-	_on_skeleton_updated()
+		_on_skeleton_updated()
+
+	notify_property_list_changed()
 
 
 func _exit_tree():
-	var parent = get_parent()
-	if parent and parent is XRT2CollisionHand:
-		parent.hand_mesh_changed.disconnect(_on_hand_mesh_changed)
-		parent.skeleton_updated.disconnect(_on_skeleton_updated)
+	if _xr_collision_hand:
+		_xr_collision_hand.hand_mesh_changed.disconnect(_on_hand_mesh_changed)
+		_xr_collision_hand.skeleton_updated.disconnect(_on_skeleton_updated)
+		_xr_collision_hand = null
 
 
 func _on_hand_mesh_changed():
@@ -87,14 +120,20 @@ func _on_hand_mesh_changed():
 
 
 func _on_skeleton_updated():
+	var transform_offset:Transform3D = Transform3D(Basis.from_euler(rotation_offset), position_offset)
+
+	if not _xr_collision_hand:
+		transform = transform_offset
+		return
+
 	if _updating:
 		return
 	_updating = true
 
-	var parent = get_parent()
-	if not bone_name.is_empty() and parent and parent is XRT2CollisionHand:
-		transform = parent.get_bone_transform(bone_name)
+	if not bone_name.is_empty():
+		transform = _xr_collision_hand.get_bone_transform(bone_name) * transform_offset
 	else:
-		transform = Transform3D()
+		transform = transform_offset
 
 	_updating = false
+#endregion
