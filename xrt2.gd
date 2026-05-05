@@ -95,6 +95,32 @@ static func get_collision_object(p_node : Node3D) -> CollisionObject3D:
 #endregion
 
 #region XRT2 Physics helper functions
+## Check if this physics body would collide if placed at the given global_transform
+static func check_body_collision(physics_body: PhysicsBody3D, at: Transform3D) -> bool:
+	var body_rid: RID = physics_body.get_rid()
+	var body_state: PhysicsDirectBodyState3D = PhysicsServer3D.body_get_direct_state(body_rid)
+	var space_state: PhysicsDirectSpaceState3D = body_state.get_space_state()
+	var query: PhysicsShapeQueryParameters3D = PhysicsShapeQueryParameters3D.new()
+
+	var exclude: Array[RID] = [ body_rid ]
+	for exception in physics_body.get_collision_exceptions():
+		exclude.push_back(exception.get_rid())
+
+	query.collision_mask = physics_body.collision_mask
+	query.exclude = exclude
+
+	for idx in PhysicsServer3D.body_get_shape_count(body_rid):
+		var shape_rid: RID = PhysicsServer3D.body_get_shape(body_rid, idx)
+		var transform: Transform3D = PhysicsServer3D.body_get_shape_transform(body_rid, idx)
+
+		query.shape_rid = shape_rid
+		query.transform = at * transform
+		if not space_state.collide_shape(query, 1).is_empty():
+			return true
+
+	return false
+
+
 ## Calculate the angle between two vector within the plane of another vector
 static func angle_in_plane(p_plane_vector: Vector3, p_a: Vector3, p_b: Vector3) -> float:
 	# Take the cross product with our plane vector

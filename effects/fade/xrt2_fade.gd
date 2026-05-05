@@ -88,9 +88,10 @@ func _update_fade():
 			_message.modulate = Color(1.0, 1.0, 1.0, fade)
 			_message.outline_modulate = Color(0.0, 0.0, 0.0, fade)
 
+			set_process(true)
+
 		if _screen_material:
 			_screen_material.set_shader_parameter("alpha", fade)
-
 
 
 # Set our fade message.
@@ -147,22 +148,24 @@ func _ready() -> void:
 		_message.transform = t
 
 
-
 func _process(delta):
 	# Don't run this in the editor
 	if Engine.is_editor_hint():
 		set_process(false)
 		return
 
-	if _message.visible:
-		var t : Transform3D = global_transform
-		var forward : Vector3 = -t.basis.z
-		forward.y = 0.0
-		forward = forward.normalized()
+	if not _message.visible:
+		set_process(false)
+		return
 
-		t.origin += forward * message_distance
-		t = t.looking_at(t.origin + forward)
+	var t : Transform3D = global_transform
+	var forward : Vector3 = -t.basis.z
+	forward.y = 0.0
+	forward = forward.normalized()
 
-		_message.transform.basis = _message.transform.basis.slerp(t.basis, delta)
-		_message.transform.origin = _message.transform.origin.lerp(t.origin, delta)
+	t.origin += forward * message_distance
+	t = t.looking_at(t.origin + forward)
+
+	_message.transform.basis = _message.transform.basis.slerp(t.basis, delta)
+	_message.transform.origin = _message.transform.origin.lerp(t.origin, delta)
 #endregion
