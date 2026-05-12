@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://xrt2ebknph2" path="res://addons/godot-xr-tools2/player/movement_providers/xrt2_direct_movement.gd" id="3_7f0s7"]
 [ext_resource type="Script" uid="uid://xrt23qrb4js" path="res://addons/godot-xr-tools2/player/interaction_functions/xrt2_pickup.gd" id="4_l0n08"]
 [ext_resource type="Script" uid="uid://xrt2eecske1" path="res://addons/godot-xr-tools2/hands/xrt2_hand_attachment.gd" id="5_4i4c4"]
+[ext_resource type="Script" uid="uid://xrt2apc5enq" path="res://addons/godot-xr-tools2/player/teleport_function/xrt2_teleport.gd" id="9_6d2rb"]
 [ext_resource type="PackedScene" uid="uid://xrt2ef8ojbk" path="res://addons/godot-xr-tools2/debug/xrt2_log.tscn" id="11_4i4c4"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ie47k"]
@@ -50,7 +51,7 @@ environment = SubResource("Environment_8sh2w")
 shadow_enabled = true
 shadow_bias = 0.01
 shadow_transmittance_bias = 0.005
-directional_shadow_split_1 = 0.05
+directional_shadow_split_1 = 0.07
 directional_shadow_split_2 = 0.1
 directional_shadow_split_3 = 0.25
 directional_shadow_max_distance = 30.0
@@ -77,25 +78,36 @@ layers = 2
 cast_shadow = 3
 mesh = SubResource("SphereMesh_4i4c4")
 
-[node name="XRT2DirectMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" parent_id_path=PackedInt32Array(1387237929, 360497191) index="0" unique_id=1416942326]
+[node name="LeftCollisionHand" parent="XRT2CharacterBody3D/XROrigin3D" parent_id_path=PackedInt32Array(1387237929, 1272081866) index="2" unique_id=360497191]
+transform = Transform3D(1, 0, 0, 0, 0.99999994, 0, 0, 0, 0.99999994, -0.5, 1, -0.5)
+
+[node name="TurnMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" index="0" unique_id=1416942326]
 script = ExtResource("3_7f0s7")
 movement_action = "move"
 forward_movement_speed = 0.0
 movement_acceleration = 0.0
 
-[node name="XRT2Pickup" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" parent_id_path=PackedInt32Array(1387237929, 360497191) index="1" unique_id=1189634809]
+[node name="XRT2Pickup" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" index="1" unique_id=1189634809]
 transform = Transform3D(0.99500257, -0.0035018958, 0.09978712, -0.003500683, 0.99754673, 0.069914035, -0.09978719, -0.069914, 0.99254906, -0.02500046, 0.003554154, 0.040035933)
 script = ExtResource("4_l0n08")
 detection_radius = 0.1
 detection_offset = Vector3(0.03, 0, -0.06)
 
-[node name="IndexTipAttachment" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" parent_id_path=PackedInt32Array(1387237929, 360497191) index="2" unique_id=1677449161]
+[node name="IndexTipAttachment" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" index="2" unique_id=1677449161]
 transform = Transform3D(0.91954595, -0.014892519, -0.39270008, -0.03211107, 0.99309224, -0.11285275, 0.39166808, 0.11638334, 0.9127157, -0.026100121, 0.042943064, -0.13161416)
 script = ExtResource("5_4i4c4")
 bone_name = "LeftIndexTip"
 metadata/_custom_type_script = "uid://xrt2eecske1"
 
-[node name="XRT2DirectMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/RightCollisionHand" parent_id_path=PackedInt32Array(1387237929, 709012286) index="0" unique_id=424588044]
+[node name="XRT2Teleport" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" index="3" unique_id=387802057]
+transform = Transform3D(0.99500257, -0.0035018958, 0.09978712, -0.003500683, 0.99754673, 0.069914035, -0.09978719, -0.069914, 0.99254906, -0.0011376105, -0.0007457088, -0.022510625)
+script = ExtResource("9_6d2rb")
+collision_mask = 3
+bone_name = "LeftMiddleMetacarpal"
+position_offset = Vector3(0.03, 0, -0.06)
+metadata/_custom_type_script = "uid://xrt2apc5enq"
+
+[node name="StrafeMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/RightCollisionHand" parent_id_path=PackedInt32Array(1387237929, 709012286) index="0" unique_id=424588044]
 script = ExtResource("3_7f0s7")
 movement_action = "move"
 rotation_speed = 0.0

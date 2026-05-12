@@ -14,7 +14,7 @@ func picked_up(by: XRT2Pickup):
 	var parent: RigidBody3D = get_parent()
 	if xr_col_hand and parent:
 		# Add the door as a collision exception as well
-		XRT2Helper.add_collision_exception(xr_col_hand, parent)
+		XRT2.add_collision_exception(xr_col_hand, parent)
 
 
 func dropped(by: XRT2Pickup):
@@ -24,7 +24,7 @@ func dropped(by: XRT2Pickup):
 	var parent: RigidBody3D = get_parent()
 	if xr_col_hand and parent:
 		# Remove the door as a collision exception
-		XRT2Helper.remove_collision_exception(xr_col_hand, parent)
+		XRT2.remove_collision_exception(xr_col_hand, parent)
 
 
 func _xr_custom_pickup_handler(pickup: XRT2Pickup, delta: float, controller_target: Transform3D, _global_target: Transform3D) -> bool:
@@ -33,9 +33,9 @@ func _xr_custom_pickup_handler(pickup: XRT2Pickup, delta: float, controller_targ
 		return true
 
 	var parent_t = parent.global_transform
-	var len = parent.angular_velocity.length()
-	if len > 0.001:
-		parent_t.basis = Basis(parent.angular_velocity / len, len * delta) * parent_t.basis
+	var v_len = parent.angular_velocity.length()
+	if v_len > 0.001:
+		parent_t.basis = Basis(parent.angular_velocity / v_len, v_len * delta) * parent_t.basis
 
 	var local_position = ((parent_t * start_transform).inverse() * (controller_target * pickup.transform)).origin
 	local_position.z = local_position.z - 0.065 # Z position of Left/RightGrabPoint
