@@ -53,9 +53,9 @@ For now check out [the demo branch](https://github.com/BastiaanOlij/godot-xr-too
 > **WARNING** At this point in time there are no stable releases of this plugin yet.
 > Some of the information presented below only applies once a stable release is available.
 
-### Godot Asset Library
+### Godot Asset Store
 
-Stable releases of this plugin can be found in the Godot Asset Library which is accessible from inside of the Godot IDE.
+Stable releases of this plugin can be found in the Godot Asset Store which is accessible from inside of the Godot IDE.
 Simply search for `Godot XR Tools 2`, download the plugin and install it.
 
 ### GIT
@@ -76,6 +76,11 @@ If you require a specific version of this plugin, cd into the `godot-xr-tools2` 
 You can download a stable release from the releases page or use the download option in the `<> Code` dropdown menu on the main Github page.
 
 Manually create the `addons/godot-xr-tools2` folder in your project and unzip the contents of Godot XR Tools 2 into that folder. 
+
+### Enabling the plugin
+
+Note that you can enable this plugin from within the project settings window after installing it.
+While care is taken that the functionality within this plugin will work even when not enabled, enabling the plugin will activate various editor features.
 
 ## Upgrading from Godot XR Tools v1
 
