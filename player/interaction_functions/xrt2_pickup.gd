@@ -280,6 +280,11 @@ func pickup_object(object : GrabObject):
 	# No longer show highlighted
 	_remove_highlight(object.body)
 
+	# Check if attached to snapzone
+	var snap_zone: XRT2SnapZone = XRT2SnapZone.captured_by(object.body)
+	if snap_zone:
+		snap_zone.release_captured_body()
+
 	var other: XRT2Pickup = picked_up_by(object.body)
 	if other:
 		# We are secondary
@@ -825,6 +830,14 @@ func _handle_picked_up_dynamic(delta: float, controller_target: Transform3D, glo
 			parent_angular_velocity = XRT2.rotation_to_axis_angle(_was_player_basis, _xr_player_object.basis) / delta
 			_was_player_basis = _xr_player_object.basis
 
+	# See if our picked up object is close to a snapzone
+	var closest_factor: float = 0.0
+	var closest_offset: Transform3D
+	var closest_snap_zone: XRT2SnapZone = XRT2SnapZone.closest_to(_picked_up)
+	if closest_snap_zone:
+		closest_offset = closest_snap_zone.get_closest_offset(true)
+		closest_factor = clamp(1.5 - ((global_target.origin - closest_offset.origin).length() / closest_snap_zone.radius), 0.0, 1.0)
+
 	if _is_primary:
 		# Find the other hand with which we are holding this object (if any).
 		# Note: If we're somehow holding an object with more than 2 hands,
@@ -857,12 +870,20 @@ func _handle_picked_up_dynamic(delta: float, controller_target: Transform3D, glo
 				# If we're pivoting on primary, adjust our target position accordingly.
 				global_target.origin = controller_target.origin - (global_target.basis * _grab_offset.origin)
 
+		# If we're close to a snap zone, slerp!
+		if closest_snap_zone:
+			global_target.basis = global_target.basis.orthonormalized().slerp(closest_offset.basis, closest_factor)
+
 		# Apply angular motion to picked up object.
 		# We always do this on primary only!
 		XRT2.apply_torque_to_target(
 			delta, _picked_up, global_target.basis, primary_factor,
 			parent_angular_velocity, parent_global_basis
 		)
+
+	# If we're close to a snap zone, lerp!
+	if closest_snap_zone:
+		global_target.origin = global_target.origin.lerp(closest_offset.origin, closest_factor)
 
 	if not _pivot_on_primary:
 		# If we're holding this with multiple hands, we apply proportionally.
