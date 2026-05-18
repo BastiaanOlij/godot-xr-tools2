@@ -27,6 +27,10 @@ window/size/viewport_height=1080
 window/size/viewport_width.minimum_spectator=512
 window/size/viewport_height.minimum_spectator=512
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot-xr-tools2/plugin.cfg")
+
 [filesystem]
 
 import/blender/enabled=false

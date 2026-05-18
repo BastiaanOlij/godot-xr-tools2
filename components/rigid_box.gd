@@ -23,6 +23,7 @@ func _update_size():
 	$LeftGrabPoint.position.x = -(size.x * 0.5 + 0.035)
 	$LeftGrabPoint.position.y = size.y * 0.5 - 0.04
 	$LeftGrabPoint.position.z = -size.z * 0.5 + 0.11
+	$SnapPoint.position.y = -size.y * 0.5
 
 
 func _update_color():
