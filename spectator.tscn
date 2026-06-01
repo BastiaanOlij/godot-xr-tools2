@@ -29,8 +29,10 @@ popup/item_1/id = 1
 
 [node name="Xrt2SpectatorCamera" parent="." unique_id=717676012 instance=ExtResource("2_hkn0h")]
 transform = Transform3D(-0.772577, 0.013742587, -0.63477176, 0.0022893846, 0.99981976, 0.018859178, 0.63491595, 0.013116851, -0.7724695, 1.7248286, 1.9712102, -2.462911)
+cull_mask = 13
 
 [node name="Xrt2StabilizedCamera" parent="." unique_id=787561721 instance=ExtResource("5_v5hs0")]
+cull_mask = 11
 
 [node name="HMDViewport" type="SubViewport" parent="." unique_id=642626542]
 msaa_3d = 1

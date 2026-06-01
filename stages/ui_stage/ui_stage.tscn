@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://d33isoydvxjq1"]
+
+[ext_resource type="Script" uid="uid://corbfkw1bhm3h" path="res://stages/ui_stage/ui_stage.gd" id="1_if21b"]
+[ext_resource type="PackedScene" uid="uid://xrt2qimm3dy" path="res://addons/godot-xr-tools2/prefabs/xrt2_character_body_3d.tscn" id="2_mf3xh"]
+[ext_resource type="PackedScene" uid="uid://c4i8jlsh78qrj" path="res://stages/ui_stage/world.tscn" id="2_n5r0p"]
+[ext_resource type="Script" uid="uid://xrt2cl3xuef" path="res://addons/godot-xr-tools2/player/interaction_functions/xrt2_pointer.gd" id="3_mf3xh"]
+[ext_resource type="PackedScene" uid="uid://cqxqi2xmp28v7" path="res://components/portal/portal.tscn" id="5_5h88j"]
+[ext_resource type="Script" uid="uid://xrt2ebknph2" path="res://addons/godot-xr-tools2/player/movement_providers/xrt2_direct_movement.gd" id="5_s2wix"]
+
+[node name="UiStage" type="Node3D" unique_id=450435196]
+script = ExtResource("1_if21b")
+
+[node name="World" parent="." unique_id=1235541039 instance=ExtResource("2_n5r0p")]
+
+[node name="XRT2CharacterBody3D" parent="." unique_id=795871005 instance=ExtResource("2_mf3xh")]
+
+[node name="XRT2Pointer" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" parent_id_path=PackedInt32Array(795871005, 360497191) index="0" unique_id=1643616718]
+transform = Transform3D(0.99500257, -0.0035018958, 0.09978712, -0.003500683, 0.99754673, 0.069914035, -0.09978719, -0.069914, 0.99254906, -0.0011376105, -0.0007457088, -0.022510625)
+script = ExtResource("3_mf3xh")
+bone_name = "LeftMiddleMetacarpal"
+position_offset = Vector3(0.03, 0, -0.06)
+metadata/_custom_type_script = "uid://xrt2cl3xuef"
+
+[node name="TurnMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" parent_id_path=PackedInt32Array(795871005, 360497191) index="1" unique_id=1797746029]
+script = ExtResource("5_s2wix")
+movement_action = "move"
+forward_movement_speed = 0.0
+metadata/_custom_type_script = "uid://xrt2ebknph2"
+
+[node name="XRT2Pointer" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/RightCollisionHand" parent_id_path=PackedInt32Array(795871005, 709012286) index="0" unique_id=1596685302]
+transform = Transform3D(0.99500257, 0.0035019002, -0.09978717, 0.003500686, 0.99754673, 0.06991408, 0.099787235, -0.06991404, 0.99254906, 0.0011376143, -0.00074571115, -0.022510625)
+script = ExtResource("3_mf3xh")
+bone_name = "RightMiddleMetacarpal"
+position_offset = Vector3(-0.03, 0, -0.06)
+metadata/_custom_type_script = "uid://xrt2cl3xuef"
+
+[node name="StrafeMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/RightCollisionHand" parent_id_path=PackedInt32Array(795871005, 709012286) index="1" unique_id=1314741855]
+script = ExtResource("5_s2wix")
+movement_action = "move"
+rotation_speed = 0.0
+strafe_movement_speed = 3.0
+metadata/_custom_type_script = "uid://xrt2ebknph2"
+
+[node name="Portal" parent="." unique_id=1194426731 instance=ExtResource("5_5h88j")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 3.3311064, 0, -1.551635)
+title = "Home"
+
+[connection signal="button_pressed" from="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" to="." method="_on_left_collision_hand_button_pressed"]
+[connection signal="input_float_changed" from="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" to="." method="_on_left_collision_hand_input_float_changed"]
+[connection signal="button_pressed" from="XRT2CharacterBody3D/XROrigin3D/RightCollisionHand" to="." method="_on_right_collision_hand_button_pressed"]
+[connection signal="input_float_changed" from="XRT2CharacterBody3D/XROrigin3D/RightCollisionHand" to="." method="_on_right_collision_hand_input_float_changed"]
+
+[editable path="XRT2CharacterBody3D"]

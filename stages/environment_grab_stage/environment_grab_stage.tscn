@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://cu5hgmaubvnnn"]
+
+[ext_resource type="Script" uid="uid://cgdo4yukg2244" path="res://stages/environment_grab_stage/environment_grab_stage.gd" id="1_crqwv"]
+[ext_resource type="PackedScene" uid="uid://y538oanold7q" path="res://components/holodeck/holodeck.tscn" id="2_rq1lg"]
+[ext_resource type="Script" uid="uid://xrt2ebmt58c" path="res://addons/godot-xr-tools2/hands/xrt2_collision_hand.gd" id="3_jjrpx"]
+[ext_resource type="Script" uid="uid://xrt23qrb4js" path="res://addons/godot-xr-tools2/player/interaction_functions/xrt2_pickup.gd" id="4_8bnho"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_nrnr8"]
+radius = 0.3
+height = 1.0
+
+[node name="EnvironmentGrabStage" type="Node3D" unique_id=1099619205]
+script = ExtResource("1_crqwv")
+
+[node name="Holodeck" parent="." unique_id=1211455787 instance=ExtResource("2_rq1lg")]
+
+[node name="RigidBody3D" type="RigidBody3D" parent="." unique_id=64300215]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D" unique_id=1703850251]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("CapsuleShape3D_nrnr8")
+
+[node name="XROrigin3D" type="XROrigin3D" parent="RigidBody3D" unique_id=1333112143]
+
+[node name="XRCamera3D" type="XRCamera3D" parent="RigidBody3D/XROrigin3D" unique_id=1032042419]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="LeftHand" type="RigidBody3D" parent="RigidBody3D/XROrigin3D" unique_id=1728342670]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.5, -0.5)
+script = ExtResource("3_jjrpx")
+metadata/_custom_type_script = "uid://xrt2ebmt58c"
+
+[node name="XRT2Pickup" type="Node3D" parent="RigidBody3D/XROrigin3D/LeftHand" unique_id=44415845]
+transform = Transform3D(0.99500257, -0.0035018958, 0.09978712, -0.003500683, 0.99754673, 0.069914035, -0.09978719, -0.069914, 0.99254906, -0.02500046, 0.003554154, 0.040035933)
+script = ExtResource("4_8bnho")
+metadata/_custom_type_script = "uid://xrt23qrb4js"
+
+[node name="RightHand" type="RigidBody3D" parent="RigidBody3D/XROrigin3D" unique_id=1760108581]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.5, -0.5)
+script = ExtResource("3_jjrpx")
+hand = 1
+metadata/_custom_type_script = "uid://xrt2ebmt58c"
+
+[node name="XRT2Pickup" type="Node3D" parent="RigidBody3D/XROrigin3D/RightHand" unique_id=350297845]
+transform = Transform3D(0.99500257, 0.0035019002, -0.09978717, 0.003500686, 0.99754673, 0.06991408, 0.099787235, -0.06991404, 0.99254906, 0.02500046, 0.003554154, 0.040035933)
+script = ExtResource("4_8bnho")
+metadata/_custom_type_script = "uid://xrt23qrb4js"

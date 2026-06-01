@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://b5seoofkx2xpn"]
+
+[ext_resource type="Script" uid="uid://xrt2fjescsu" path="res://addons/godot-xr-tools2/staging/base_stages/xrt2_stage_base.gd" id="1_vqw5o"]
+[ext_resource type="PackedScene" uid="uid://xrt2qimm3dy" path="res://addons/godot-xr-tools2/prefabs/xrt2_character_body_3d.tscn" id="2_bb573"]
+[ext_resource type="Script" uid="uid://xrt2ebknph2" path="res://addons/godot-xr-tools2/player/movement_providers/xrt2_direct_movement.gd" id="3_7aybs"]
+[ext_resource type="Script" uid="uid://xrt23qrb4js" path="res://addons/godot-xr-tools2/player/interaction_functions/xrt2_pickup.gd" id="4_rayd5"]
+[ext_resource type="PackedScene" uid="uid://cywcy5w53kcp8" path="res://stages/climbing_stage/climbing_room.tscn" id="5_cgxmv"]
+[ext_resource type="PackedScene" uid="uid://cqxqi2xmp28v7" path="res://components/portal/portal.tscn" id="6_vqw5o"]
+
+[node name="ClimbingStage" type="Node3D" unique_id=971772542]
+script = ExtResource("1_vqw5o")
+
+[node name="XRT2CharacterBody3D" parent="." unique_id=795871005 instance=ExtResource("2_bb573")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1, 0, 4.371139e-08)
+
+[node name="TurnMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" parent_id_path=PackedInt32Array(795871005, 360497191) index="0" unique_id=2081252770]
+script = ExtResource("3_7aybs")
+movement_action = "move"
+forward_movement_speed = 0.0
+metadata/_custom_type_script = "uid://xrt2ebknph2"
+
+[node name="XRT2Pickup" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" parent_id_path=PackedInt32Array(795871005, 360497191) index="1" unique_id=1864264001]
+transform = Transform3D(0.99500257, -0.0035018958, 0.09978712, -0.003500683, 0.99754673, 0.069914035, -0.09978719, -0.069914, 0.99254906, -0.02500046, 0.003554154, 0.040035933)
+script = ExtResource("4_rayd5")
+metadata/_custom_type_script = "uid://xrt23qrb4js"
+
+[node name="StrafeMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/RightCollisionHand" parent_id_path=PackedInt32Array(795871005, 709012286) index="0" unique_id=46491692]
+script = ExtResource("3_7aybs")
+movement_action = "move"
+rotation_speed = 0.0
+strafe_movement_speed = 3.0
+metadata/_custom_type_script = "uid://xrt2ebknph2"
+
+[node name="XRT2Pickup" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/RightCollisionHand" parent_id_path=PackedInt32Array(795871005, 709012286) index="1" unique_id=1214556484]
+transform = Transform3D(0.99500257, 0.0035019002, -0.09978717, 0.003500686, 0.99754673, 0.06991408, 0.099787235, -0.06991404, 0.99254906, 0.02500046, 0.003554154, 0.040035933)
+script = ExtResource("4_rayd5")
+metadata/_custom_type_script = "uid://xrt23qrb4js"
+
+[node name="ClimbingRoom" parent="." unique_id=906329658 instance=ExtResource("5_cgxmv")]
+
+[node name="Portal" parent="." unique_id=1194426731 instance=ExtResource("6_vqw5o")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 9.33076, 0, 4.0786048e-07)
+title = "Home"
+
+[editable path="XRT2CharacterBody3D"]

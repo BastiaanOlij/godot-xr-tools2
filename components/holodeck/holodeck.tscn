@@ -1,0 +1,77 @@
+[gd_scene format=3 uid="uid://y538oanold7q"]
+
+[ext_resource type="Shader" uid="uid://btm7aux51urt2" path="res://materials_and_shaders/unshaded_textured.gdshader" id="1_016x1"]
+[ext_resource type="Texture2D" uid="uid://coleqjn6t2dg4" path="res://assets/main/arcade_floor_baseColor.png" id="2_bskf2"]
+[ext_resource type="PackedScene" uid="uid://htnl5c7rhyve" path="res://components/holodeck/holodeck_wall.tscn" id="3_bskf2"]
+[ext_resource type="Script" uid="uid://b68rrwdd4s7ii" path="res://components/portal/portal_probe.gd" id="5_vru0d"]
+[ext_resource type="Texture2D" uid="uid://bwia066ggdfce" path="res://assets/main/grid_glow.png" id="5_wnwie"]
+
+[sub_resource type="Environment" id="Environment_016x1"]
+background_mode = 1
+ambient_light_source = 2
+ambient_light_color = Color(0.19434929, 0.19434926, 0.19434926, 1)
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_smtut"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vru0d"]
+render_priority = 0
+shader = ExtResource("1_016x1")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/texture_albedo = ExtResource("2_bskf2")
+shader_parameter/strength = 1.0000000149012
+shader_parameter/uv1_scale = Vector2(20, 20)
+shader_parameter/uv1_offset = Vector2(0, 0)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_cnudb"]
+size = Vector2(50, 50)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_uqx4j"]
+render_priority = 0
+shader = ExtResource("1_016x1")
+shader_parameter/albedo = Color(1, 1, 0, 1)
+shader_parameter/texture_albedo = ExtResource("5_wnwie")
+shader_parameter/strength = 3.0000000447036
+shader_parameter/uv1_scale = Vector2(100, 100)
+shader_parameter/uv1_offset = Vector2(0, 0)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_wuyi0"]
+size = Vector2(50, 50)
+
+[node name="Holodeck" type="Node3D" unique_id=1211455787]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1481155374]
+environment = SubResource("Environment_016x1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1921971495]
+transform = Transform3D(1, 0, 0, 0, 0.83192503, 0.554888, 0, -0.554888, 0.83192503, 0, 0.951337, 0)
+
+[node name="Floor" type="StaticBody3D" parent="." unique_id=1469736620]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=246566265]
+shape = SubResource("WorldBoundaryShape3D_smtut")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" unique_id=1008869942]
+material_override = SubResource("ShaderMaterial_vru0d")
+mesh = SubResource("PlaneMesh_cnudb")
+
+[node name="Wall01" parent="." unique_id=1012672233 instance=ExtResource("3_bskf2")]
+
+[node name="Wall02" parent="." unique_id=1779455882 instance=ExtResource("3_bskf2")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+
+[node name="Wall03" parent="." unique_id=325416256 instance=ExtResource("3_bskf2")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+
+[node name="Wall04" parent="." unique_id=834223269 instance=ExtResource("3_bskf2")]
+transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 0, 0, 0)
+
+[node name="Ceiling" type="MeshInstance3D" parent="." unique_id=1560922219]
+transform = Transform3D(-1, 8.742278e-08, 0, -8.742278e-08, -1, 0, 0, 0, 1, 0, 10, 0)
+material_override = SubResource("ShaderMaterial_uqx4j")
+mesh = SubResource("PlaneMesh_wuyi0")
+
+[node name="PortalProbe" type="Node3D" parent="." unique_id=1991470024]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+script = ExtResource("5_vru0d")
+probe_image = "res://stages/menu_stage/portal_image.png"
+base_size = Vector2i(1024, 1024)

@@ -1,0 +1,124 @@
+[gd_scene format=3 uid="uid://c4i8jlsh78qrj"]
+
+[ext_resource type="Shader" uid="uid://hy6wp5qwpmjk" path="res://materials_and_shaders/textured.gdshader" id="1_uc726"]
+[ext_resource type="Texture2D" uid="uid://coleqjn6t2dg4" path="res://assets/main/arcade_floor_baseColor.png" id="2_vb2dc"]
+[ext_resource type="Script" uid="uid://b68rrwdd4s7ii" path="res://components/portal/portal_probe.gd" id="3_axfp1"]
+[ext_resource type="Shader" uid="uid://xrt2oqik7ik" path="res://addons/godot-xr-tools2/shaders/shaded_no_alpha.gdshader" id="4_slxw2"]
+[ext_resource type="Script" uid="uid://xrt2pss26pe" path="res://addons/godot-xr-tools2/components/ui/xrt2_ui_2d_in_3d.gd" id="5_hc4p6"]
+[ext_resource type="Script" uid="uid://xrt26qvygkp" path="res://addons/godot-xr-tools2/components/xrt2_frame_limited_sub_viewport.gd" id="6_tm1qv"]
+[ext_resource type="PackedScene" uid="uid://bqenuisgqnt00" path="res://stages/ui_stage/game_2d.tscn" id="7_ogk68"]
+
+[sub_resource type="Environment" id="Environment_if21b"]
+background_mode = 1
+ambient_light_source = 2
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_66j0e"]
+render_priority = 0
+shader = ExtResource("1_uc726")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/texture_albedo = ExtResource("2_vb2dc")
+shader_parameter/roughness = 1.0
+shader_parameter/specular = 0.5
+shader_parameter/metallic = 0.0
+shader_parameter/uv1_scale = Vector3(5, 5, 5)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_q7tcf"]
+material = SubResource("ShaderMaterial_66j0e")
+size = Vector2(20, 20)
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_s2wix"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_s2wix"]
+render_priority = 0
+shader = ExtResource("4_slxw2")
+shader_parameter/albedo = Color(0, 0, 0, 1)
+shader_parameter/metallic = 0.0
+shader_parameter/roughness = 1.0
+shader_parameter/specular = 0.5
+
+[node name="World" type="Node3D" unique_id=1235541039]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2080338763]
+environment = SubResource("Environment_if21b")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1210371284]
+visible = false
+
+[node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=28853192]
+transform = Transform3D(1, 0, 0, 0, 0.702327, 0.71185446, 0, -0.71185446, 0.702327, 0, 2.8100655, -0.33029905)
+spot_range = 13.272
+spot_angle = 75.0
+
+[node name="Floor" type="StaticBody3D" parent="." unique_id=1146109983]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" unique_id=1097026055]
+mesh = SubResource("PlaneMesh_q7tcf")
+skeleton = NodePath("../../GameCabinet")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=1440896897]
+shape = SubResource("WorldBoundaryShape3D_s2wix")
+
+[node name="GameCabinet" type="Node3D" parent="." unique_id=1180466474]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
+
+[node name="Shell" type="CSGCombiner3D" parent="GameCabinet" unique_id=1941317876]
+use_collision = true
+collision_layer = 2
+
+[node name="LeftSide" type="CSGPolygon3D" parent="GameCabinet/Shell" unique_id=1225034413]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -0.45, 0, 0)
+polygon = PackedVector2Array(-0.3, 0, -0.3, 0.8, -0.5, 1, -0.3, 2, 0.4, 1.9, 0.5, 0)
+depth = 0.05
+
+[node name="RightSide" type="CSGPolygon3D" parent="GameCabinet/Shell" unique_id=552043583]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.5, 0, 0)
+polygon = PackedVector2Array(-0.3, 0, -0.3, 0.8, -0.5, 1, -0.3, 2, 0.4, 1.9, 0.5, 0)
+depth = 0.05
+
+[node name="Back" type="CSGBox3D" parent="GameCabinet/Shell" unique_id=1315842291]
+transform = Transform3D(1, 0, 0, 0, 0.9991221, -0.04189309, 0, 0.04189309, 0.9991221, 0, 0.95, -0.362)
+size = Vector3(0.95, 1.9, 0.05)
+
+[node name="Front" type="CSGBox3D" parent="GameCabinet/Shell" unique_id=281035272]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0.259)
+size = Vector3(0.95, 0.8, 0.05)
+
+[node name="Shelf" type="CSGPolygon3D" parent="GameCabinet/Shell" unique_id=182200873]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.45, 0.8, 0)
+polygon = PackedVector2Array(-0.29, 0, -0.49, 0.2, 0.35, 0.2, 0.35, 0)
+depth = 0.9
+
+[node name="Top" type="CSGPolygon3D" parent="GameCabinet/Shell" unique_id=1368279745]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.45, 1.7, 0)
+polygon = PackedVector2Array(-0.35, 0, -0.29, 0.28, 0.3, 0.195, 0.4, 0)
+depth = 0.9
+
+[node name="MonitorBack" type="CSGBox3D" parent="GameCabinet/Shell" unique_id=1868558402]
+transform = Transform3D(1, 0, 0, 0, 0.9764506, 0.21574093, 0, -0.21574093, 0.9764506, 0, 1.3574113, 0.18692136)
+size = Vector3(0.9, 0.8, 0.1)
+material = SubResource("ShaderMaterial_s2wix")
+
+[node name="XRT2UI2Din3D" type="Node3D" parent="GameCabinet" unique_id=671888380 node_paths=PackedStringArray("display_viewport")]
+transform = Transform3D(1, 0, 0, 0, 0.9764506, 0.21574093, 0, -0.21574093, 0.9764506, 0, 1.3574113, 0.24016392)
+script = ExtResource("5_hc4p6")
+display_size = Vector2(0.8, 0.6)
+display_viewport = NodePath("XRT2FrameLimitedSubViewport")
+metadata/_custom_type_script = "uid://xrt2pss26pe"
+
+[node name="XRT2FrameLimitedSubViewport" type="SubViewport" parent="GameCabinet/XRT2UI2Din3D" unique_id=1121087139]
+size = Vector2i(800, 600)
+render_target_update_mode = 1
+script = ExtResource("6_tm1qv")
+target_fps = -1
+metadata/_custom_type_script = "uid://xrt26qvygkp"
+
+[node name="Game2D" parent="GameCabinet/XRT2UI2Din3D/XRT2FrameLimitedSubViewport" unique_id=2044165349 instance=ExtResource("7_ogk68")]
+
+[node name="PortalProbe3D" type="Node3D" parent="." unique_id=1751088348]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 1)
+script = ExtResource("3_axfp1")
+probe_image = "res://stages/ui_stage/portal_image.png"
+base_size = Vector2i(1024, 1024)
+metadata/_custom_type_script = "uid://b68rrwdd4s7ii"
