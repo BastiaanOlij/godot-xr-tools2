@@ -1,0 +1,135 @@
+[gd_scene format=3 uid="uid://cqxqi2xmp28v7"]
+
+[ext_resource type="Script" uid="uid://f7nst6wpdysn" path="res://components/portal/portal.gd" id="1_73rxi"]
+[ext_resource type="Texture2D" uid="uid://bgbyp7ugnceub" path="res://stages/menu_stage/portal_image.png" id="2_ihjj7"]
+[ext_resource type="Shader" uid="uid://duxqjuexe8pjc" path="res://materials_and_shaders/portal.gdshader" id="3_ihjj7"]
+
+[sub_resource type="Curve3D" id="Curve3D_73rxi"]
+bake_interval = 0.01
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0.1, 0, -2, 2, 0, -0.1, 0, 0, 0, 0, 0, -1.75, 2.25, 0, 0, 0, 0, 0.1, 0, 0, 1.75, 2.25, 0, 0, 0.1, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_73rxi"]
+viewport_path = NodePath("Title/SubViewport")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ihjj7"]
+resource_local_to_scene = true
+shading_mode = 0
+albedo_texture = SubResource("ViewportTexture_73rxi")
+
+[sub_resource type="QuadMesh" id="QuadMesh_fy5ys"]
+size = Vector2(2.048, 0.256)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ihjj7"]
+size = Vector3(1, 2, 0.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_73rxi"]
+render_priority = 1
+shading_mode = 0
+stencil_mode = 3
+stencil_flags = 2
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ihjj7"]
+orientation = 2
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ihjj7"]
+resource_local_to_scene = true
+render_priority = 2
+shader = ExtResource("3_ihjj7")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/albedo_texture = ExtResource("2_ihjj7")
+shader_parameter/uv1_scale = Vector2(1, 1)
+shader_parameter/uv1_offset = Vector2(0, 0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_n0kdf"]
+flip_faces = true
+size = Vector3(15, 15, 15)
+
+[node name="Portal" type="Node3D" unique_id=1194426731]
+script = ExtResource("1_73rxi")
+portal_image = ExtResource("2_ihjj7")
+
+[node name="Arch" type="CSGPolygon3D" parent="." unique_id=1113633119]
+use_collision = true
+polygon = PackedVector2Array(-0.997, -0.097, -1, -0.09, -1, -0.06, -0.997, -0.053, -0.99, -0.05, -0.8, -0.05, -0.8, 0.05, -0.99, 0.05, -0.997, 0.053, -1, 0.06, -1, 0.09, -0.997, 0.097, -0.99, 0.1, 0.19, 0.1, 0.2, 0.1, 0.2, 0.09, 0.2, -0.09, 0.2, -0.1, 0.19, -0.1, -0.99, -0.1)
+mode = 2
+path_node = NodePath("Path3D")
+path_interval_type = 0
+path_interval = 0.05
+path_simplify_angle = 5.0
+path_rotation = 2
+path_rotation_accurate = false
+path_local = true
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = false
+smooth_faces = true
+
+[node name="Path3D" type="Path3D" parent="Arch" unique_id=2113347340]
+curve = SubResource("Curve3D_73rxi")
+
+[node name="Back" type="CSGBox3D" parent="Arch" unique_id=325758978]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, -0.14)
+size = Vector3(3.9, 2.2, 0.1)
+
+[node name="Block" type="CSGPolygon3D" parent="Arch" unique_id=467463620]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0.8)
+polygon = PackedVector2Array(-1.03, -0.13, -1.5, 0.2, 1.5, 0.2, 1.03, -0.13)
+depth = 0.9
+
+[node name="Subtract" type="CSGBox3D" parent="Arch/Block" unique_id=774802599]
+operation = 2
+size = Vector3(2.048, 0.256, 0.4)
+
+[node name="LeftDoorHousing" type="CSGBox3D" parent="Arch" unique_id=1475622784]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.1, 0.1)
+size = Vector3(1, 2.2, 0.05)
+
+[node name="RightDoorHousing" type="CSGBox3D" parent="Arch" unique_id=1114255311]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1.1, 0.1)
+size = Vector3(1, 2.2, 0.05)
+
+[node name="Title" type="MeshInstance3D" parent="." unique_id=194847571]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.01, 0.78067774)
+material_override = SubResource("StandardMaterial3D_ihjj7")
+mesh = SubResource("QuadMesh_fy5ys")
+
+[node name="SubViewport" type="SubViewport" parent="Title" unique_id=891089692]
+disable_3d = true
+size = Vector2i(512, 64)
+render_target_update_mode = 1
+
+[node name="Label" type="Label" parent="Title/SubViewport" unique_id=1843428569]
+custom_minimum_size = Vector2(512, 64)
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_font_sizes/font_size = 36
+text = "Testing"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LeftDoor" type="MeshInstance3D" parent="." unique_id=145466550]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1, 0)
+mesh = SubResource("BoxMesh_ihjj7")
+
+[node name="RightDoor" type="MeshInstance3D" parent="." unique_id=1195877157]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1, 0)
+mesh = SubResource("BoxMesh_ihjj7")
+
+[node name="StencilDoorway" type="MeshInstance3D" parent="." unique_id=205210821]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_73rxi")
+mesh = SubResource("PlaneMesh_ihjj7")
+
+[node name="PortalImage" type="MeshInstance3D" parent="." unique_id=604441006]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0.5)
+layers = 2
+material_override = SubResource("ShaderMaterial_ihjj7")
+custom_aabb = AABB(-1.5, -1.5, -1.5, 3, 3, 3)
+mesh = SubResource("BoxMesh_n0kdf")
+skeleton = NodePath("../..")
+
+[node name="SlideSound" type="AudioStreamPlayer3D" parent="." unique_id=1545405173]
