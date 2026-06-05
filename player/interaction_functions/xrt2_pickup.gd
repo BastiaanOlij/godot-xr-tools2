@@ -777,8 +777,8 @@ func _get_closest() -> GrabObject:
 	if hand_normal.dot(result.normal) < 0.0:
 		return null
 
-	var collider: PhysicsBody3D = instance_from_id(result.collider_id)
-	if not collider:
+	var collider: Node3D = instance_from_id(result.collider_id)
+	if not collider or not collider is PhysicsBody3D:
 		return null
 
 	# Check if already picked up

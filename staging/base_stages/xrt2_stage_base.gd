@@ -60,6 +60,16 @@ var _camera : XRCamera3D
 # this worked in XR Tools 2 around centering the player
 
 #region Public functions
+## Find our ancestor stage
+static func get_stage(node: Node) -> XRT2StageBase:
+	var parent = node.get_parent()
+	while parent:
+		if parent is XRT2StageBase:
+			return parent
+		parent = parent.get_parent()
+
+	return null
+
 ## Make our origin and camera the current entries
 func make_current():
 	# Make our camera current
