@@ -1,0 +1,215 @@
+[gd_scene format=3 uid="uid://cywcy5w53kcp8"]
+
+[ext_resource type="PackedScene" uid="uid://s31714php54w" path="res://assets/climbing/climbing_building.glb" id="1_repvt"]
+[ext_resource type="LightmapGIData" uid="uid://drdnqdf2ygyho" path="res://stages/climbing_stage/climbing_stage.lmbake" id="2_6x35d"]
+[ext_resource type="PackedScene" uid="uid://cdsp0awdqvwc7" path="res://components/climbing/climbing_hold_green.tscn" id="3_na1fe"]
+[ext_resource type="PackedScene" uid="uid://cunilmctlx4pw" path="res://components/climbing/climbing_hold_purple.tscn" id="4_0ty7s"]
+[ext_resource type="Script" uid="uid://b68rrwdd4s7ii" path="res://components/portal/portal_probe.gd" id="5_0ty7s"]
+[ext_resource type="PackedScene" uid="uid://d4r1db8w75e7" path="res://components/climbing/climbing_hold_red.tscn" id="5_ohi6f"]
+[ext_resource type="PackedScene" uid="uid://3wtrtlg65e2a" path="res://components/climbing/climbing_hold_yellow.tscn" id="6_y80cs"]
+[ext_resource type="Script" uid="uid://115ev6r1w7a" path="res://components/climbing/climbing_hold_path.gd" id="7_1788w"]
+
+[sub_resource type="Environment" id="Environment_y80cs"]
+background_mode = 1
+ambient_light_source = 2
+ambient_light_color = Color(0.1584723, 0.15847233, 0.1584723, 1)
+
+[sub_resource type="Curve3D" id="Curve3D_1788w"]
+bake_interval = 0.1
+_data = {
+"points": PackedVector3Array(0.046601713, -0.9356663, 0, -0.046601713, 0.9356663, 0, 0.19973713, 1.3939033, 0.53062916, 0.0932121, -1.5790187, -0.0011451244, -0.0932121, 1.5790187, 0.0011451244, 0.013330281, 5.1365685, 0.53062916, 0.010849867, -1.5663935, 0.043563128, -0.010849867, 1.5663935, -0.043563128, -0.17311126, 7.709978, 0.53520966, -0.03576052, -0.9230411, 0.044708252, 0.03576052, 0.9230411, -0.044708252, -0.030069187, 11.402143, 0.35637665),
+"tilts": PackedFloat32Array(1.5707964, 1.5707964, 1.5972179, 0.1779348)
+}
+point_count = 4
+
+[sub_resource type="Curve3D" id="Curve3D_ytjjo"]
+bake_interval = 0.1
+_data = {
+"points": PackedVector3Array(0.24462572, -0.45989674, 0.015825272, -0.24462572, 0.45989674, -0.015825272, 0.25921273, 1.4925127, 0.57849026, 0.2555708, -1.0104042, 0.13500822, -0.2555708, 1.0104042, -0.13500822, -0.71929014, 3.3320997, 0.5151892, -0.2257443, -0.74803597, 0.06954229, 0.2257443, 0.74803597, -0.06954229, -0.76307046, 5.5341296, 0.038457394, -0.07380211, -0.98463833, 0.20035934, 0.07380211, 0.98463833, -0.20035934, 0.18368709, 6.3242435, 0.23702002, 0.12850016, -1.1676276, 0.34034204, -0.12850016, 1.1676276, -0.34034204, -0.467862, 9.472683, -0.76298, -0.03438711, -0.38051772, 0.090342045, 0.03438711, 0.38051772, -0.090342045, -0.33031356, 10.994754, -1.1243482),
+"tilts": PackedFloat32Array(1.5195172, 1.5195172, 1.7415022, 1.3906657, 1.6277964, 1.1665257)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_y80cs"]
+bake_interval = 0.1
+_data = {
+"points": PackedVector3Array(-0.02708143, -0.4280534, 0.038460135, 0.02708143, 0.4280534, -0.038460135, 0.13314581, 1.1396421, 0.87281466, 0.028572202, -0.93661654, 0.08036649, -0.028572202, 0.93661654, -0.08036649, 0.24147153, 2.8518558, 0.7189741, -0.04968673, -0.95637715, 0.22059536, 0.04968673, 0.95637715, -0.22059536, 0.018857002, 4.8861084, 0.5513487, 0.2515148, -0.78532267, 0.34188628, -0.2515148, 0.78532267, -0.34188628, 0.44021845, 6.6773643, -0.16340733, 0.2950809, -0.6081877, 0.3437673, -0.2950809, 0.6081877, -0.3437673, -0.98720217, 8.027399, -0.81619644, -0.08124709, -0.49573874, 0.3628034, 0.08124709, 0.49573874, -0.3628034, -0.74010515, 9.110115, -1.5384765, -0.007854581, -0.4106233, 0.34202808, 0.007854581, 0.4106233, -0.34202808, -0.6622138, 10.010354, -2.26741, 0.011618257, -0.18556356, 0.15979469, -0.011618257, 0.18556356, -0.15979469, -0.7086868, 10.752608, -2.9065888),
+"tilts": PackedFloat32Array(-2.5305896, -2.6213632, -2.5510635, -2.8618467, -2.8618467, -2.5250022, -2.5250022, -2.5250022)
+}
+point_count = 8
+
+[sub_resource type="Curve3D" id="Curve3D_m3n0q"]
+bake_interval = 0.1
+_data = {
+"points": PackedVector3Array(0.037194133, -0.40436202, 0.07461643, -0.037194133, 0.40436202, -0.07461643, 0.3558731, 1.4554629, 0.3474474, -0.012770772, -0.856025, 0.13538885, 0.012770772, 0.856025, -0.13538885, 0.20709658, 3.072911, 0.048981667, -0.5007659, -0.9881789, 0.27364933, 0.5007659, 0.9881789, -0.27364933, 0.4069562, 4.879563, -0.19410801, -0.7365693, -0.8349503, 0.16655314, 0.7365693, 0.8349503, -0.16655314, 2.2101603, 7.0256267, -1.0456157, -0.40727812, -0.5340835, 0.10961783, 0.40727812, 0.5340835, -0.10961783, 3.3532333, 8.219364, -0.86032057, -0.12748867, -0.41586852, 0.23496091, 0.12748867, 0.41586852, -0.23496091, 3.8392727, 9.161961, -1.484087, -0.014806926, -0.3573315, 0.12689757, 0.014806926, 0.3573315, -0.12689757, 3.863188, 9.882838, -1.8001642, -0.008828104, -0.1771121, 0.047878265, 0.008828104, 0.1771121, -0.047878265, 3.8985004, 10.591287, -1.9916773),
+"tilts": PackedFloat32Array(2.687428, 2.6874278, 2.5476103, 2.54744, 2.2954547, 2.2954547, 2.0186005, 2.0186577)
+}
+point_count = 8
+
+[sub_resource type="Curve3D" id="Curve3D_sj53h"]
+bake_interval = 0.1
+_data = {
+"points": PackedVector3Array(0.06492782, -0.725951, 0.16642427, -0.06492782, 0.725951, -0.16642427, 0.16415977, 1.1812804, 0.63132, 0.16033065, -1.1629968, 0.24163437, -0.16033065, 1.1629968, -0.24163437, -0.09555149, 4.0850844, -0.034377098, 0.24724877, -0.76931596, 0.20976472, -0.24724877, 0.76931596, -0.20976472, -0.47716284, 5.8332677, -0.33521748, 0.35253364, -0.5701324, 0.16427624, -0.35253364, 0.5701324, -0.16427624, -1.0845466, 7.1623483, -0.873436, 0.6013485, -0.93574154, 0.24006307, -0.6013485, 0.93574154, -0.24006307, -1.8872974, 8.113797, -0.99232244, 0.4006608, -0.6978793, 0.21034145, -0.4006608, 0.6978793, -0.21034145, -3.4899406, 10.905314, -1.8336883),
+"tilts": PackedFloat32Array(2.9457617, 2.9457617, 2.939022, -2.6253, -2.6253, -2.6530468)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_2e3px"]
+bake_interval = 0.1
+_data = {
+"points": PackedVector3Array(0.03342253, -0.79642487, 0.10001397, -0.03342253, 0.79642487, -0.10001397, -0.16377544, 1.3797393, 0.57101154, 0.22770667, -1.5819384, 0.25766182, -0.22770667, 1.5819384, -0.25766182, -0.29746556, 4.5654387, 0.17095566, 0.29117683, -1.105296, 0.30074906, -0.29117683, 1.105296, -0.30074906, -1.0746021, 7.707493, -0.45963573, 0.16967377, -0.49117994, 0.22305083, -0.16967377, 0.49117994, -0.22305083, -1.4621729, 8.986623, -1.0320406, 0.072781086, -0.17139745, 0.07994962, -0.072781086, 0.17139745, -0.07994962, -1.7532972, 9.672213, -1.3518391),
+"tilts": PackedFloat32Array(2.793008, 2.9794774, 2.6203, 2.6203, 2.6203)
+}
+point_count = 5
+
+[sub_resource type="Curve3D" id="Curve3D_vhnb5"]
+bake_interval = 0.1
+_data = {
+"points": PackedVector3Array(0.37875724, -0.59335744, 0.25, -0.37875724, 0.59335744, -0.25, -0.033132315, 1.2033585, -0.079117775, 0.5609791, -1.1776029, 0.5, -0.5609791, 1.1776029, -0.5, -1.5481613, 3.5767882, -1.0791178, 0.18222189, -0.5842455, 0.25, -0.18222189, 0.5842455, -0.25, -2.2770488, 5.91377, -2.0791178),
+"tilts": PackedFloat32Array(2.3089294, 2.0236814, 2.0236814)
+}
+point_count = 3
+
+[sub_resource type="Curve3D" id="Curve3D_1h505"]
+bake_interval = 0.1
+_data = {
+"points": PackedVector3Array(0.08664799, -0.3344226, 0.1135484, -0.08664799, 0.3344226, -0.1135484, 0.03156376, 0.29658937, -0.012083054, 0.27174568, -0.9012474, 0.3009228, -0.27174568, 0.9012474, -0.3009228, -0.3150282, 1.6342797, -0.46627665, 0.21899772, -0.9262763, 0.43737435, -0.21899772, 0.9262763, -0.43737435, -1.055419, 3.901579, -1.2157743, 0.033900023, -0.35945153, 0.24999994, -0.033900023, 0.35945153, -0.24999994, -1.191019, 5.339385, -2.215774),
+"tilts": PackedFloat32Array(2.5762713, 2.5945597, 2.443569, 2.3906415)
+}
+point_count = 4
+
+[sub_resource type="Curve3D" id="Curve3D_awjg2"]
+bake_interval = 0.1
+_data = {
+"points": PackedVector3Array(0.018097162, -0.45627463, 0.1239357, -0.018097162, 0.45627463, -0.1239357, -0.097436905, 0.30914545, 0.9544296, -0.07068777, -0.9254465, 0.29207373, 0.07068777, 0.9254465, -0.29207373, -0.16982555, 2.134244, 0.45868683, 0.01355207, -0.86072826, 0.29988384, -0.01355207, 0.86072826, -0.29988384, 0.18531418, 4.0109315, -0.21386528, 0.102337, -0.39155638, 0.13174582, -0.102337, 0.39155638, -0.13174582, -0.22403383, 5.577157, -0.74084854),
+"tilts": PackedFloat32Array(3.0016494, 3.0273578, 3.0273578, 3.0273578)
+}
+point_count = 4
+
+[sub_resource type="Curve3D" id="Curve3D_qlfx2"]
+bake_interval = 0.1
+_data = {
+"points": PackedVector3Array(-0.26873463, -0.65609413, 0.19843626, 0.26873463, 0.65609413, -0.19843626, 0.12537503, 1.2720659, 0.69412756, -0.105367005, -1.0973058, 0.3445536, 0.105367005, 1.0973058, -0.3445536, 1.2003136, 3.8964424, -0.09961748, 0.13907719, -0.8733692, 0.29495943, -0.13907719, 0.8733692, -0.29495943, 0.54684305, 5.661289, -0.6840868, 0.16296792, -0.8411391, 0.2849437, -0.16296792, 0.8411391, -0.2849437, 0.6440048, 7.3899193, -1.2794552, 0.14003873, -0.87925124, 0.3271889, -0.14003873, 0.87925124, -0.3271889, -0.10502863, 9.025846, -1.8238616, -0.047219634, -0.47026968, 0.1910873, 0.047219634, 0.47026968, -0.1910873, 0.08384991, 10.906924, -2.5882108),
+"tilts": PackedFloat32Array(-2.2515948, -2.2341795, -2.2341795, -2.2229648, -2.2229648, -2.0026982)
+}
+point_count = 6
+
+[sub_resource type="Curve3D" id="Curve3D_ofujs"]
+bake_interval = 0.1
+_data = {
+"points": PackedVector3Array(0.20702085, -0.5718486, 0.15458548, -0.20702085, 0.5718486, -0.15458548, 0.3925097, 1.2664154, 0.69565487, 0.20197582, -1.1260328, 0.3217609, -0.20197582, 1.1260328, -0.3217609, -0.4355737, 3.5538096, 0.07731295, -0.16630378, -1.0371736, 0.3374157, 0.16630378, 1.0371736, -0.3374157, -0.4153936, 5.7705464, -0.5913887, -0.18982166, -0.89354455, 0.30925536, 0.18982166, 0.89354455, -0.30925536, 0.22964144, 7.702504, -1.2723498, 0.0043414235, -0.809891, 0.15155482, -0.0043414235, 0.809891, -0.15155482, 0.34389305, 9.344725, -1.8284101, 0.032904327, -0.39933586, 0.012539744, -0.032904327, 0.39933586, -0.012539744, 0.21227574, 10.942068, -1.8785691),
+"tilts": PackedFloat32Array(2.257251, 2.257251, 2.3230565, 2.3198152, 2.204306, 2.6605868)
+}
+point_count = 6
+
+[node name="ClimbingRoom" type="Node3D" unique_id=906329658]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1559666147]
+environment = SubResource("Environment_y80cs")
+
+[node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=175041852]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 13.178057, -1.6709883e-07)
+light_bake_mode = 0
+light_cull_mask = 4293918721
+spot_range = 90.745
+spot_attenuation = 0.0
+spot_angle = 74.09
+
+[node name="climbing_building" parent="." unique_id=1155453210 instance=ExtResource("1_repvt")]
+
+[node name="LightmapGI" type="LightmapGI" parent="." unique_id=2024933137]
+layers = 8
+interior = true
+light_data = ExtResource("2_6x35d")
+
+[node name="ClimbHolds" type="Node3D" parent="." unique_id=1654156122]
+
+[node name="ClimbingHoldPath01" type="Path3D" parent="ClimbHolds" unique_id=847269077]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 6.469372)
+curve = SubResource("Curve3D_1788w")
+script = ExtResource("7_1788w")
+hand_hold_scene = ExtResource("3_na1fe")
+metadata/_custom_type_script = "uid://115ev6r1w7a"
+
+[node name="ClimbingHoldPath02" type="Path3D" parent="ClimbHolds" unique_id=25948047]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7974111, 0, 6.2880497)
+curve = SubResource("Curve3D_ytjjo")
+script = ExtResource("7_1788w")
+hand_hold_scene = ExtResource("6_y80cs")
+metadata/_custom_type_script = "uid://115ev6r1w7a"
+
+[node name="ClimbingHoldPath03" type="Path3D" parent="ClimbHolds" unique_id=1799674953]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -4.1699033, 0, 5.916889)
+curve = SubResource("Curve3D_y80cs")
+script = ExtResource("7_1788w")
+hand_hold_scene = ExtResource("5_ohi6f")
+ray_distance = 5.0
+
+[node name="ClimbingHoldPath04" type="Path3D" parent="ClimbHolds" unique_id=1601809460]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.1106157, 0, 6.383979)
+curve = SubResource("Curve3D_m3n0q")
+script = ExtResource("7_1788w")
+hand_hold_scene = ExtResource("3_na1fe")
+path_spacing = 0.3
+metadata/_custom_type_script = "uid://115ev6r1w7a"
+
+[node name="ClimbingHoldPath05" type="Path3D" parent="ClimbHolds" unique_id=1687503402]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -8.853538, 0, 5.244822)
+curve = SubResource("Curve3D_sj53h")
+script = ExtResource("7_1788w")
+hand_hold_scene = ExtResource("4_0ty7s")
+ray_distance = 5.0
+metadata/_custom_type_script = "uid://115ev6r1w7a"
+
+[node name="ClimbingHoldPath06" type="Path3D" parent="ClimbHolds" unique_id=1450576283]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -8.932936, 0, 3.124268)
+curve = SubResource("Curve3D_2e3px")
+script = ExtResource("7_1788w")
+hand_hold_scene = ExtResource("3_na1fe")
+metadata/_custom_type_script = "uid://115ev6r1w7a"
+
+[node name="ClimbingHoldPath07" type="Path3D" parent="ClimbHolds" unique_id=1138320742]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -8.932936, 0, -3.0949457)
+curve = SubResource("Curve3D_vhnb5")
+script = ExtResource("7_1788w")
+hand_hold_scene = ExtResource("5_ohi6f")
+path_spacing = 0.4
+metadata/_custom_type_script = "uid://115ev6r1w7a"
+
+[node name="ClimbingHoldPath08" type="Path3D" parent="ClimbHolds" unique_id=1592411615]
+transform = Transform3D(-1, 0, 5.9604645e-08, 0, 1, 3.7252903e-09, -2.9802322e-08, -3.7252903e-09, -1, -5.9147763, 5.4365788, -5.182971)
+curve = SubResource("Curve3D_1h505")
+script = ExtResource("7_1788w")
+hand_hold_scene = ExtResource("5_ohi6f")
+path_spacing = 0.4
+metadata/_custom_type_script = "uid://115ev6r1w7a"
+
+[node name="ClimbingHoldPath09" type="Path3D" parent="ClimbHolds" unique_id=1792720837]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -6.257, 0, -5.962)
+curve = SubResource("Curve3D_awjg2")
+script = ExtResource("7_1788w")
+hand_hold_scene = ExtResource("6_y80cs")
+path_spacing = 0.3
+metadata/_custom_type_script = "uid://115ev6r1w7a"
+
+[node name="ClimbingHoldPath10" type="Path3D" parent="ClimbHolds" unique_id=556894505]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -3.714182, 0, -5.962)
+curve = SubResource("Curve3D_qlfx2")
+script = ExtResource("7_1788w")
+hand_hold_scene = ExtResource("4_0ty7s")
+metadata/_custom_type_script = "uid://115ev6r1w7a"
+
+[node name="ClimbingHoldPath11" type="Path3D" parent="ClimbHolds" unique_id=1995640939]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -1.9847736, 0, -5.962)
+curve = SubResource("Curve3D_ofujs")
+script = ExtResource("7_1788w")
+hand_hold_scene = ExtResource("5_ohi6f")
+metadata/_custom_type_script = "uid://115ev6r1w7a"
+
+[node name="PortalProbe3D" type="Node3D" parent="." unique_id=825827703]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 3, 0)
+script = ExtResource("5_0ty7s")
+probe_image = "res://stages/climbing_stage/portal_image.png"
+base_size = Vector2i(1024, 1024)
+cull_mask = 9
+metadata/_custom_type_script = "uid://b68rrwdd4s7ii"

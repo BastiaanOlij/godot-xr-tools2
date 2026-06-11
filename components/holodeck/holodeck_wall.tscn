@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://htnl5c7rhyve"]
+
+[ext_resource type="Shader" uid="uid://btm7aux51urt2" path="res://materials_and_shaders/unshaded_textured.gdshader" id="1_nyqvq"]
+[ext_resource type="Texture2D" uid="uid://bwia066ggdfce" path="res://assets/main/grid_glow.png" id="2_7pjtn"]
+[ext_resource type="Shader" uid="uid://c3rgix4i72qln" path="res://materials_and_shaders/holodeck_bottom_wall.gdshader" id="3_7pjtn"]
+[ext_resource type="Texture2D" uid="uid://coleqjn6t2dg4" path="res://assets/main/arcade_floor_baseColor.png" id="4_nyqvq"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8xeuo"]
+size = Vector3(50, 10, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_016x1"]
+render_priority = 0
+shader = ExtResource("1_nyqvq")
+shader_parameter/albedo = Color(1, 1, 0, 1)
+shader_parameter/texture_albedo = ExtResource("2_7pjtn")
+shader_parameter/strength = 3.0000000447036
+shader_parameter/uv1_scale = Vector2(100, 16)
+shader_parameter/uv1_offset = Vector2(0, 0)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_8xeuo"]
+size = Vector2(50, 8)
+orientation = 2
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_npyrh"]
+render_priority = 0
+shader = ExtResource("3_7pjtn")
+shader_parameter/albedo = Color(1, 1, 0, 1)
+shader_parameter/texture_albedo = ExtResource("2_7pjtn")
+shader_parameter/texture_floor = ExtResource("4_nyqvq")
+shader_parameter/strength = 3.0000000447036
+shader_parameter/uv1_scale = Vector2(100, 4)
+shader_parameter/uv1_offset = Vector2(0, 0)
+shader_parameter/floor_scale = Vector2(20, 20)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_7pjtn"]
+size = Vector2(50, 2)
+orientation = 2
+
+[node name="Wall" type="StaticBody3D" unique_id=1012672233]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=215103475]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -25.5)
+shape = SubResource("BoxShape3D_8xeuo")
+
+[node name="TopWall" type="MeshInstance3D" parent="." unique_id=426926594]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, -25)
+material_override = SubResource("ShaderMaterial_016x1")
+mesh = SubResource("PlaneMesh_8xeuo")
+skeleton = NodePath("../..")
+
+[node name="BottomWall" type="MeshInstance3D" parent="." unique_id=390725272]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -25)
+material_override = SubResource("ShaderMaterial_npyrh")
+mesh = SubResource("PlaneMesh_7pjtn")
+skeleton = NodePath("../..")
