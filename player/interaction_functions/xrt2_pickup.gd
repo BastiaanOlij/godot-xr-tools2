@@ -665,6 +665,7 @@ func _physics_process(delta):
 	if not _grab_as_static_body and (_picked_up is RigidBody3D or _picked_up is PhysicalBone3D):
 		_handle_picked_up_dynamic(delta, controller_target, global_target)
 	elif _grab_as_static_body and _xr_player_object:
+		# Note, if we're using a locomotion handler, this is handled in `_process_locomotion`.
 		if not XRT2LocomotionHandler.get_locomotion_handler(_xr_player_object):
 			_handle_picked_up_static(delta, controller_target, global_target)
 
