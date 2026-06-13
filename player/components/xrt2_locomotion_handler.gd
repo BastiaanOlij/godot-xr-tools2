@@ -71,10 +71,14 @@ var _floor_friction_callbacks: Array[Callable]
 
 #region Public functions
 ## Returns the locomotion handler for this character body (null if none)
-static func get_locomotion_handler(for_character_body: CharacterBody3D) -> XRT2LocomotionHandler:
+static func get_locomotion_handler(for_node: Node3D) -> XRT2LocomotionHandler:
 	var locomotion_handle: XRT2LocomotionHandler
 
-	var handlers: Array[Node] = for_character_body.find_children("*", "XRT2LocomotionHandler", false)
+	# Locomotion handler is only for character bodies
+	if not for_node is CharacterBody3D:
+		return null
+
+	var handlers: Array[Node] = for_node.find_children("*", "XRT2LocomotionHandler", false)
 	if not handlers.is_empty():
 		# There should be only 1!
 		return handlers[0]
