@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# xrt2_2d_ui.gd
+# xrt2_frame_limited_sub_viewport.gd
 #-------------------------------------------------------------------------------
 # MIT License
 #
@@ -24,39 +24,64 @@
 # SOFTWARE.
 #-------------------------------------------------------------------------------
 
-
 @tool
-extends Node3D
+class_name XRT2FrameLimitedSubViewport
+extends SubViewport
 
-@export var screen_size : Vector2 = Vector2(1.0, 1.0):
+#region Export variables
+## Target FPS:[br]
+## Set to 0 to disable updates[br]
+## Set to -1 to always update[br]
+## This does not guarantee FPS
+@export_range(-1, 240, 1) var target_fps: int = 30:
 	set(value):
-		screen_size = value
+		target_fps = value
 		if is_inside_tree():
-			_update_screen_size()
+			render_target_update_mode = SubViewport.UPDATE_ONCE if target_fps >= 0 else SubViewport.UPDATE_ALWAYS
+#endregion
 
-# Node helpers
-@onready var _origin : Node3D = $FollowXROrigin3D
-@onready var _composition_layer : OpenXRCompositionLayerQuad = \
-	$FollowXROrigin3D/OpenXRCompositionLayerQuad
+#region Private variables
+var _time_passed: float = 0.0
+#endregion
 
-
-# Called when our screen size was changed
-func _update_screen_size() -> void:
-	_composition_layer.quad_size = screen_size
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	_update_screen_size()
+#region Private functions
+# Update our properties
+func _validate_property(property) -> void:
+	if property.name == "render_target_update_mode":
+		property.usage = PROPERTY_USAGE_NO_EDITOR
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta):
-	# Don't run in editor
+func _ready() -> void:
+	render_target_update_mode = SubViewport.UPDATE_ONCE if target_fps >= 0 else SubViewport.UPDATE_ALWAYS
+
+
+func _process(delta: float) -> void:
+	if target_fps == 0:
+		return
+
+	_time_passed += delta
+	var target_time = (1.0 / float(target_fps))
+	if _time_passed >= target_time:
+		render_target_update_mode = SubViewport.UPDATE_ONCE
+		_time_passed = fmod(0.0, target_time)
+
+
+# Pass through input events
+func _input(event):
 	if Engine.is_editor_hint():
 		return
 
-	# Need to reposition our quad so its local transform matches our world origin
-	# as it is rendered on our compositor
-	_origin.global_transform = XRServer.world_origin
-	_composition_layer.global_transform = global_transform
+	# For now we only forward key events.
+	if event is InputEventKey:
+		push_input(event)
+
+
+# Pass through input events
+func _unhandled_input(event):
+	if Engine.is_editor_hint():
+		return
+
+	# For now we only forward key events.
+	if event is InputEventKey:
+		push_input(event)
+#endregion

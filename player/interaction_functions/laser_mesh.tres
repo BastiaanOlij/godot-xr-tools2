@@ -1,0 +1,20 @@
+[gd_resource type="CylinderMesh" format=3 uid="uid://xrt2gae4i57"]
+
+[ext_resource type="Shader" uid="uid://xrt2083kp0a" path="res://addons/godot-xr-tools2/shaders/laser.gdshader" id="1_akutf"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tq5qc"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("1_akutf")
+shader_parameter/albedo = Color(0.46417773, 0.46671766, 0.93791705, 1)
+
+[resource]
+resource_local_to_scene = true
+material = SubResource("ShaderMaterial_tq5qc")
+top_radius = 0.0
+bottom_radius = 0.01
+height = 1.0
+radial_segments = 16
+rings = 1
+cap_top = false
+cap_bottom = false
