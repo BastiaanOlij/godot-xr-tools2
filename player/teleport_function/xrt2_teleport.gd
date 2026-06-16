@@ -303,6 +303,8 @@ func _get_configuration_warnings() -> PackedStringArray:
 # Update our properties
 func _validate_property(property):
 	super(property)
+
+	# We manage these so hide them.
 	if property.name in [ "bone_name", "position_offset", "rotation_offset" ]:
 		property.usage = PROPERTY_USAGE_NO_EDITOR
 

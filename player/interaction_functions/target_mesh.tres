@@ -1,0 +1,17 @@
+[gd_resource type="SphereMesh" format=3 uid="uid://xrt2ysawcr2"]
+
+[ext_resource type="Shader" uid="uid://xrt23qv3bw5" path="res://addons/godot-xr-tools2/shaders/unshaded_with_alpha.gdshader" id="1_rsqat"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vveqh"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("1_rsqat")
+shader_parameter/albedo = Color(0.46417773, 0.46671766, 0.93791705, 1)
+
+[resource]
+resource_local_to_scene = true
+material = SubResource("ShaderMaterial_vveqh")
+radius = 0.01
+height = 0.02
+radial_segments = 8
+rings = 4
