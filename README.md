@@ -1,15 +1,17 @@
 # Godot XR Tools v2 (XRT2)
 
-> [!WARNING]
-> This repo is still a Work in Progress, this toolkit is still missing many features from [Godot XR Tools v1](https://github.com/godotvr/godot-xr-tools) and is short on documentation.
-> If you've found yourself here early, be aware that things may and will drastically change as we deside the way forward.
-> You may find yourself having to make large changes to anything you build using the toolkit.
-> This is by no stretch of the imagination production ready.
-> If you're looking for a toolkit with which to release a game, you should use [Godot XR Tools v1](https://github.com/godotvr/godot-xr-tools).
+> [!IMPORTANT]
+> This toolkit is the spiritual successor to [Godot XR Tools](https://github.com/godotvr/godot-xr-tools) and still under active development moving towards a first release.
+> It does not have feature parity with XR Tools and likely won't until a few releases have been made. It also approaches a number of things structurally different from XR Tools.
+>
+> For this reason we've been discussing renaming this toolkit and that will be a **BREAKING** change.
+> If you're already experimenting with the new toolkit, you'll like need to do a bunch of renames in your project soon.
+>
+> This toolkit by no stretch of the imagination production ready, use at your own peril.
 > 
 > Check the demo branch for a demo showcasing current features.
 >
-> While under early development this repository is hosted on my personal GitHub space.
+> While under early development this repository is hosted on my personal GitHub space but it will soon move to the GodotVR repository.
 
 This repository contains a number of support files and support scenes that can be used together with the various AR and VR interfaces for the Godot game engine.
 
