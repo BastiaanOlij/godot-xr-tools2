@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://cmqxwa8s35g8c"]
+
+[ext_resource type="Shader" uid="uid://hy6wp5qwpmjk" path="res://materials_and_shaders/textured.gdshader" id="1_3njxa"]
+[ext_resource type="Texture2D" uid="uid://ds8hppgpq3pod" path="res://assets/main/pattern.png" id="2_cvor2"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_3njxa")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/texture_albedo = ExtResource("2_cvor2")
+shader_parameter/roughness = 1.0
+shader_parameter/specular = 0.5
+shader_parameter/metallic = 0.0
+shader_parameter/uv1_scale = Vector3(2, 2, 1)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)

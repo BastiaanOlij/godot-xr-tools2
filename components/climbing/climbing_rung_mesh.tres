@@ -1,0 +1,13 @@
+[gd_resource type="CylinderMesh" format=3 uid="uid://bheifa6x12qfk"]
+
+[ext_resource type="Material" uid="uid://frcbtmki3lnn" path="res://assets/climbing/materials/MetalScrew.tres" id="1_nwoxs"]
+
+[resource]
+lightmap_size_hint = Vector2i(5, 8)
+material = ExtResource("1_nwoxs")
+add_uv2 = true
+top_radius = 0.05
+bottom_radius = 0.05
+height = 0.8
+radial_segments = 8
+rings = 0

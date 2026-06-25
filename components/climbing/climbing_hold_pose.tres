@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="XRT2FingerPoses" format=3 uid="uid://bglrxdt5fkwdu"]
+
+[ext_resource type="Script" uid="uid://xrt22k41jo6" path="res://addons/godot-xr-tools2/hands/poses/xrt2_finger_poses.gd" id="1_w2stl"]
+
+[resource]
+script = ExtResource("1_w2stl")
+thumb_enabled = true
+thumb_spread = 0.05235987755982989
+thumb_metacarpal_curl = -0.017453292519943295
+thumb_proximal_curl = 0.2792526803190927
+thumb_distal_curl = 0.5235987755982988
+index_enabled = true
+index_proximal_curl = 0.7155849933176751
+index_intermediate_curl = 0.5410520681182421
+index_distal_curl = 0.2792526803190927
+middle_enabled = true
+middle_proximal_curl = 0.5410520681182421
+middle_intermediate_curl = 0.8203047484373349
+middle_distal_curl = 0.19198621771937624
+ring_enabled = true
+ring_distal_curl = 0.2617993877991494
+little_enabled = true
+little_spread = 0.10471975511965978
+little_proximal_curl = 0.33161255787892263
+little_intermediate_curl = 0.8377580409572782
+little_distal_curl = 0.0
+metadata/_custom_type_script = "uid://xrt22k41jo6"

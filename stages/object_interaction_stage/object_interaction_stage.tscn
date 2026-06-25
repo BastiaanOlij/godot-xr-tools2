@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://rhmlk81yswd0"]
+
+[ext_resource type="Script" uid="uid://br8v62pprqf32" path="res://stages/object_interaction_stage/object_interaction_stage.gd" id="1_tggud"]
+[ext_resource type="PackedScene" uid="uid://y538oanold7q" path="res://components/holodeck/holodeck.tscn" id="2_sdydm"]
+[ext_resource type="PackedScene" uid="uid://xrt2qimm3dy" path="res://addons/godot-xr-tools2/prefabs/xrt2_character_body_3d.tscn" id="3_qyem3"]
+[ext_resource type="Script" uid="uid://xrt23qrb4js" path="res://addons/godot-xr-tools2/player/interaction_functions/xrt2_pickup.gd" id="4_caniu"]
+[ext_resource type="Script" uid="uid://xrt2ebknph2" path="res://addons/godot-xr-tools2/player/movement_providers/xrt2_direct_movement.gd" id="5_5hmy8"]
+
+[node name="ObjectInteractionStage" type="Node3D" unique_id=22072178]
+script = ExtResource("1_tggud")
+
+[node name="Holodeck" parent="." unique_id=1211455787 instance=ExtResource("2_sdydm")]
+
+[node name="XRT2CharacterBody3D" parent="." unique_id=795871005 instance=ExtResource("3_qyem3")]
+
+[node name="XRT2Pickup" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" parent_id_path=PackedInt32Array(795871005, 360497191) index="2" unique_id=432379324]
+transform = Transform3D(0.99500257, -0.0035018958, 0.09978712, -0.003500683, 0.99754673, 0.069914035, -0.09978719, -0.069914, 0.99254906, -0.02500046, 0.003554154, 0.040035933)
+script = ExtResource("4_caniu")
+metadata/_custom_type_script = "uid://xrt23qrb4js"
+
+[node name="TurnMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" parent_id_path=PackedInt32Array(795871005, 360497191) index="3" unique_id=846136560]
+script = ExtResource("5_5hmy8")
+movement_action = "move"
+metadata/_custom_type_script = "uid://xrt2ebknph2"
+
+[node name="XRT2Pickup" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/RightCollisionHand" parent_id_path=PackedInt32Array(795871005, 709012286) index="2" unique_id=2103181334]
+transform = Transform3D(0.99500257, 0.0035019002, -0.09978717, 0.003500686, 0.99754673, 0.06991408, 0.099787235, -0.06991404, 0.99254906, 0.02500046, 0.003554154, 0.040035933)
+script = ExtResource("4_caniu")
+metadata/_custom_type_script = "uid://xrt23qrb4js"
+
+[node name="StrafeMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/RightCollisionHand" parent_id_path=PackedInt32Array(795871005, 709012286) index="3" unique_id=307544332]
+script = ExtResource("5_5hmy8")
+movement_action = "move"
+rotation_speed = 0.0
+strafe_movement_speed = 3.0
+metadata/_custom_type_script = "uid://xrt2ebknph2"
+
+[editable path="XRT2CharacterBody3D"]

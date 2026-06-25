@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://bb4mu11s0usak"]
+
+[ext_resource type="Script" uid="uid://c7480w4mknucu" path="res://stages/movement_stage/movement_stage.gd" id="1_bqu4o"]
+[ext_resource type="PackedScene" uid="uid://y538oanold7q" path="res://components/holodeck/holodeck.tscn" id="2_qi32o"]
+[ext_resource type="PackedScene" uid="uid://xrt2qimm3dy" path="res://addons/godot-xr-tools2/prefabs/xrt2_character_body_3d.tscn" id="3_8f54l"]
+[ext_resource type="Script" uid="uid://xrt2ebknph2" path="res://addons/godot-xr-tools2/player/movement_providers/xrt2_direct_movement.gd" id="4_30jb3"]
+
+[node name="MovementStage" type="Node3D" unique_id=1441224450]
+script = ExtResource("1_bqu4o")
+
+[node name="Holodeck" parent="." unique_id=1211455787 instance=ExtResource("2_qi32o")]
+
+[node name="XRT2CharacterBody3D" parent="." unique_id=795871005 instance=ExtResource("3_8f54l")]
+
+[node name="TurnMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" parent_id_path=PackedInt32Array(795871005, 360497191) index="2" unique_id=1945289616]
+script = ExtResource("4_30jb3")
+movement_action = "move"
+forward_movement_speed = 0.0
+metadata/_custom_type_script = "uid://xrt2ebknph2"
+
+[node name="StrafeMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/RightCollisionHand" parent_id_path=PackedInt32Array(795871005, 709012286) index="2" unique_id=1533277168]
+script = ExtResource("4_30jb3")
+movement_action = "move"
+rotation_speed = 0.0
+strafe_movement_speed = 3.0
+metadata/_custom_type_script = "uid://xrt2ebknph2"
+
+[editable path="XRT2CharacterBody3D"]

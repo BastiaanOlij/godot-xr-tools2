@@ -1,0 +1,113 @@
+[gd_scene format=3 uid="uid://dgv3v7t4w20wm"]
+
+[ext_resource type="Script" uid="uid://cd7r11gjf23cg" path="res://stages/menu_stage/menu_stage.gd" id="1_qi4g2"]
+[ext_resource type="PackedScene" uid="uid://y538oanold7q" path="res://components/holodeck/holodeck.tscn" id="2_cn4ww"]
+[ext_resource type="PackedScene" uid="uid://xrt2qimm3dy" path="res://addons/godot-xr-tools2/prefabs/xrt2_character_body_3d.tscn" id="3_n0kdf"]
+[ext_resource type="Script" uid="uid://xrt2ebknph2" path="res://addons/godot-xr-tools2/player/movement_providers/xrt2_direct_movement.gd" id="4_n0kdf"]
+[ext_resource type="Script" uid="uid://d2o2ae3p6axnw" path="res://stages/menu_stage/portals.gd" id="5_p85co"]
+[ext_resource type="PackedScene" uid="uid://cqxqi2xmp28v7" path="res://components/portal/portal.tscn" id="5_uhuxn"]
+[ext_resource type="Texture2D" uid="uid://d26h3jf4340md" path="res://stages/test_stage/portal_image.png" id="6_tk7xk"]
+[ext_resource type="Texture2D" uid="uid://du5mfrlweakm0" path="res://stages/climbing_stage/portal_image.png" id="7_1iemo"]
+[ext_resource type="Texture2D" uid="uid://2i6mtapi1l0e" path="res://stages/ui_stage/portal_image.png" id="8_d3lul"]
+[ext_resource type="Script" uid="uid://xrt2pss26pe" path="res://addons/godot-xr-tools2/components/ui/xrt2_ui_2d_in_3d.gd" id="9_4ckmo"]
+[ext_resource type="Shader" uid="uid://xrt2oqik7ik" path="res://addons/godot-xr-tools2/shaders/shaded_no_alpha.gdshader" id="10_kqpdg"]
+[ext_resource type="Script" uid="uid://xrt26qvygkp" path="res://addons/godot-xr-tools2/components/xrt2_frame_limited_sub_viewport.gd" id="11_d3lul"]
+[ext_resource type="PackedScene" uid="uid://dmqhkhfrddk6p" path="res://stages/menu_stage/overhead_ui.tscn" id="12_kqpdg"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fkeei"]
+render_priority = 0
+shader = ExtResource("10_kqpdg")
+shader_parameter/albedo = Color(0.8346143, 0.8346143, 0.8346143, 1)
+shader_parameter/metallic = 0.40000000596048
+shader_parameter/roughness = 0.80000001192096
+shader_parameter/specular = 0.30000000447036
+
+[sub_resource type="BoxMesh" id="BoxMesh_615ca"]
+material = SubResource("ShaderMaterial_fkeei")
+size = Vector3(2.02, 1.02, 0.05)
+
+[node name="MenuStage" type="Node3D" unique_id=1667637670]
+script = ExtResource("1_qi4g2")
+
+[node name="Holodeck" parent="." unique_id=1211455787 instance=ExtResource("2_cn4ww")]
+
+[node name="XRT2CharacterBody3D" parent="." unique_id=795871005 instance=ExtResource("3_n0kdf")]
+
+[node name="TurnMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/LeftCollisionHand" parent_id_path=PackedInt32Array(795871005, 360497191) index="0" unique_id=1896713981]
+script = ExtResource("4_n0kdf")
+movement_action = "move"
+forward_movement_speed = 0.0
+movement_acceleration = 0.0
+
+[node name="StrafeMovement" type="Node3D" parent="XRT2CharacterBody3D/XROrigin3D/RightCollisionHand" parent_id_path=PackedInt32Array(795871005, 709012286) index="0" unique_id=1832545822]
+script = ExtResource("4_n0kdf")
+movement_action = "move"
+rotation_speed = 0.0
+strafe_movement_speed = 2.5
+
+[node name="Portals" type="Node3D" parent="." unique_id=1829036677]
+script = ExtResource("5_p85co")
+distance = 15.0
+
+[node name="Portal01" parent="Portals" unique_id=1194426731 instance=ExtResource("5_uhuxn")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 15)
+title = "Movement"
+portal_scene = "uid://bb4mu11s0usak"
+
+[node name="Portal02" parent="Portals" unique_id=1942051815 instance=ExtResource("5_uhuxn")]
+transform = Transform3D(-0.6234898, 0, -0.7818315, 0, 1, 0, 0.7818315, 0, -0.6234898, 11.727472, 0, 9.352347)
+title = "Teleport"
+portal_scene = "uid://bfaq7tjpoyw5y"
+
+[node name="Portal03" parent="Portals" unique_id=2011851441 instance=ExtResource("5_uhuxn")]
+transform = Transform3D(0.22252096, 0, -0.9749279, 0, 1, 0, 0.9749279, 0, 0.22252096, 14.623919, 0, -3.3378143)
+portal_image = ExtResource("7_1iemo")
+title = "Climbing"
+portal_scene = "uid://b5seoofkx2xpn"
+
+[node name="Portal04" parent="Portals" unique_id=886344703 instance=ExtResource("5_uhuxn")]
+transform = Transform3D(0.90096885, 0, -0.4338838, 0, 0.99999994, 0, 0.43388382, 0, 0.9009688, 6.5082574, 0, -13.514533)
+title = "Environment Grab"
+portal_scene = "uid://cu5hgmaubvnnn"
+
+[node name="Portal05" parent="Portals" unique_id=456000707 instance=ExtResource("5_uhuxn")]
+transform = Transform3D(0.9009689, 0, 0.43388373, 0, 1, 0, -0.4338838, 0, 0.9009688, -6.5082564, 0, -13.514533)
+title = "Object interaction"
+portal_scene = "uid://rhmlk81yswd0"
+
+[node name="Portal06" parent="Portals" unique_id=165752606 instance=ExtResource("5_uhuxn")]
+transform = Transform3D(0.222521, 0, 0.9749279, 0, 1, 0, -0.9749279, 0, 0.222521, -14.623919, 0, -3.337815)
+portal_image = ExtResource("8_d3lul")
+title = "UI/UX"
+portal_scene = "uid://d33isoydvxjq1"
+
+[node name="Portal99" parent="Portals" unique_id=856518971 instance=ExtResource("5_uhuxn")]
+transform = Transform3D(-0.6234897, 0, 0.7818316, 0, 1.0000001, 0, -0.7818316, 0, -0.6234897, -11.727474, 0, 9.352345)
+portal_image = ExtResource("6_tk7xk")
+title = "Test scene"
+portal_scene = "uid://7lt82mv6lmxo"
+
+[node name="OverheadDisplay" type="Node3D" parent="." unique_id=971844624 node_paths=PackedStringArray("display_viewport")]
+transform = Transform3D(1, 0, 0, 0, 0.9657585, -0.25944275, 0, 0.25944275, 0.9657585, 0, 2.3997679, -2.243996)
+script = ExtResource("9_4ckmo")
+display_viewport = NodePath("XRT2FrameLimitedSubViewport")
+metadata/_custom_type_script = "uid://xrt2pss26pe"
+
+[node name="Frame" type="MeshInstance3D" parent="OverheadDisplay" unique_id=1910375930]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.026)
+mesh = SubResource("BoxMesh_615ca")
+
+[node name="XRT2FrameLimitedSubViewport" type="SubViewport" parent="OverheadDisplay" unique_id=236092067]
+size = Vector2i(1024, 512)
+render_target_update_mode = 1
+script = ExtResource("11_d3lul")
+target_fps = 0
+metadata/_custom_type_script = "uid://xrt26qvygkp"
+
+[node name="OverheadUI" parent="OverheadDisplay/XRT2FrameLimitedSubViewport" unique_id=1522792980 instance=ExtResource("12_kqpdg")]
+
+[connection signal="child_entered_tree" from="Portals" to="Portals" method="_on_child_entered_tree"]
+[connection signal="child_exiting_tree" from="Portals" to="Portals" method="_on_child_exiting_tree"]
+[connection signal="child_order_changed" from="Portals" to="Portals" method="_on_child_order_changed"]
+
+[editable path="XRT2CharacterBody3D"]

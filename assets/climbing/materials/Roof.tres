@@ -1,0 +1,15 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dxtujxih0iwcw"]
+
+[ext_resource type="Texture2D" uid="uid://bhl3qidprggps" path="res://assets/climbing/climbing_building_roof_color.png" id="1_b4n60"]
+[ext_resource type="Texture2D" uid="uid://btf7mfxee5ns5" path="res://assets/climbing/climbing_building_roof_emission.png" id="2_rhsyv"]
+
+[resource]
+resource_name = "Roof"
+cull_mode = 2
+albedo_texture = ExtResource("1_b4n60")
+roughness = 0.5
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_energy_multiplier = 3.0
+emission_operator = 1
+emission_texture = ExtResource("2_rhsyv")

@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://dmqhkhfrddk6p"]
+
+[node name="OverheadUI" type="Node2D" unique_id=1522792980]
+
+[node name="Background" type="ColorRect" parent="." unique_id=1733308541]
+offset_right = 1024.0
+offset_bottom = 512.0
+color = Color(0.051970966, 0.05197096, 0.05197095, 1)
+
+[node name="RichTextLabel" type="RichTextLabel" parent="." unique_id=1572902202]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 1014.0
+offset_bottom = 502.0
+theme_override_font_sizes/normal_font_size = 32
+bbcode_enabled = true
+text = "Welcome to XR Tools v2
+
+This is just [u]a placeholder text[/u], we'll make a nicer introduction text later...
+
+Move and turn using joystick input on your XR controllers, enter any of the portals for various demos."

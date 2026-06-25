@@ -1,0 +1,12 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://ko7f8v8278tr"]
+
+[ext_resource type="Texture2D" uid="uid://dh3x3iglct7la" path="res://assets/climbing/climbing_building_walls_color.jpg" id="1_lswd1"]
+[ext_resource type="Texture2D" uid="uid://3o5gejhsh4um" path="res://assets/climbing/climbing_building_walls_normal.jpg" id="2_chshf"]
+
+[resource]
+resource_name = "Walls"
+cull_mode = 2
+albedo_texture = ExtResource("1_lswd1")
+roughness = 0.5
+normal_enabled = true
+normal_texture = ExtResource("2_chshf")

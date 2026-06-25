@@ -1,0 +1,137 @@
+[gd_scene format=3 uid="uid://bqenuisgqnt00"]
+
+[ext_resource type="Script" uid="uid://tukq7jhfwfd" path="res://stages/ui_stage/game_2d.gd" id="1_ydscs"]
+[ext_resource type="Texture2D" uid="uid://xrt20000001" path="res://addons/godot-xr-tools2/icon.png" id="2_ymbyi"]
+
+[node name="Game2D" type="Control" unique_id=2044165349]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 800.0
+offset_bottom = 600.0
+script = ExtResource("1_ydscs")
+
+[node name="MainMenu" type="Node2D" parent="." unique_id=1042023155]
+
+[node name="BackGround" type="ColorRect" parent="MainMenu" unique_id=1626782271]
+offset_right = 800.0
+offset_bottom = 600.0
+color = Color(0, 0, 0, 1)
+
+[node name="Godot" type="Label" parent="MainMenu" unique_id=1203737024]
+offset_left = 26.0
+offset_top = 21.0
+offset_right = 285.0
+offset_bottom = 120.0
+theme_override_colors/font_color = Color(0.36218756, 0.5897524, 0.7728974, 1)
+theme_override_font_sizes/font_size = 72
+text = "GODOT"
+
+[node name="Hunt" type="Label" parent="MainMenu" unique_id=1274539841]
+offset_left = 186.0
+offset_top = 114.0
+offset_right = 445.0
+offset_bottom = 213.0
+theme_override_colors/font_color = Color(0.36078432, 0.5882353, 0.77254903, 1)
+theme_override_font_sizes/font_size = 72
+text = "HUNT"
+
+[node name="Line2D" type="Line2D" parent="MainMenu" unique_id=1939684641]
+position = Vector2(38, 122)
+points = PackedVector2Array(0, 0, 350, 0)
+width = 2.0
+default_color = Color(0.57365125, 0.28412175, 0.92003417, 1)
+
+[node name="TextureRect" type="TextureRect" parent="MainMenu" unique_id=893536268]
+offset_left = 528.0
+offset_top = 11.0
+offset_right = 784.0
+offset_bottom = 267.0
+texture = ExtResource("2_ymbyi")
+
+[node name="StartGame" type="Button" parent="MainMenu" unique_id=933200600]
+offset_left = 200.0
+offset_top = 355.0
+offset_right = 600.0
+offset_bottom = 451.0
+theme_override_font_sizes/font_size = 64
+text = "Press to start"
+flat = true
+
+[node name="Game" type="Node2D" parent="." unique_id=321535911]
+visible = false
+
+[node name="BackGround" type="ColorRect" parent="Game" unique_id=1724449255]
+offset_right = 800.0
+offset_bottom = 600.0
+color = Color(0.17936546, 0.44148713, 0.70674264, 1)
+
+[node name="Target" type="Button" parent="Game" unique_id=930077840]
+custom_minimum_size = Vector2(50, 50)
+offset_left = 50.0
+offset_top = 50.0
+offset_right = 100.0
+offset_bottom = 100.0
+icon = ExtResource("2_ymbyi")
+flat = true
+expand_icon = true
+
+[node name="Grass" type="ColorRect" parent="Game" unique_id=1831751040]
+offset_top = 400.0
+offset_right = 800.0
+offset_bottom = 500.0
+mouse_filter = 2
+color = Color(0.36093688, 0.76325333, 0.38602477, 1)
+
+[node name="Ground" type="ColorRect" parent="Game" unique_id=1172515003]
+offset_top = 500.0
+offset_right = 800.0
+offset_bottom = 600.0
+mouse_filter = 2
+color = Color(0.842694, 0.6099117, 0.21679324, 1)
+
+[node name="Score" type="Label" parent="Game" unique_id=1918824665]
+offset_left = 15.0
+offset_top = 532.0
+offset_right = 227.0
+offset_bottom = 577.0
+theme_override_font_sizes/font_size = 32
+text = "Score: 000000"
+
+[node name="EndScreen" type="Node2D" parent="." unique_id=858761257]
+visible = false
+
+[node name="BackGround" type="ColorRect" parent="EndScreen" unique_id=1775894544]
+offset_right = 800.0
+offset_bottom = 600.0
+color = Color(0, 0, 0, 1)
+
+[node name="GameOver" type="Label" parent="EndScreen" unique_id=1173244644]
+offset_top = 100.0
+offset_right = 800.0
+offset_bottom = 206.0
+theme_override_colors/font_color = Color(0.36218756, 0.5897524, 0.7728974, 1)
+theme_override_font_sizes/font_size = 72
+text = "GAME OVER"
+horizontal_alignment = 1
+
+[node name="TextEdit" type="TextEdit" parent="EndScreen" unique_id=460988509]
+custom_minimum_size = Vector2(400, 120)
+offset_left = 150.0
+offset_top = 250.0
+offset_right = 550.0
+offset_bottom = 370.0
+theme_override_font_sizes/font_size = 64
+placeholder_text = "Name"
+
+[node name="Record" type="Button" parent="EndScreen" unique_id=1581656432]
+custom_minimum_size = Vector2(120, 120)
+offset_left = 550.0
+offset_top = 250.0
+offset_right = 670.0
+offset_bottom = 370.0
+text = "GO"
+
+[connection signal="pressed" from="MainMenu/StartGame" to="." method="_on_start_game_pressed"]
+[connection signal="gui_input" from="Game/BackGround" to="." method="_on_bg_gui_input"]
+[connection signal="pressed" from="Game/Target" to="." method="_on_target_pressed"]
+[connection signal="pressed" from="EndScreen/Record" to="." method="_on_record_pressed"]
