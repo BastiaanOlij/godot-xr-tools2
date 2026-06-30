@@ -39,7 +39,7 @@ func _has_gizmo(node):
 
 
 func _can_be_hidden():
-	true
+	return true
 
 
 func _init():
